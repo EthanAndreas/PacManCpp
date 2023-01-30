@@ -36,9 +36,12 @@ debug:
 	make CFLAGS="-Wall -Wextra -Werror -std=c++17 -DDEBUG"
 
 doc:
+	@cp -r ./assets ./html
 	@doxygen > /dev/null 2>&1
 	@echo "Documentaion générée !"
-	@xdg-open html/index.html
+	@wslview html/index.html 	# Windows Subsystem for Linux
+	# @open html/index.html 		# MacOS
+	# @xdg-open html/index.html 	# Linux
 
 all:
 	make

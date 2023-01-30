@@ -1,6 +1,7 @@
 /obj
 pacman
 /html
+/logs
 /.vscode
 test.log
 *.zip
