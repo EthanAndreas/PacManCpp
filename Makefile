@@ -31,3 +31,15 @@ clean:
 	rm -f $(OBJDIR)/*.gcno
 	rm -f $(BINDIR)/$(TARGET)
 	rm -r html
+
+debug: 
+	make CFLAGS="-Wall -Wextra -Werror -std=c++17 -DDEBUG"
+
+doc:
+	@doxygen > /dev/null 2>&1
+	@echo "Documentaion générée !"
+	@xdg-open html/index.html
+
+all:
+	make
+	make doc
