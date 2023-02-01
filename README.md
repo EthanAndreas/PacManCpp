@@ -24,13 +24,13 @@ make
 
 ## Usage
 ### Controls
-| Key                 | Action     |
-| ------------------- | ---------- |
-| `UpArrow` or  `Z`   | Move up    |
-| `DownArrow` or `S`  | Move down  |
-| `LeftArrow` or `Q`  | Move left  |
-| `RightArrow` or `D` | Move right |
-| `Space`             | Pause      |
-| `Escape`            | Quit       |
+| Key          | Action     |
+| ------------ | ---------- |
+| `UpArrow`    | Move up    |
+| `DownArrow`  | Move down  |
+| `LeftArrow`  | Move left  |
+| `RightArrow` | Move right |
+| `Space`      | Pause      |
+| `Escape`     | Quit       |
 
 
