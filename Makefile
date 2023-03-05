@@ -39,9 +39,9 @@ doc:
 	@cp -r ./assets ./html
 	@doxygen > /dev/null 2>&1
 	@echo "Documentaion générée !"
-	@wslview html/index.html 	# Windows Subsystem for Linux
+	# @wslview html/index.html 		# Windows Subsystem for Linux
 	# @open html/index.html 		# MacOS
-	# @xdg-open html/index.html 	# Linux
+	@xdg-open html/index.html 		# Linux
 
 all:
 	make
