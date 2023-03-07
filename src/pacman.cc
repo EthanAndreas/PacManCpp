@@ -69,8 +69,11 @@ SDL_Rect letter_blank = {108, 69, 8, 8};
 SDL_Rect number[] = {letter_0, letter_1, letter_2, letter_3, letter_4,
                      letter_5, letter_6, letter_7, letter_8, letter_9};
 
+SDL_Rect letter[256];
+SDL_Rect letter['a'] = letter_a;
+SDL_Rect letter['b'] = letter_b;
+
 int count;
-int fps_counter;
 
 void init() {
     pWindow =
@@ -84,32 +87,33 @@ void init() {
 
 // fonction qui met à jour la surface de la fenetre "win_surf"
 void draw() {
-    Uint64 fps_start = SDL_GetPerformanceCounter();
     SDL_SetColorKey(plancheSprites, false, 0);
     SDL_BlitScaled(plancheSprites, &src_bg, win_surf, &bg);
 
-    // Print high score msg
     // TODO: create a function to print text using a dictionary
-    SDL_Rect high_score = {4, 874, 16, 16};
-    SDL_BlitScaled(plancheSprites, &letter_h, win_surf, &high_score);
-    high_score.x += 16;
-    SDL_BlitScaled(plancheSprites, &letter_i, win_surf, &high_score);
-    high_score.x += 16;
-    SDL_BlitScaled(plancheSprites, &letter_g, win_surf, &high_score);
-    high_score.x += 16;
-    SDL_BlitScaled(plancheSprites, &letter_h, win_surf, &high_score);
-    high_score.x += 16;
-    SDL_BlitScaled(plancheSprites, &letter_blank, win_surf, &high_score);
-    high_score.x += 16;
-    SDL_BlitScaled(plancheSprites, &letter_s, win_surf, &high_score);
-    high_score.x += 16;
-    SDL_BlitScaled(plancheSprites, &letter_c, win_surf, &high_score);
-    high_score.x += 16;
-    SDL_BlitScaled(plancheSprites, &letter_o, win_surf, &high_score);
-    high_score.x += 16;
-    SDL_BlitScaled(plancheSprites, &letter_r, win_surf, &high_score);
-    high_score.x += 16;
-    SDL_BlitScaled(plancheSprites, &letter_e, win_surf, &high_score);
+    // Erase score area
+    SDL_Rect score_area = {4, 874, 16 * 36, 16};
+    SDL_FillRect(win_surf, &score_area, 0);
+    // Print score
+    SDL_Rect score = {4, 874, 16, 16};
+    SDL_BlitScaled(plancheSprites, &letter_s, win_surf, &score);
+    score.x += 16;
+    SDL_BlitScaled(plancheSprites, &letter_c, win_surf, &score);
+    score.x += 16;
+    SDL_BlitScaled(plancheSprites, &letter_o, win_surf, &score);
+    score.x += 16;
+    SDL_BlitScaled(plancheSprites, &letter_r, win_surf, &score);
+    score.x += 16;
+    SDL_BlitScaled(plancheSprites, &letter_e, win_surf, &score);
+    score.x += 16;
+    SDL_BlitScaled(plancheSprites, &letter_blank, win_surf, &score);
+    score.x += 16;
+    SDL_BlitScaled(plancheSprites, &number[1], win_surf, &score);
+    score.x += 16;
+    SDL_BlitScaled(plancheSprites, &number[2], win_surf, &score);
+    score.x += 16;
+    SDL_BlitScaled(plancheSprites, &number[3], win_surf, &score);
+    score.x += 16;
 
     // petit truc pour faire tourner le fantome
     SDL_Rect *ghost_in = nullptr;
@@ -184,35 +188,6 @@ void draw() {
     SDL_BlitScaled(plancheSprites, &ghost_in2, win_surf, &ghost);
     // copie du sprite normal
     SDL_BlitScaled(plancheSprites, &pac_in, win_surf, &pac);
-
-    Uint64 fps_end = SDL_GetPerformanceCounter();
-    Uint64 fps_freq = SDL_GetPerformanceFrequency();
-    // Dont print fps at every frame because it's to fast
-    if (count % 10 == 0) {
-        fps_counter = (double)fps_freq / (double)(fps_end - fps_start);
-        std::cout << "FPS : " << fps_counter << std::endl;
-        // Clear the fps area
-        SDL_Rect fps_clear = {550, 874, 16 * 15, 16};
-        SDL_FillRect(win_surf, &fps_clear, 0);
-        // Print fps
-        SDL_Rect fps = {550, 874, 16, 16};
-        SDL_BlitScaled(plancheSprites, &letter_f, win_surf, &fps);
-        fps.x += 16;
-        SDL_BlitScaled(plancheSprites, &letter_p, win_surf, &fps);
-        fps.x += 16;
-        SDL_BlitScaled(plancheSprites, &letter_s, win_surf, &fps);
-        fps.x += 16;
-        SDL_BlitScaled(plancheSprites, &letter_blank, win_surf, &fps);
-        fps.x += 16;
-        SDL_BlitScaled(plancheSprites, &number[int(fps_counter / 100)],
-                       win_surf, &fps);
-        fps.x += 16;
-        SDL_BlitScaled(plancheSprites, &number[int(fps_counter / 10) % 10],
-                       win_surf, &fps);
-        fps.x += 16;
-        SDL_BlitScaled(plancheSprites, &number[int(fps_counter) % 10], win_surf,
-                       &fps);
-    }
 }
 
 int main() {
@@ -226,6 +201,8 @@ int main() {
     // BOUCLE PRINCIPALE
     bool quit = false;
     while (!quit) {
+        Uint64 fps_start = SDL_GetTicks64();
+
         SDL_Event event;
         while (!quit && SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -258,8 +235,13 @@ int main() {
         // AFFICHAGE
         draw();
         SDL_UpdateWindowSurface(pWindow);
+
+        Uint64 fps_end = SDL_GetTicks64();
+        float elapsed = (fps_end - fps_start) /
+                        (float)SDL_GetPerformanceFrequency() * 1000.0f;
+
         // LIMITE A 60 FPS
-        SDL_Delay(16); // utiliser SDL_GetTicks64() pour plus de precisions
+        SDL_Delay(floor(16.666f - elapsed));
     }
     SDL_Quit(); // ON SORT
     return 0;
