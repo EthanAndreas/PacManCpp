@@ -10,16 +10,16 @@ SRCDIR   = src
 OBJDIR   = obj
 BINDIR   = bin
 
-SOURCES  := $(wildcard $(SRCDIR)/*.cc)
+SOURCES  := $(wildcard $(SRCDIR)/*.cpp)
 INCLUDES := $(wildcard $(INCLUDE_PATH)/*.h)
-OBJECTS  := $(SOURCES:$(SRCDIR)/%.cc=$(OBJDIR)/%.o)
+OBJECTS  := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 
 $(BINDIR)/$(TARGET): $(OBJECTS)
 	mkdir -p $(BINDIR)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDLIBS)
 	@echo "Programme compilé !"
 
-$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cc $(INCLUDES)
+$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp $(INCLUDES)
 	mkdir -p $(OBJDIR)
 	$(CC) -o $@ -c $< $(CFLAGS) -isystem$(INCLUDE_PATH)
 

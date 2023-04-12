@@ -69,9 +69,9 @@ SDL_Rect letter_blank = {108, 69, 8, 8};
 SDL_Rect number[] = {letter_0, letter_1, letter_2, letter_3, letter_4,
                      letter_5, letter_6, letter_7, letter_8, letter_9};
 
-SDL_Rect letter[256];
-SDL_Rect letter['a'] = letter_a;
-SDL_Rect letter['b'] = letter_b;
+// SDL_Rect letter[256];
+// SDL_Rect letter['a'] = letter_a;
+// SDL_Rect letter['b'] = letter_b;
 
 int count;
 
@@ -201,7 +201,7 @@ int main() {
     // BOUCLE PRINCIPALE
     bool quit = false;
     while (!quit) {
-        Uint64 fps_start = SDL_GetTicks64();
+        Uint64 fps_start = SDL_GetTicks();
 
         SDL_Event event;
         while (!quit && SDL_PollEvent(&event)) {
@@ -236,7 +236,7 @@ int main() {
         draw();
         SDL_UpdateWindowSurface(pWindow);
 
-        Uint64 fps_end = SDL_GetTicks64();
+        Uint64 fps_end = SDL_GetTicks();
         float elapsed = (fps_end - fps_start) /
                         (float)SDL_GetPerformanceFrequency() * 1000.0f;
 
