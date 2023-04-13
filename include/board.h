@@ -32,6 +32,7 @@ class board {
   public:
     board();
     ~board();
+    std::vector<std::vector<square>> getBoard();
     void load();
     void display();
 

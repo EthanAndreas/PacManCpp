@@ -13,7 +13,15 @@ void square::setItem(item *item) { _item = item; }
 item *square::getItem() { return _item; }
 
 board::board() { _board = std::vector<std::vector<square>>(); }
-board::~board() {}
+board::~board() {
+    for (auto &line : _board) {
+        for (auto &square : line) {
+            square.~square();
+        }
+    }
+}
+
+std::vector<std::vector<square>> board::getBoard() { return _board; }
 
 /**
  * @brief Set the state of each square with the map defined

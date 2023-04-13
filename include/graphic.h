@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL2/SDL.h>
+#include <utility>
 
 enum dir { LEFT, RIGHT, UP, DOWN, NONE };
 
@@ -25,4 +26,5 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
  * @param windowSurf
  * @param spriteBoard
  */
-void draw(dir *last_dir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard);
+std::pair<int, int> draw(dir *lastDir, SDL_Surface **windowSurf,
+                         SDL_Surface **spriteBoard);

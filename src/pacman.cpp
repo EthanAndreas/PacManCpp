@@ -1,75 +1,79 @@
-#include "board.h"
-#include "graphic.h"
-#include <iostream>
+#include "pacman.h"
 
-int main() {
+pacman::pacman() {
+    _xBoard = 15;
+    _yBoard = 10;
+    _xPixel = 484;
+    _yPixel = 326;
+}
+pacman::~pacman() {}
 
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+dir *pacman::getLastDir() { return &_lastDir; }
 
-        std::cerr << "Echec de l'initialisation de la SDL " << SDL_GetError()
-                  << std::endl;
-        exit(EXIT_FAILURE);
+void pacman::updatePos(int column, int line) {
+    _xPixel = line;
+    _yPixel = column;
+}
+
+void pacman::updateDir(board Board, dir currentDir) {
+
+    // while pacman does not reach the virtual square, the position
+    // is not updated
+    // each square is 32x32 pixels
+    if ((_xPixel / 32) != _xBoard && (_yPixel / 32) != _yBoard) {
+
+        return;
     }
 
-    SDL_Window *Window = nullptr;
-    SDL_Surface *windowSurf = nullptr;
-    SDL_Surface *spriteBoard = nullptr;
-    dir last_dir = NONE;
-    // dir old_dir = NONE;
-    init(&Window, &windowSurf, &spriteBoard);
+    std::vector<std::vector<square>> vBoard = Board.getBoard();
 
-    board Board;
-    Board.load();
+    switch (currentDir) {
 
-    bool quit = false;
-    int nbk;
-    const Uint8 *keys;
-    while (!quit) {
-
-        Uint64 fps_start = SDL_GetTicks();
-
-        SDL_Event event;
-        while (!quit && SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT:
-                quit = true;
-                break;
-            default:
-                break;
-            }
+    case LEFT:
+        if (_xBoard <= 0)
+            return;
+        if (vBoard[_xBoard - 1][_yBoard].getState() == 0) {
+            _xBoard--;
+            _lastDir = LEFT;
+        } else {
+            _lastDir = NONE;
         }
+        break;
 
-        // keyboard management
-        // old_dir = last_dir;
-        keys = SDL_GetKeyboardState(&nbk);
-        if (keys[SDL_SCANCODE_ESCAPE])
-            quit = true;
-        if (keys[SDL_SCANCODE_LEFT]) {
-            last_dir = LEFT;
+    case RIGHT:
+        if (_xBoard >= 26)
+            return;
+        if (vBoard[_xBoard + 1][_yBoard].getState() == 0) {
+            _xBoard++;
+            _lastDir = RIGHT;
+        } else {
+            _lastDir = NONE;
         }
-        if (keys[SDL_SCANCODE_RIGHT]) {
-            last_dir = RIGHT;
-        }
-        if (keys[SDL_SCANCODE_UP]) {
-            last_dir = UP;
-        }
-        if (keys[SDL_SCANCODE_DOWN]) {
-            last_dir = DOWN;
-        }
+        break;
 
-        // display
-        draw(&last_dir, &windowSurf, &spriteBoard);
-        SDL_UpdateWindowSurface(Window);
+    case UP:
+        if (_yBoard >= 21)
+            return;
+        if (vBoard[_xBoard][_yBoard + 1].getState() == 0) {
+            _yBoard++;
+            _lastDir = UP;
+        } else {
+            _lastDir = NONE;
+        }
+        break;
 
-        Uint64 fps_end = SDL_GetTicks();
-        float elapsed = (fps_end - fps_start) /
-                        (float)SDL_GetPerformanceFrequency() * 1000.0f;
+    case DOWN:
+        if (_yBoard <= 0)
+            return;
+        if (vBoard[_xBoard][_yBoard - 1].getState() == 0) {
+            _yBoard--;
+            _lastDir = DOWN;
+        } else {
+            _lastDir = NONE;
+        }
+        break;
 
-        // 60 fps
-        SDL_Delay(floor(16.666f - elapsed));
+    case NONE:
+        break;
     }
-
-    SDL_Quit();
-
-    exit(EXIT_SUCCESS);
 }

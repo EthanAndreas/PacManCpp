@@ -75,7 +75,8 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
     count = 0;
 }
 
-void draw(dir *last_dir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard) {
+std::pair<int, int> draw(dir *lastDir, SDL_Surface **windowSurf,
+                         SDL_Surface **spriteBoard) {
 
     SDL_SetColorKey(*spriteBoard, false, 0);
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
@@ -136,7 +137,7 @@ void draw(dir *last_dir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard) {
     // pacman animation
     SDL_Rect pac_in = pac_blank;
     if ((count / 4) % 2) {
-        switch (*last_dir) {
+        switch (*lastDir) {
         case RIGHT:
             pac_in = pac_r;
             break;
@@ -156,7 +157,7 @@ void draw(dir *last_dir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard) {
     }
 
     // pacman movement
-    switch (*last_dir) {
+    switch (*lastDir) {
     case RIGHT:
         pac.x++;
         break;
@@ -176,4 +177,6 @@ void draw(dir *last_dir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard) {
     SDL_SetColorKey(*spriteBoard, true, 0);
     SDL_BlitScaled(*spriteBoard, &ghost_in2, *windowSurf, &ghost);
     SDL_BlitScaled(*spriteBoard, &pac_in, *windowSurf, &pac);
+
+    return std::make_pair(pac.x, pac.y);
 }
