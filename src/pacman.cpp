@@ -1,3 +1,4 @@
+#include "board.h"
 #include "graphic.h"
 #include <iostream>
 
@@ -14,10 +15,17 @@ int main() {
     SDL_Surface *windowSurf = nullptr;
     SDL_Surface *spriteBoard = nullptr;
     dir last_dir = NONE;
+    // dir old_dir = NONE;
     init(&Window, &windowSurf, &spriteBoard);
 
+    board Board;
+    Board.load();
+
     bool quit = false;
+    int nbk;
+    const Uint8 *keys;
     while (!quit) {
+
         Uint64 fps_start = SDL_GetTicks();
 
         SDL_Event event;
@@ -32,8 +40,8 @@ int main() {
         }
 
         // keyboard management
-        int nbk;
-        const Uint8 *keys = SDL_GetKeyboardState(&nbk);
+        // old_dir = last_dir;
+        keys = SDL_GetKeyboardState(&nbk);
         if (keys[SDL_SCANCODE_ESCAPE])
             quit = true;
         if (keys[SDL_SCANCODE_LEFT]) {
@@ -62,5 +70,6 @@ int main() {
     }
 
     SDL_Quit();
+
     exit(EXIT_SUCCESS);
 }

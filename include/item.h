@@ -3,7 +3,7 @@
 #include "carac.h"
 #include "edible.h"
 
-enum type { PACMAN, GHOST, FRUIT, SUPERFRUIT, DOT };
+enum type { _PACMAN, _GHOST, _FRUIT, _SUPERFRUIT, _DOT };
 
 /**
  * @brief Correspond to the item.
