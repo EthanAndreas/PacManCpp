@@ -40,78 +40,100 @@ void pacman::updateDir(board Board, dir currentDir) {
     if ((_xPixel % 32) != 6 || (_yPixel % 32) != 4)
         return;
 
-    std::vector<std::vector<square>> vBoard = Board.getBoard();
+    std::vector<std::vector<square>> vecBoard = Board.getBoard();
 
-    std::cout << "xBoard: " << _xBoard << " yBoard: " << _yBoard << std::endl;
-    std::cout << "xPixel: " << _xPixel << " yPixel: " << _yPixel << std::endl;
+    DEB(std::cout << "current dir : " << currentDir << std::endl);
 
-    // std::cout << vBoard[_yBoard - 1][_xBoard - 1].getState() << " "
-    //           << vBoard[_yBoard - 1][_xBoard].getState() << " "
-    //           << vBoard[_yBoard - 1][_xBoard + 1].getState() << std::endl;
-    // std::cout << vBoard[_yBoard][_xBoard - 1].getState() << " "
-    //           << vBoard[_yBoard][_xBoard].getState() << " "
-    //           << vBoard[_yBoard][_xBoard + 1].getState() << std::endl;
-    // std::cout << vBoard[_yBoard + 1][_xBoard - 1].getState() << " "
-    //           << vBoard[_yBoard + 1][_xBoard].getState() << " "
-    //           << vBoard[_yBoard + 1][_xBoard + 1].getState() << std::endl;
+    DEB(std::cout << "xBoard: " << _xBoard << " yBoard: " << _yBoard
+                  << std::endl);
+    DEB(std::cout << "xPixel: " << _xPixel << " yPixel: " << _yPixel
+                  << std::endl);
+
+    DEB(std::cout << "board state: " << std::endl;);
+    DEB(std::cout << vecBoard[_yBoard - 1][_xBoard - 1].getState() << " "
+                  << vecBoard[_yBoard - 1][_xBoard].getState() << " "
+                  << vecBoard[_yBoard - 1][_xBoard + 1].getState()
+                  << std::endl);
+    DEB(std::cout << vecBoard[_yBoard][_xBoard - 1].getState() << " "
+                  << vecBoard[_yBoard][_xBoard].getState() << " "
+                  << vecBoard[_yBoard][_xBoard + 1].getState() << std::endl)
+    DEB(std::cout << vecBoard[_yBoard + 1][_xBoard - 1].getState() << " "
+                  << vecBoard[_yBoard + 1][_xBoard].getState() << " "
+                  << vecBoard[_yBoard + 1][_xBoard + 1].getState()
+                  << std::endl);
 
     switch (currentDir) {
 
     case LEFT:
         if (_xBoard <= 0)
             _lastDir = NONE;
-        if (vBoard[_yBoard][_xBoard - 1].getState() == 0) {
+
+        if (vecBoard[_yBoard][_xBoard - 1].getState() == 0) {
             _xBoard--;
             _lastDir = LEFT;
-        } else if (vBoard[_yBoard][_xBoard - 1].getState() == 2) {
+
+        } else if (vecBoard[_yBoard][_xBoard - 1].getState() == 2) {
             _xBoard = 20;
             _xPixel = 646;
+
         } else {
             _lastDir = NONE;
         }
-        std::cout << "current dir LEFT && last dir : " << currentDir
-                  << std::endl;
+
+        DEB(std::cout << "current dir LEFT & last dir : " << currentDir
+                      << std::endl);
         break;
 
     case RIGHT:
         if (_xBoard >= 21)
             _lastDir = NONE;
-        if (vBoard[_yBoard][_xBoard + 1].getState() == 0) {
+
+        if (vecBoard[_yBoard][_xBoard + 1].getState() == 0) {
             _xBoard++;
             _lastDir = RIGHT;
-        } else if (vBoard[_yBoard][_xBoard + 1].getState() == 2) {
+
+        } else if (vecBoard[_yBoard][_xBoard + 1].getState() == 2) {
             _xBoard = 0;
             _xPixel = 6;
+
         } else {
             _lastDir = NONE;
         }
-        std::cout << "current dir RIGHT && last dir : " << currentDir
-                  << std::endl;
+
+        DEB(std::cout << "current dir RIGHT & last dir : " << currentDir
+                      << std::endl);
         break;
 
     case UP:
         if (_yBoard >= 26)
             _lastDir = NONE;
-        if (vBoard[_yBoard - 1][_xBoard].getState() == 0) {
+
+        if (vecBoard[_yBoard - 1][_xBoard].getState() == 0) {
             _yBoard--;
             _lastDir = UP;
+
         } else {
             _lastDir = NONE;
         }
-        std::cout << "current dir UP && last dir : " << currentDir << std::endl;
+
+        DEB(std::cout << "current dir UP & last dir : " << currentDir
+                      << std::endl);
         break;
 
     case DOWN:
         if (_yBoard <= 0)
             _lastDir = NONE;
-        if (vBoard[_yBoard + 1][_xBoard].getState() == 0) {
+
+        if (vecBoard[_yBoard + 1][_xBoard].getState() == 0) {
             _yBoard++;
             _lastDir = DOWN;
+
         } else {
             _lastDir = NONE;
         }
-        std::cout << "current dir DOWN && last dir : " << currentDir
-                  << std::endl;
+
+        DEB(std::cout << "current dir DOWN & last dir : " << currentDir
+                      << std::endl);
         break;
 
     case NONE:

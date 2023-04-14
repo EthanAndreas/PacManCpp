@@ -24,26 +24,40 @@ $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp $(INCLUDES)
 	$(CC) -o $@ -c $< $(CFLAGS) -isystem$(INCLUDE_PATH)
 
 
-.PHONY: all tests clean cov
+.PHONY: all tests clean cov 
 clean:
+	@echo "\033[93mCleaning...\033[0m"
 	rm -rf obj/*.o
 	rm -rf tests/obj/*.o
 	rm -f $(BINDIR)/$(TARGET)
 	rm -rf html
-	@echo "\033[92mCleaned\033[0m"
+	@echo "\033[92mCleaned\033[0m" 
 
 debug: 
-	make CFLAGS="-Wall -Wextra -Werror -std=c++17 -DDEBUG"
+	@make clean -s 1>/dev/null 
+	@echo "\033[93mCompilation...\033[0m"
+	@make CFLAGS="-Wall -Wextra -Werror -std=c++17 -DDEBUG" -s 2>/dev/null || (echo "\033[91mError on compilation, re-run with \"make\" to see the errors\033[0m" && exit 1)
+	@echo "\033[93mRun Application in debug mode...\033[0m"
+	./$(BINDIR)/$(TARGET)
+	@echo "\033[92mExit properly\033[0m"
 
 doc:
-	@echo "\033[95mBuilding documentation...\033[0m"
+	@echo "\033[93mBuilding documentation...\033[0m"
 	@cp -r ./assets ./html
 	@doxygen > /dev/null 2>&1
-	@echo "\033[92mDocumentation built!\033[0m"
+	@echo "\033[92mDocumentation built\033[0m"
 	@wslview html/index.html 		
 	# @wslview html/index.html 		# Windows Subsystem for Linux
 	# @open html/index.html 		# MacOS
 	# @xdg-open html/index.html 		# Linux
+
+run:
+	@make clean -s 1>/dev/null 
+	@echo "\033[93mCompilation...\033[0m"
+	@make -s 2>/dev/null || (echo "\033[91mError on compilation, re-run with \"make\" to see the errors\033[0m" && exit 1)
+	@echo "\033[93mRun Application...\033[0m"
+	./$(BINDIR)/$(TARGET)
+	@echo "\033[92mExit properly\033[0m"
 
 all:
 	make

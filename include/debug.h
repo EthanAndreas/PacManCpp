@@ -3,10 +3,7 @@
  * @brief Macro which allows to print debug messages in green in the terminal
  * @param x command executed if compiled with the debug option
  */
-#define DEB(x)          \
-    cout << "\e[0;32m"; \
-    x;                  \
-    cout << "\e[0m";
+#define DEB(x) x;
 #else
 /**
  * @brief Macro which allows to print debug messages in green in the terminal

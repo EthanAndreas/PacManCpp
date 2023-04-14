@@ -7,17 +7,18 @@ int main() {
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 
-        std::cerr << "Echec de l'initialisation de la SDL " << SDL_GetError()
-                  << std::endl;
+        std::cerr << "SDL init initialization" << SDL_GetError() << std::endl;
         exit(EXIT_FAILURE);
     }
 
+    // initialize SDL window
     SDL_Window *Window = nullptr;
     SDL_Surface *windowSurf = nullptr;
     SDL_Surface *spriteBoard = nullptr;
     dir currentDir = NONE;
     init(&Window, &windowSurf, &spriteBoard);
 
+    // initialize board and pacman
     board Board;
     Board.load();
     pacman Pacman;
@@ -57,12 +58,11 @@ int main() {
             currentDir = DOWN;
         }
 
-        std::cout << "dir: " << currentDir << std::endl;
         // pacman movement management
         Pacman.updateDir(Board, currentDir);
         Pacman.updatePos();
 
-        // display
+        // display updated board
         draw(Pacman.getLastDir(), &windowSurf, &spriteBoard, Pacman.getPos());
 
         SDL_UpdateWindowSurface(Window);

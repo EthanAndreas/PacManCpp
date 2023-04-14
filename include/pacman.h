@@ -1,6 +1,7 @@
 #pragma once
 
 #include "board.h"
+#include "debug.h"
 #include "graphic.h"
 
 class pacman {
