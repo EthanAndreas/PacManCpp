@@ -25,7 +25,6 @@ int main() {
     bool quit = false;
     int nbk;
     const Uint8 *keys;
-    std::pair<int, int> newPos;
     while (!quit) {
 
         Uint64 fps_start = SDL_GetTicks();
@@ -58,12 +57,13 @@ int main() {
             currentDir = DOWN;
         }
 
+        std::cout << "dir: " << currentDir << std::endl;
         // pacman movement management
         Pacman.updateDir(Board, currentDir);
+        Pacman.updatePos();
 
         // display
-        newPos = draw(Pacman.getLastDir(), &windowSurf, &spriteBoard);
-        Pacman.updatePos(newPos.first, newPos.second);
+        draw(Pacman.getLastDir(), &windowSurf, &spriteBoard, Pacman.getPos());
 
         SDL_UpdateWindowSurface(Window);
 

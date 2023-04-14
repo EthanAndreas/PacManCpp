@@ -8,7 +8,8 @@ class pacman {
     pacman();
     ~pacman();
     dir *getLastDir();
-    void updatePos(int xPIxel, int yPixel);
+    void updatePos();
+    std::pair<int, int> getPos();
     void updateDir(board Board, dir currentDir);
 
   private:

@@ -26,5 +26,5 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
  * @param windowSurf
  * @param spriteBoard
  */
-std::pair<int, int> draw(dir *lastDir, SDL_Surface **windowSurf,
-                         SDL_Surface **spriteBoard);
+void draw(dir *lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
+          std::pair<int, int> pacPos);
