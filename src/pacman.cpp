@@ -1,38 +1,38 @@
 #include "pacman.h"
 
 pacman::pacman() {
-    _xBoard = 15;
-    _yBoard = 10;
-    _xPixel = 484;
-    _yPixel = 326;
+    _xBoard = 10;
+    _yBoard = 15;
+    _xPixel = 326;
+    _yPixel = 484;
 }
 pacman::~pacman() {}
 
 dir *pacman::getLastDir() { return &_lastDir; }
 
 void pacman::updatePos(int column, int line) {
-    _xPixel = line;
-    _yPixel = column;
+    _xPixel = column;
+    _yPixel = line;
 }
 
 void pacman::updateDir(board Board, dir currentDir) {
 
-    // while pacman does not reach the virtual square, the position
-    // is not updated
     // each square is 32x32 pixels
-    if ((_xPixel / 32) != _xBoard && (_yPixel / 32) != _yBoard) {
-
+    // wait until pacman reaches the middle of the next square
+    if ((_xPixel % 32) != 6 || (_yPixel % 32) != 4)
         return;
-    }
 
     std::vector<std::vector<square>> vBoard = Board.getBoard();
+
+    std::cout << "xBoard: " << _xBoard << " yBoard: " << _yBoard << std::endl;
+    std::cout << "xPixel: " << _xPixel << " yPixel: " << _yPixel << std::endl;
 
     switch (currentDir) {
 
     case LEFT:
         if (_xBoard <= 0)
-            return;
-        if (vBoard[_xBoard - 1][_yBoard].getState() == 0) {
+            _lastDir = NONE;
+        if (vBoard[_yBoard][_xBoard - 1].getState() == 0) {
             _xBoard--;
             _lastDir = LEFT;
         } else {
@@ -41,9 +41,9 @@ void pacman::updateDir(board Board, dir currentDir) {
         break;
 
     case RIGHT:
-        if (_xBoard >= 26)
-            return;
-        if (vBoard[_xBoard + 1][_yBoard].getState() == 0) {
+        if (_xBoard >= 21)
+            _lastDir = NONE;
+        if (vBoard[_yBoard][_xBoard + 1].getState() == 0) {
             _xBoard++;
             _lastDir = RIGHT;
         } else {
@@ -52,9 +52,9 @@ void pacman::updateDir(board Board, dir currentDir) {
         break;
 
     case UP:
-        if (_yBoard >= 21)
-            return;
-        if (vBoard[_xBoard][_yBoard + 1].getState() == 0) {
+        if (_yBoard >= 26)
+            _lastDir = NONE;
+        if (vBoard[_yBoard + 1][_xBoard].getState() == 0) {
             _yBoard++;
             _lastDir = UP;
         } else {
@@ -64,8 +64,8 @@ void pacman::updateDir(board Board, dir currentDir) {
 
     case DOWN:
         if (_yBoard <= 0)
-            return;
-        if (vBoard[_xBoard][_yBoard - 1].getState() == 0) {
+            _lastDir = NONE;
+        if (vBoard[_yBoard - 1][_xBoard].getState() == 0) {
             _yBoard--;
             _lastDir = DOWN;
         } else {

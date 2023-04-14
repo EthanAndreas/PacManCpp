@@ -58,6 +58,7 @@ int main() {
             currentDir = DOWN;
         }
 
+        std::cout << "dir: " << currentDir << std::endl;
         // pacman movement management
         Pacman.updateDir(Board, currentDir);
 
