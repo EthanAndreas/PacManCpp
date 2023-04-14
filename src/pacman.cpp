@@ -24,9 +24,6 @@ void pacman::updateDir(board Board, dir currentDir) {
 
     std::vector<std::vector<square>> vBoard = Board.getBoard();
 
-    std::cout << "xBoard: " << _xBoard << " yBoard: " << _yBoard << std::endl;
-    std::cout << "xPixel: " << _xPixel << " yPixel: " << _yPixel << std::endl;
-
     switch (currentDir) {
 
     case LEFT:
@@ -38,6 +35,7 @@ void pacman::updateDir(board Board, dir currentDir) {
         } else {
             _lastDir = NONE;
         }
+        std::cout << "LEFT current dir : " << currentDir << std::endl;
         break;
 
     case RIGHT:
@@ -49,28 +47,31 @@ void pacman::updateDir(board Board, dir currentDir) {
         } else {
             _lastDir = NONE;
         }
+        std::cout << "RIGHT current dir : " << currentDir << std::endl;
         break;
 
     case UP:
         if (_yBoard >= 26)
             _lastDir = NONE;
-        if (vBoard[_yBoard + 1][_xBoard].getState() == 0) {
-            _yBoard++;
+        if (vBoard[_yBoard - 1][_xBoard].getState() == 0) {
+            _yBoard--;
             _lastDir = UP;
         } else {
             _lastDir = NONE;
         }
+        std::cout << "UP current dir : " << currentDir << std::endl;
         break;
 
     case DOWN:
         if (_yBoard <= 0)
             _lastDir = NONE;
-        if (vBoard[_yBoard - 1][_xBoard].getState() == 0) {
-            _yBoard--;
+        if (vBoard[_yBoard + 1][_xBoard].getState() == 0) {
+            _yBoard++;
             _lastDir = DOWN;
         } else {
             _lastDir = NONE;
         }
+        std::cout << "DOWN current dir : " << currentDir << std::endl;
         break;
 
     case NONE:
