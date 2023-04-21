@@ -42,6 +42,8 @@ void pacman::updateDir(board Board, dir currentDir) {
 
     std::vector<std::vector<square>> vecBoard = Board.getBoard();
 
+    DEB(std::cout << "\e[33mPacman" << std::endl;);
+
     DEB(std::cout << "current dir : " << currentDir << std::endl);
 
     DEB(std::cout << "xBoard: " << _xBoard << " yBoard: " << _yBoard
@@ -68,11 +70,11 @@ void pacman::updateDir(board Board, dir currentDir) {
         if (_xBoard <= 0)
             _lastDir = NONE;
 
-        if (vecBoard[_yBoard][_xBoard - 1].getState() == 0) {
+        if (vecBoard[_xBoard - 1][_yBoard].getState() == 0) {
             _xBoard--;
             _lastDir = LEFT;
 
-        } else if (vecBoard[_yBoard][_xBoard - 1].getState() == 2) {
+        } else if (vecBoard[_xBoard - 1][_yBoard].getState() == 2) {
             _xBoard = 20;
             _xPixel = 646;
 
@@ -88,11 +90,11 @@ void pacman::updateDir(board Board, dir currentDir) {
         if (_xBoard >= 21)
             _lastDir = NONE;
 
-        if (vecBoard[_yBoard][_xBoard + 1].getState() == 0) {
+        if (vecBoard[_xBoard + 1][_yBoard].getState() == 0) {
             _xBoard++;
             _lastDir = RIGHT;
 
-        } else if (vecBoard[_yBoard][_xBoard + 1].getState() == 2) {
+        } else if (vecBoard[_xBoard + 1][_yBoard].getState() == 2) {
             _xBoard = 0;
             _xPixel = 6;
 
@@ -108,7 +110,7 @@ void pacman::updateDir(board Board, dir currentDir) {
         if (_yBoard >= 26)
             _lastDir = NONE;
 
-        if (vecBoard[_yBoard - 1][_xBoard].getState() == 0) {
+        if (vecBoard[_xBoard][_yBoard - 1].getState() == 0) {
             _yBoard--;
             _lastDir = UP;
 
@@ -124,7 +126,7 @@ void pacman::updateDir(board Board, dir currentDir) {
         if (_yBoard <= 0)
             _lastDir = NONE;
 
-        if (vecBoard[_yBoard + 1][_xBoard].getState() == 0) {
+        if (vecBoard[_xBoard][_yBoard + 1].getState() == 0) {
             _yBoard++;
             _lastDir = DOWN;
 
@@ -139,4 +141,6 @@ void pacman::updateDir(board Board, dir currentDir) {
     case NONE:
         break;
     }
+
+    DEB(std::cout << "\e[0m" << std::endl);
 }

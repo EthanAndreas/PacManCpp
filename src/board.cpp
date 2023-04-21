@@ -23,6 +23,21 @@ board::~board() {
 
 std::vector<std::vector<square>> board::getBoard() { return _board; }
 
+void board::transpose() {
+    const size_t numRows = _board.size();
+    const size_t numCols = _board.empty() ? 0 : _board[0].size();
+    std::vector<std::vector<square>> tBoard(numCols,
+                                            std::vector<square>(numRows));
+
+    for (size_t i = 0; i < numRows; ++i) {
+        for (size_t j = 0; j < numCols; ++j) {
+            tBoard[j][i] = _board[i][j];
+        }
+    }
+
+    _board = tBoard;
+}
+
 /**
  * @brief Set the state of each square with the map defined
  * in "assets/pacman_board.txt".
@@ -33,18 +48,16 @@ void board::load() {
 
     char c;
     square Square;
-    _board.push_back(std::vector<square>());
+    _board.push_back(std::vector<square>()); // first column
     while (inputFile.get(c)) {
 
-        if (c == '\n')
-            _board.push_back(std::vector<square>());
-        else {
+        if (c == '\n') {
+            _board.push_back(std::vector<square>()); // next column
+        } else {
             Square.setState(c - '0');
             _board.back().push_back(Square);
         }
     }
-
-    inputFile.close();
 }
 
 void board::display() {

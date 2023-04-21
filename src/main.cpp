@@ -1,4 +1,5 @@
 #include "board.h"
+#include "ghost.h"
 #include "graphic.h"
 #include "pacman.h"
 #include <iostream>
@@ -21,7 +22,9 @@ int main() {
     // initialize board and pacman
     board Board;
     Board.load();
+    Board.transpose();
     pacman Pacman;
+    ghost Ghost;
 
     bool quit = false;
     int nbk;
@@ -62,8 +65,13 @@ int main() {
         Pacman.updateDir(Board, currentDir);
         Pacman.updatePos();
 
+        // ghost movement management
+        Ghost.updateDir(Board);
+        Ghost.updatePos();
+
         // display updated board
-        draw(Pacman.getLastDir(), &windowSurf, &spriteBoard, Pacman.getPos());
+        draw(Pacman.getLastDir(), &windowSurf, &spriteBoard, Pacman.getPos(),
+             Ghost.getPos());
 
         SDL_UpdateWindowSurface(Window);
 

@@ -76,7 +76,7 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
 }
 
 void draw(dir *lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
-          std::pair<int, int> pacPos) {
+          std::pair<int, int> pacPos, std::pair<int, int> ghostPos) {
 
     SDL_SetColorKey(*spriteBoard, false, 0);
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
@@ -133,6 +133,10 @@ void draw(dir *lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
     SDL_Rect ghost_in2 = *ghost_in;
     if ((count / 4) % 2)
         ghost_in2.x += 17;
+
+    // ghost updated position
+    ghost.x = ghostPos.first;
+    ghost.y = ghostPos.second;
 
     // pacman animation
     SDL_Rect pac_in = pac_blank;

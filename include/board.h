@@ -34,6 +34,7 @@ class board {
     ~board();
     std::vector<std::vector<square>> getBoard();
     void load();
+    void transpose();
     void display();
 
   private:
