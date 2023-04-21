@@ -1,5 +1,5 @@
 CC ?= g++
-CFLAGS ?= -Wall -Wextra -Werror -std=c++17 -g
+CFLAGS ?= -Wall -Wextra -Werror -std=c++17 -g -Og
 LDLIBS ?= -lSDL2 -lstdc++
 
 INCLUDE_PATH = ./include

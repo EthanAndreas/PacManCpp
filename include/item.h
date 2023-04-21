@@ -1,9 +1,6 @@
 #pragma once
 
-#include "carac.h"
-#include "edible.h"
-
-enum type { _PACMAN, _GHOST, _FRUIT, _SUPERFRUIT, _DOT };
+enum type { _NONE, _PACMAN, _GHOST, _FRUIT, _POWERUP, _DOT };
 
 /**
  * @brief Correspond to the item.
@@ -14,18 +11,12 @@ class item {
   public:
     item();
     ~item();
-    void init();
-    void display();
-    type getType();
-    void setCarac(carac *c);
-    void setEdible(edible *e);
-    carac *getCarac();
-    edible *getEdible();
+    void setCarater(type typeCaracter);
+    void setEdible(type typeEdible);
+    type getCaracter();
+    type getEdible();
 
   private:
-    union {
-        carac *_carac;
-        edible *_edible;
-    } _item;
-    type _type;
+    type _typeCaracter;
+    type _typeEdible;
 };

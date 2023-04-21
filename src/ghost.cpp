@@ -33,36 +33,12 @@ void ghost::updatePos() {
 
 std::pair<int, int> ghost::getPos() { return std::make_pair(_xPixel, _yPixel); }
 
-void ghost::updateDir(board Board) {
+void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
 
     // each square is 32x32 pixels
     // wait until ghost reaches the middle of the next square
     if ((_xPixel % 32) != 2 || (_yPixel % 32) != 2)
         return;
-
-    std::vector<std::vector<square>> vecBoard = Board.getBoard();
-
-    DEB(std::cout << "Ghost" << std::endl;);
-
-    DEB(std::cout << "current dir : " << _lastDir << std::endl);
-
-    DEB(std::cout << "xBoard: " << _xBoard << " yBoard: " << _yBoard
-                  << std::endl);
-    DEB(std::cout << "xPixel: " << _xPixel << " yPixel: " << _yPixel
-                  << std::endl);
-
-    DEB(std::cout << "board state: " << std::endl;);
-    DEB(std::cout << vecBoard[_yBoard - 1][_xBoard - 1].getState() << " "
-                  << vecBoard[_yBoard - 1][_xBoard].getState() << " "
-                  << vecBoard[_yBoard - 1][_xBoard + 1].getState()
-                  << std::endl);
-    DEB(std::cout << vecBoard[_yBoard][_xBoard - 1].getState() << " "
-                  << vecBoard[_yBoard][_xBoard].getState() << " "
-                  << vecBoard[_yBoard][_xBoard + 1].getState() << std::endl)
-    DEB(std::cout << vecBoard[_yBoard + 1][_xBoard - 1].getState() << " "
-                  << vecBoard[_yBoard + 1][_xBoard].getState() << " "
-                  << vecBoard[_yBoard + 1][_xBoard + 1].getState()
-                  << std::endl);
 
     bool findPos = false;
     while (findPos == false) {
@@ -72,7 +48,6 @@ void ghost::updateDir(board Board) {
             _yBoard--;
             _lastDir = UP;
             findPos = true;
-            break;
         }
 
         int randDir = rand() % 4;
@@ -95,8 +70,6 @@ void ghost::updateDir(board Board) {
                 findPos = true;
             }
 
-            DEB(std::cout << "current dir LEFT & last dir : " << randDir
-                          << std::endl);
             break;
 
         case RIGHT:
@@ -106,7 +79,7 @@ void ghost::updateDir(board Board) {
                 break;
 
             // avoid teleporation hall
-            if (_xBoard + 1 == 24 && _yBoard == 13)
+            if (_xBoard + 1 == 16 && _yBoard == 13)
                 break;
 
             if (vecBoard[_xBoard + 1][_yBoard].getState() == 0) {
@@ -115,8 +88,6 @@ void ghost::updateDir(board Board) {
                 findPos = true;
             }
 
-            DEB(std::cout << "current dir RIGHT & last dir : " << randDir
-                          << std::endl);
             break;
 
         case UP:
@@ -131,8 +102,6 @@ void ghost::updateDir(board Board) {
                 findPos = true;
             }
 
-            DEB(std::cout << "current dir UP & last dir : " << randDir
-                          << std::endl);
             break;
 
         case DOWN:
@@ -147,12 +116,37 @@ void ghost::updateDir(board Board) {
                 findPos = true;
             }
 
-            DEB(std::cout << "current dir DOWN & last dir : " << randDir
-                          << std::endl);
             break;
 
         case NONE:
             break;
         }
     }
+}
+
+dir ghost::getDir() { return _lastDir; }
+
+void ghost::updateSquare(std::vector<std::vector<square>> vecBoard) {
+
+    if ((_xPixel % 32) != 2 || (_yPixel % 32) != 2)
+        return;
+
+    switch (_lastDir) {
+    case LEFT:
+        vecBoard[_xBoard - 1][_yBoard].getItem()->setCarater(_NONE);
+        break;
+    case RIGHT:
+        vecBoard[_xBoard + 1][_yBoard].getItem()->setCarater(_NONE);
+        break;
+    case UP:
+        vecBoard[_xBoard][_yBoard - 1].getItem()->setCarater(_NONE);
+        break;
+    case DOWN:
+        vecBoard[_xBoard][_yBoard + 1].getItem()->setCarater(_NONE);
+        break;
+    case NONE:
+        break;
+    }
+
+    vecBoard[_xBoard][_yBoard].getItem()->setCarater(_GHOST);
 }

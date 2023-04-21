@@ -22,9 +22,13 @@ int main() {
     // initialize board and pacman
     board Board;
     Board.load();
-    Board.transpose();
+    // transpose the board to match the sprite
+    Board.transpose(); // x : col, y : row
+    Board.setItem();
     pacman Pacman;
     ghost Ghost;
+
+    // Board.display();
 
     bool quit = false;
     int nbk;
@@ -62,11 +66,13 @@ int main() {
         }
 
         // pacman movement management
-        Pacman.updateDir(Board, currentDir);
+        Pacman.updateDir(Board.getBoard(), currentDir);
+        Pacman.updateSquare(Board.getBoard());
         Pacman.updatePos();
 
         // ghost movement management
-        Ghost.updateDir(Board);
+        Ghost.updateDir(Board.getBoard());
+        Ghost.updateSquare(Board.getBoard());
         Ghost.updatePos();
 
         // display updated board

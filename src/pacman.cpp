@@ -33,36 +33,13 @@ std::pair<int, int> pacman::getPos() {
     return std::make_pair(_xPixel, _yPixel);
 }
 
-void pacman::updateDir(board Board, dir currentDir) {
+void pacman::updateDir(std::vector<std::vector<square>> vecBoard,
+                       dir currentDir) {
 
     // each square is 32x32 pixels
     // wait until pacman reaches the middle of the next square
     if ((_xPixel % 32) != 6 || (_yPixel % 32) != 4)
         return;
-
-    std::vector<std::vector<square>> vecBoard = Board.getBoard();
-
-    DEB(std::cout << "\e[33mPacman" << std::endl;);
-
-    DEB(std::cout << "current dir : " << currentDir << std::endl);
-
-    DEB(std::cout << "xBoard: " << _xBoard << " yBoard: " << _yBoard
-                  << std::endl);
-    DEB(std::cout << "xPixel: " << _xPixel << " yPixel: " << _yPixel
-                  << std::endl);
-
-    DEB(std::cout << "board state: " << std::endl;);
-    DEB(std::cout << vecBoard[_yBoard - 1][_xBoard - 1].getState() << " "
-                  << vecBoard[_yBoard - 1][_xBoard].getState() << " "
-                  << vecBoard[_yBoard - 1][_xBoard + 1].getState()
-                  << std::endl);
-    DEB(std::cout << vecBoard[_yBoard][_xBoard - 1].getState() << " "
-                  << vecBoard[_yBoard][_xBoard].getState() << " "
-                  << vecBoard[_yBoard][_xBoard + 1].getState() << std::endl)
-    DEB(std::cout << vecBoard[_yBoard + 1][_xBoard - 1].getState() << " "
-                  << vecBoard[_yBoard + 1][_xBoard].getState() << " "
-                  << vecBoard[_yBoard + 1][_xBoard + 1].getState()
-                  << std::endl);
 
     switch (currentDir) {
 
@@ -82,8 +59,6 @@ void pacman::updateDir(board Board, dir currentDir) {
             _lastDir = NONE;
         }
 
-        DEB(std::cout << "current dir LEFT & last dir : " << currentDir
-                      << std::endl);
         break;
 
     case RIGHT:
@@ -102,8 +77,6 @@ void pacman::updateDir(board Board, dir currentDir) {
             _lastDir = NONE;
         }
 
-        DEB(std::cout << "current dir RIGHT & last dir : " << currentDir
-                      << std::endl);
         break;
 
     case UP:
@@ -118,8 +91,6 @@ void pacman::updateDir(board Board, dir currentDir) {
             _lastDir = NONE;
         }
 
-        DEB(std::cout << "current dir UP & last dir : " << currentDir
-                      << std::endl);
         break;
 
     case DOWN:
@@ -134,13 +105,41 @@ void pacman::updateDir(board Board, dir currentDir) {
             _lastDir = NONE;
         }
 
-        DEB(std::cout << "current dir DOWN & last dir : " << currentDir
-                      << std::endl);
         break;
 
     case NONE:
         break;
     }
+}
 
-    DEB(std::cout << "\e[0m" << std::endl);
+dir pacman::getDir() { return _lastDir; }
+
+void pacman::updateSquare(std::vector<std::vector<square>> vecBoard) {
+
+    if ((_xPixel % 32) != 6 || (_yPixel % 32) != 4)
+        return;
+
+    switch (_lastDir) {
+    case LEFT:
+        vecBoard[_xBoard - 1][_yBoard].getItem()->setCarater(_NONE);
+        break;
+    case RIGHT:
+        vecBoard[_xBoard + 1][_yBoard].getItem()->setCarater(_NONE);
+        break;
+    case UP:
+        vecBoard[_xBoard][_yBoard - 1].getItem()->setCarater(_NONE);
+        break;
+    case DOWN:
+        vecBoard[_xBoard][_yBoard + 1].getItem()->setCarater(_NONE);
+        break;
+    case NONE:
+        break;
+    }
+
+    if (_xBoard == 0 && _yBoard == 13)
+        vecBoard[21][13].getItem()->setCarater(_NONE);
+    else if (_xBoard == 21 && _yBoard == 13)
+        vecBoard[0][13].getItem()->setCarater(_NONE);
+
+    vecBoard[_xBoard][_yBoard].getItem()->setCarater(_PACMAN);
 }
