@@ -1,16 +1,16 @@
 #include "ghost.h"
 
 ghost::ghost() {
-    _xBoard = 10;
-    _yBoard = 12;
-    _xPixel = 322;
-    _yPixel = 386;
+    _xBoard = GHOST_INIT_X;
+    _yBoard = GHOST_INIT_Y;
+    _xPixel = GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X;
+    _yPixel = GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y;
     _lastDir = NONE;
     srand(time(NULL));
 }
 ghost::~ghost() {}
 
-dir *ghost::getLastDir() { return &_lastDir; }
+dir ghost::getLastDir() { return _lastDir; }
 
 void ghost::updatePos() {
     switch (_lastDir) {
@@ -37,7 +37,7 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
 
     // each square is 32x32 pixels
     // wait until ghost reaches the middle of the next square
-    if ((_xPixel % 32) != 2 || (_yPixel % 32) != 2)
+    if ((_xPixel % 32) != GHOST_CENTER_X || (_yPixel % 32) != GHOST_CENTER_Y)
         return;
 
     bool findPos = false;
@@ -48,6 +48,15 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
             _yBoard--;
             _lastDir = UP;
             findPos = true;
+            break;
+        }
+
+        if (vecBoard[_xBoard][_yBoard].getState() == 3) {
+            // TODO : add wait function to launch ghost by ghost
+            _yBoard--;
+            _lastDir = UP;
+            findPos = true;
+            break;
         }
 
         int randDir = rand() % 4;
@@ -127,9 +136,6 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
 dir ghost::getDir() { return _lastDir; }
 
 void ghost::updateSquare(std::vector<std::vector<square>> vecBoard) {
-
-    if ((_xPixel % 32) != 2 || (_yPixel % 32) != 2)
-        return;
 
     switch (_lastDir) {
     case LEFT:

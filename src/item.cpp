@@ -3,16 +3,16 @@
 #include <iostream>
 
 item::item() {
-    _typeCaracter = _NONE;
-    _typeEdible = _NONE;
+    _Caracter = _NONE;
+    _Edible = _EMPTY;
 }
 
 item::~item() {}
 
-void item::setCarater(type typeCaracter) { _typeCaracter = typeCaracter; }
+void item::setCarater(typeCaracter Caracter) { _Caracter = Caracter; }
 
-void item::setEdible(type typeEdible) { _typeEdible = typeEdible; }
+void item::setEdible(typeEdible Edible) { _Edible = Edible; }
 
-type item::getCaracter() { return _typeCaracter; }
+typeCaracter item::getCaracter() { return _Caracter; }
 
-type item::getEdible() { return _typeEdible; }
+typeEdible item::getEdible() { return _Edible; }

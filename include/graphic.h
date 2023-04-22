@@ -1,13 +1,12 @@
 #pragma once
 
+#include "board.h"
 #include <SDL2/SDL.h>
 #include <utility>
 
-enum dir { LEFT, RIGHT, UP, DOWN, NONE };
+#define SCALE_PIXEL 32
 
-// SDL_Rect letter[256];
-// SDL_Rect letter['a'] = letter_a;
-// SDL_Rect letter['b'] = letter_b;
+enum dir { LEFT, RIGHT, UP, DOWN, NONE };
 
 /**
  * @brief Initialize SDL and create the window
@@ -26,5 +25,6 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
  * @param windowSurf
  * @param spriteBoard
  */
-void draw(dir *lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
-          std::pair<int, int> pacPos, std::pair<int, int> ghostPos);
+void draw(dir lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
+          std::pair<int, int> pacPos, std::pair<int, int> ghostPos,
+          std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup);

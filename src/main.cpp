@@ -2,13 +2,12 @@
 #include "ghost.h"
 #include "graphic.h"
 #include "pacman.h"
-#include <iostream>
 
 int main() {
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 
-        std::cerr << "SDL init initialization" << SDL_GetError() << std::endl;
+        std::cerr << "SDL initialization" << SDL_GetError() << std::endl;
         exit(EXIT_FAILURE);
     }
 
@@ -19,25 +18,26 @@ int main() {
     dir currentDir = NONE;
     init(&Window, &windowSurf, &spriteBoard);
 
-    // initialize board and pacman
+    // initialize board, pacman, ghost and edible
     board Board;
     Board.load();
-    // transpose the board to match the sprite
-    Board.transpose(); // x : col, y : row
+    Board.transpose();
     Board.setItem();
     pacman Pacman;
     ghost Ghost;
-
-    // Board.display();
+    std::vector<Coordinate> vecDot = Board.getDotList();
+    std::vector<Coordinate> vecPowerup = Board.getPowerupList();
 
     bool quit = false;
     int nbk;
     const Uint8 *keys;
+    SDL_Event event;
     while (!quit) {
 
+        // fps management
         Uint64 fps_start = SDL_GetTicks();
 
-        SDL_Event event;
+        // event management
         while (!quit && SDL_PollEvent(&event)) {
             switch (event.type) {
             case SDL_QUIT:
@@ -67,17 +67,21 @@ int main() {
 
         // pacman movement management
         Pacman.updateDir(Board.getBoard(), currentDir);
-        Pacman.updateSquare(Board.getBoard());
         Pacman.updatePos();
+        Pacman.updateSquare(Board.getBoard());
 
         // ghost movement management
         Ghost.updateDir(Board.getBoard());
-        Ghost.updateSquare(Board.getBoard());
         Ghost.updatePos();
+        Ghost.updateSquare(Board.getBoard());
+
+        // update item on the board
+        vecDot = Board.getDotList();
+        vecPowerup = Board.getPowerupList();
 
         // display updated board
         draw(Pacman.getLastDir(), &windowSurf, &spriteBoard, Pacman.getPos(),
-             Ghost.getPos());
+             Ghost.getPos(), vecDot, vecPowerup);
 
         SDL_UpdateWindowSurface(Window);
 

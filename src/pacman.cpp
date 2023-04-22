@@ -1,14 +1,16 @@
 #include "pacman.h"
 
 pacman::pacman() {
-    _xBoard = 10;
-    _yBoard = 15;
-    _xPixel = 326;
-    _yPixel = 484;
+    _xBoard = PACMAN_INIT_X;
+    _yBoard = PACMAN_INIT_Y;
+    _xPixel = PACMAN_INIT_X * SCALE_PIXEL + PACMAN_CENTER_X;
+    _yPixel = PACMAN_INIT_Y * SCALE_PIXEL + PACMAN_CENTER_Y;
+    _lastDir = NONE;
+    _score = 0;
 }
 pacman::~pacman() {}
 
-dir *pacman::getLastDir() { return &_lastDir; }
+dir pacman::getLastDir() { return _lastDir; }
 
 void pacman::updatePos() {
     switch (_lastDir) {
@@ -38,13 +40,13 @@ void pacman::updateDir(std::vector<std::vector<square>> vecBoard,
 
     // each square is 32x32 pixels
     // wait until pacman reaches the middle of the next square
-    if ((_xPixel % 32) != 6 || (_yPixel % 32) != 4)
+    if ((_xPixel % 32) != PACMAN_CENTER_X || (_yPixel % 32) != PACMAN_CENTER_Y)
         return;
 
     switch (currentDir) {
 
     case LEFT:
-        if (_xBoard <= 0)
+        if (_xBoard <= 0 && _yBoard != 13)
             _lastDir = NONE;
 
         if (vecBoard[_xBoard - 1][_yBoard].getState() == 0) {
@@ -62,7 +64,7 @@ void pacman::updateDir(std::vector<std::vector<square>> vecBoard,
         break;
 
     case RIGHT:
-        if (_xBoard >= 21)
+        if (_xBoard >= 21 && _yBoard != 13)
             _lastDir = NONE;
 
         if (vecBoard[_xBoard + 1][_yBoard].getState() == 0) {
@@ -70,7 +72,7 @@ void pacman::updateDir(std::vector<std::vector<square>> vecBoard,
             _lastDir = RIGHT;
 
         } else if (vecBoard[_xBoard + 1][_yBoard].getState() == 2) {
-            _xBoard = 0;
+            _xBoard = 1;
             _xPixel = 6;
 
         } else {
@@ -116,30 +118,91 @@ dir pacman::getDir() { return _lastDir; }
 
 void pacman::updateSquare(std::vector<std::vector<square>> vecBoard) {
 
-    if ((_xPixel % 32) != 6 || (_yPixel % 32) != 4)
-        return;
-
-    switch (_lastDir) {
-    case LEFT:
-        vecBoard[_xBoard - 1][_yBoard].getItem()->setCarater(_NONE);
-        break;
-    case RIGHT:
-        vecBoard[_xBoard + 1][_yBoard].getItem()->setCarater(_NONE);
-        break;
-    case UP:
-        vecBoard[_xBoard][_yBoard - 1].getItem()->setCarater(_NONE);
-        break;
-    case DOWN:
-        vecBoard[_xBoard][_yBoard + 1].getItem()->setCarater(_NONE);
-        break;
-    case NONE:
-        break;
-    }
-
+    // update caracter item
     if (_xBoard == 0 && _yBoard == 13)
-        vecBoard[21][13].getItem()->setCarater(_NONE);
+        vecBoard[20][13].getItem()->setCarater(_NONE);
     else if (_xBoard == 21 && _yBoard == 13)
         vecBoard[0][13].getItem()->setCarater(_NONE);
+    else {
+        switch (_lastDir) {
+        case LEFT:
+            vecBoard[_xBoard - 1][_yBoard].getItem()->setCarater(_NONE);
+            break;
+        case RIGHT:
+            vecBoard[_xBoard + 1][_yBoard].getItem()->setCarater(_NONE);
+            break;
+        case UP:
+            vecBoard[_xBoard][_yBoard - 1].getItem()->setCarater(_NONE);
+            break;
+        case DOWN:
+            vecBoard[_xBoard][_yBoard + 1].getItem()->setCarater(_NONE);
+            break;
+        case NONE:
+            break;
+        }
+    }
 
     vecBoard[_xBoard][_yBoard].getItem()->setCarater(_PACMAN);
+
+    // update edible item
+    if (vecBoard[_xBoard][_yBoard].getItem()->getEdible() == _DOT) {
+
+        switch (_lastDir) {
+        case LEFT:
+            if (_xPixel % 32 > DOT_PACMAN_CONTACT) {
+                return;
+            }
+            break;
+        case RIGHT:
+            if (_xPixel % 32 < DOT_PACMAN_CONTACT) {
+                return;
+            }
+            break;
+        case UP:
+            if (_yPixel % 32 > DOT_PACMAN_CONTACT) {
+                return;
+            }
+            break;
+        case DOWN:
+            if (_yPixel % 32 < DOT_PACMAN_CONTACT) {
+                return;
+            }
+            break;
+        case NONE:
+            return;
+        }
+
+        vecBoard[_xBoard][_yBoard].getItem()->setEdible(_EMPTY);
+        _score = _score + 10;
+
+    } else if (vecBoard[_xBoard][_yBoard].getItem()->getEdible() == _POWERUP) {
+
+        switch (_lastDir) {
+        case LEFT:
+            if (_xPixel % 32 > POWERUP_PACMAN_CONTACT) {
+                return;
+            }
+            break;
+        case RIGHT:
+            if (_xPixel % 32 < POWERUP_PACMAN_CONTACT) {
+                return;
+            }
+            break;
+        case UP:
+            if (_yPixel % 32 > POWERUP_PACMAN_CONTACT) {
+                return;
+            }
+            break;
+        case DOWN:
+            if (_yPixel % 32 < POWERUP_PACMAN_CONTACT) {
+                return;
+            }
+            break;
+        case NONE:
+            return;
+        }
+
+        vecBoard[_xBoard][_yBoard].getItem()->setEdible(_EMPTY);
+        _score = _score + 50;
+    }
 }

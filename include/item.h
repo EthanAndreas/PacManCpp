@@ -1,6 +1,7 @@
 #pragma once
 
-enum type { _NONE, _PACMAN, _GHOST, _FRUIT, _POWERUP, _DOT };
+enum typeCaracter { _NONE, _PACMAN, _GHOST };
+enum typeEdible { _EMPTY, _FRUIT, _POWERUP, _DOT };
 
 /**
  * @brief Correspond to the item.
@@ -11,12 +12,32 @@ class item {
   public:
     item();
     ~item();
-    void setCarater(type typeCaracter);
-    void setEdible(type typeEdible);
-    type getCaracter();
-    type getEdible();
+    /**
+     * @brief Set the Carater object (pacman or ghost).
+     *
+     * @param Caracter
+     */
+    void setCarater(typeCaracter Caracter);
+    /**
+     * @brief Set the Edible object (dot, powerup or fruit).
+     *
+     * @param Edible
+     */
+    void setEdible(typeEdible Edible);
+    /**
+     * @brief Get the Carater.
+     *
+     * @return typeCaracter
+     */
+    typeCaracter getCaracter();
+    /**
+     * @brief Get the Edible.
+     *
+     * @return typeEdible
+     */
+    typeEdible getEdible();
 
   private:
-    type _typeCaracter;
-    type _typeEdible;
+    typeCaracter _Caracter;
+    typeEdible _Edible;
 };

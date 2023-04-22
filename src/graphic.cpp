@@ -1,22 +1,32 @@
 #include "graphic.h"
 
-SDL_Rect src_bg = {200, 3, 168, 216}; // x,y, w,h (0,0) en haut a gauche
-SDL_Rect bg = {4, 4, 672, 864};       // ici scale x4
+SDL_Rect src_bg = {370, 3, 169, 217};
+SDL_Rect bg = {4, 4, 672, 864};
 
 // Red Ghost
+// animation
 SDL_Rect ghost_r = {3, 123, 16, 16};
 SDL_Rect ghost_l = {37, 123, 16, 16};
 SDL_Rect ghost_d = {105, 123, 16, 16};
 SDL_Rect ghost_u = {71, 123, 16, 16};
-SDL_Rect ghost = {34, 34, 32, 32}; // ici scale x2
+// position
+SDL_Rect ghost = {GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
+                  GHOST_INIT_Y *SCALE_PIXEL + GHOST_CENTER_Y, 32, 32};
 
 // PacMan
+// animation
 SDL_Rect pac_blank = {3, 89, 16, 16};
 SDL_Rect pac_r = {20, 89, 16, 16};
 SDL_Rect pac_l = {46, 89, 16, 16};
 SDL_Rect pac_d = {109, 90, 16, 16};
 SDL_Rect pac_u = {75, 89, 16, 16};
-SDL_Rect pac = {326, 484, 32, 32}; // ici scale x2
+// position
+SDL_Rect pac = {PACMAN_INIT_X * SCALE_PIXEL + PACMAN_CENTER_X,
+                PACMAN_INIT_Y *SCALE_PIXEL + PACMAN_CENTER_Y, 32, 32};
+
+// items
+SDL_Rect dot_in = {4, 81, 2, 2};
+SDL_Rect powerup_in = {9, 79, 7, 7};
 
 // Letters and numbers
 // TODO: use a dictionary
@@ -75,8 +85,9 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
     count = 0;
 }
 
-void draw(dir *lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
-          std::pair<int, int> pacPos, std::pair<int, int> ghostPos) {
+void draw(dir lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
+          std::pair<int, int> pacPos, std::pair<int, int> ghostPos,
+          std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup) {
 
     SDL_SetColorKey(*spriteBoard, false, 0);
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
@@ -106,6 +117,16 @@ void draw(dir *lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
     score.x += 16;
     SDL_BlitScaled(*spriteBoard, &number[3], *windowSurf, &score);
     score.x += 16;
+
+    for (auto &coord : vecDot) {
+        SDL_Rect dot = {coord.x * 32 + 10, coord.y * 32 + 10, 10, 10};
+        SDL_BlitScaled(*spriteBoard, &dot_in, *windowSurf, &dot);
+    }
+
+    for (auto &coord : vecPowerup) {
+        SDL_Rect powerup = {coord.x * 32 + 5, coord.y * 32 + 5, 20, 20};
+        SDL_BlitScaled(*spriteBoard, &powerup_in, *windowSurf, &powerup);
+    }
 
     // ghost rotation
     SDL_Rect *ghost_in = nullptr;
@@ -141,7 +162,7 @@ void draw(dir *lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
     // pacman animation
     SDL_Rect pac_in = pac_blank;
     if ((count / 4) % 2) {
-        switch (*lastDir) {
+        switch (lastDir) {
         case RIGHT:
             pac_in = pac_r;
             break;
