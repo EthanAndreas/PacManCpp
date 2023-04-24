@@ -26,7 +26,7 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
           std::vector<ghost> vecGhost, std::vector<Coordinate> vecDot,
           std::vector<Coordinate> vecPowerup, int cur_score);
 
-void drawStringAndInt(SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
-                      std::string str, int number, int x, int y);
+void drawString(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int x,
+                int y, std::string str);
 
 #endif
