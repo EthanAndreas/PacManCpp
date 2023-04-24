@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ITEM_H
+#define ITEM_H
 
 enum typeCaracter { _NONE, _PACMAN, _GHOST };
 enum typeEdible { _EMPTY, _FRUIT, _POWERUP, _DOT };
@@ -41,3 +42,5 @@ class item {
     typeCaracter _Caracter;
     typeEdible _Edible;
 };
+
+#endif

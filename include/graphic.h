@@ -22,7 +22,7 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
  * @param spriteBoard
  */
 void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
-          ghost Ghost, std::vector<Coordinate> vecDot,
+          std::vector<ghost> vecGhost, std::vector<Coordinate> vecDot,
           std::vector<Coordinate> vecPowerup, int cur_score);
 
 #endif

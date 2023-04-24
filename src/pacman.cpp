@@ -33,7 +33,7 @@ void pacman::updatePos() {
             _lastDir = NONE;
         break;
     case DOWN:
-        if (_yPixel < 20 * SCALE_PIXEL)
+        if (_yPixel < 26 * SCALE_PIXEL)
             _yPixel++;
         else
             _lastDir = NONE;

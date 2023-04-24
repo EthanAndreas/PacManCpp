@@ -9,10 +9,24 @@
 #define GHOST_CENTER_X 0
 #define GHOST_CENTER_Y 4
 
+enum color { RED, PINK, BLUE, ORANGE };
+
 class ghost {
   public:
     ghost();
     ~ghost();
+    /**
+     * @brief Set the color of the ghost.
+     *
+     * @param c
+     */
+    void setGhost(color c);
+    /**
+     * @brief Get the color of the ghost.
+     *
+     * @return color
+     */
+    color getColor();
     /**
      * @brief Get the last direction of the ghost.
      *
@@ -52,6 +66,7 @@ class ghost {
     void updateSquare(std::vector<std::vector<square>> vecBoard);
 
   private:
+    color _color;
     int _xBoard, _yBoard, _xPixel, _yPixel;
     dir _lastDir;
 };

@@ -10,33 +10,25 @@ ghost::ghost() {
 }
 ghost::~ghost() {}
 
+void ghost::setGhost(color c) { _color = c; }
+
+color ghost::getColor() { return _color; }
+
 dir ghost::getLastDir() { return _lastDir; }
 
 void ghost::updatePos() {
     switch (_lastDir) {
     case LEFT:
-        if (_xPixel > 0)
-            _xPixel--;
-        else
-            _lastDir = NONE;
+        _xPixel--;
         break;
     case RIGHT:
-        if (_xPixel < 20 * SCALE_PIXEL)
-            _xPixel++;
-        else
-            _lastDir = NONE;
+        _xPixel++;
         break;
     case UP:
-        if (_yPixel > 0)
-            _yPixel--;
-        else
-            _lastDir = NONE;
+        _yPixel--;
         break;
     case DOWN:
-        if (_yPixel < 20 * SCALE_PIXEL)
-            _yPixel++;
-        else
-            _lastDir = NONE;
+        _yPixel++;
         break;
     case NONE:
         break;

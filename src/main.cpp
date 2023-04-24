@@ -24,12 +24,17 @@ int main() {
     Board.transpose();
     Board.setItem();
     pacman Pacman;
-    ghost Ghost;
+    std::vector<ghost> vecGhost;
+    for (int i = 0; i < 4; i++) {
+        ghost Ghost;
+        Ghost.setGhost(color(i));
+        vecGhost.push_back(Ghost);
+    }
     std::vector<Coordinate> vecDot = Board.getDotList();
     std::vector<Coordinate> vecPowerup = Board.getPowerupList();
 
     // display initial board
-    draw(&windowSurf, &spriteBoard, Pacman, Ghost, vecDot, vecPowerup, 0);
+    draw(&windowSurf, &spriteBoard, Pacman, vecGhost, vecDot, vecPowerup, 0);
     SDL_UpdateWindowSurface(Window);
 
     bool start = false, quit = false;
@@ -78,17 +83,19 @@ int main() {
             Pacman.updateSquare(Board.getBoard());
 
             // ghost movement management
-            Ghost.updateDir(Board.getBoard());
-            Ghost.updatePos();
-            Ghost.updateSquare(Board.getBoard());
+            for (auto &Ghost : vecGhost) {
+                Ghost.updateDir(Board.getBoard());
+                Ghost.updatePos();
+                Ghost.updateSquare(Board.getBoard());
+            }
 
             // update item on the board
             vecDot = Board.getDotList();
             vecPowerup = Board.getPowerupList();
 
             // display updated board
-            draw(&windowSurf, &spriteBoard, Pacman, Ghost, vecDot, vecPowerup,
-                 Pacman.getScore());
+            draw(&windowSurf, &spriteBoard, Pacman, vecGhost, vecDot,
+                 vecPowerup, Pacman.getScore());
             SDL_UpdateWindowSurface(Window);
         }
 

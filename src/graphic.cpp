@@ -3,16 +3,6 @@
 SDL_Rect src_bg = {370, 3, 168, 216};
 SDL_Rect bg = {4, 4, 672, 864};
 
-// Red Ghost
-// animation
-SDL_Rect ghost_r = {3, 123, 16, 16};
-SDL_Rect ghost_l = {37, 123, 16, 16};
-SDL_Rect ghost_d = {105, 123, 16, 16};
-SDL_Rect ghost_u = {71, 123, 16, 16};
-// position
-SDL_Rect _ghost = {GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
-                   GHOST_INIT_Y *SCALE_PIXEL + GHOST_CENTER_Y, 32, 32};
-
 // PacMan
 // animation
 SDL_Rect pac_blank = {3, 89, 16, 16};
@@ -23,6 +13,67 @@ SDL_Rect pac_u = {75, 89, 16, 16};
 // position
 SDL_Rect _pacman = {PACMAN_INIT_X * SCALE_PIXEL + PACMAN_CENTER_X,
                     PACMAN_INIT_Y *SCALE_PIXEL + PACMAN_CENTER_Y, 32, 32};
+
+std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
+
+    // Red Ghost
+    std::vector<SDL_Rect> redGhostSprite;
+    // animation
+    redGhostSprite.push_back({37, 123, 16, 16});  // left
+    redGhostSprite.push_back({3, 123, 16, 16});   // right
+    redGhostSprite.push_back({71, 123, 16, 16});  // up
+    redGhostSprite.push_back({105, 123, 16, 16}); // down
+    // position
+    redGhostSprite.push_back({GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
+                              GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y, 32,
+                              32});
+
+    // Pink Ghost
+    std::vector<SDL_Rect> pinkGhostSprite;
+    // animation
+    pinkGhostSprite.push_back({37, 141, 16, 16});
+    pinkGhostSprite.push_back({3, 141, 16, 16});
+    pinkGhostSprite.push_back({71, 141, 16, 16});
+    pinkGhostSprite.push_back({105, 141, 16, 16});
+    // position
+    pinkGhostSprite.push_back({GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
+                               GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y, 32,
+                               32});
+
+    // Blue Ghost
+    std::vector<SDL_Rect> blueGhostSprite;
+    // animation
+    blueGhostSprite.push_back({37, 159, 16, 16});
+    blueGhostSprite.push_back({3, 159, 16, 16});
+    blueGhostSprite.push_back({71, 159, 16, 16});
+    blueGhostSprite.push_back({105, 159, 16, 16});
+    // position
+    blueGhostSprite.push_back({GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
+                               GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y, 32,
+                               32});
+    // Orange Ghost
+    std::vector<SDL_Rect> orangeGhostSprite;
+    // animation
+    orangeGhostSprite.push_back({37, 177, 16, 16});
+    orangeGhostSprite.push_back({3, 177, 16, 16});
+    orangeGhostSprite.push_back({71, 177, 16, 16});
+    orangeGhostSprite.push_back({105, 177, 16, 16});
+    // position
+    orangeGhostSprite.push_back({GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
+                                 GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y,
+                                 32, 32});
+
+    std::vector<std::vector<SDL_Rect>> vecGhostSprite;
+    vecGhostSprite.push_back(redGhostSprite);
+    vecGhostSprite.push_back(pinkGhostSprite);
+    vecGhostSprite.push_back(blueGhostSprite);
+    vecGhostSprite.push_back(orangeGhostSprite);
+
+    return vecGhostSprite;
+}
+
+// Ghost
+std::vector<std::vector<SDL_Rect>> vecGhostSprite = initGhostSrpite();
 
 // items
 SDL_Rect dot_in = {4, 81, 2, 2};
@@ -86,7 +137,7 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
 }
 
 void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
-          ghost Ghost, std::vector<Coordinate> vecDot,
+          std::vector<ghost> vecGhost, std::vector<Coordinate> vecDot,
           std::vector<Coordinate> vecPowerup, int cur_score) {
 
     SDL_SetColorKey(*spriteBoard, false, 0);
@@ -141,36 +192,41 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
         SDL_BlitScaled(*spriteBoard, &powerup_in, *windowSurf, &powerup);
     }
 
-    // _ghost look animation
-    SDL_Rect *ghost_in = nullptr;
-    switch (Ghost.getLastDir()) {
-    case RIGHT:
-        ghost_in = &(ghost_r);
-        break;
-    case DOWN:
-        ghost_in = &(ghost_d);
-        break;
-    case LEFT:
-        ghost_in = &(ghost_l);
-        break;
-    case UP:
-        ghost_in = &(ghost_u);
-        break;
-    case NONE:
-        // by default, _ghost looks right
-        ghost_in = &(ghost_r);
-        break;
+    for (auto &Ghost : vecGhost) {
+        // _ghost look animation
+        SDL_Rect *ghost_in = nullptr;
+        switch (Ghost.getLastDir()) {
+        case LEFT:
+            ghost_in = &(vecGhostSprite[Ghost.getColor()][LEFT]);
+            break;
+        case RIGHT:
+            ghost_in = &(vecGhostSprite[Ghost.getColor()][RIGHT]);
+            break;
+        case UP:
+            ghost_in = &(vecGhostSprite[Ghost.getColor()][UP]);
+            break;
+        case DOWN:
+            ghost_in = &(vecGhostSprite[Ghost.getColor()][DOWN]);
+            break;
+        case NONE:
+            // by default, _ghost looks right
+            ghost_in = &(vecGhostSprite[Ghost.getColor()][RIGHT]);
+            break;
+        }
+        count = (count + 1) % (512);
+
+        // _ghost wave animation
+        SDL_Rect ghost_in2 = *ghost_in;
+        if ((count / 4) % 2)
+            ghost_in2.x += 17;
+
+        // _ghost updated position
+        vecGhostSprite[Ghost.getColor()].back().x = Ghost.getPos().first;
+        vecGhostSprite[Ghost.getColor()].back().y = Ghost.getPos().second;
+
+        SDL_BlitScaled(*spriteBoard, &ghost_in2, *windowSurf,
+                       &vecGhostSprite[Ghost.getColor()].back());
     }
-    count = (count + 1) % (512);
-
-    // _ghost wave animation
-    SDL_Rect ghost_in2 = *ghost_in;
-    if ((count / 4) % 2)
-        ghost_in2.x += 17;
-
-    // _ghost updated position
-    _ghost.x = Ghost.getPos().first;
-    _ghost.y = Ghost.getPos().second;
 
     // pacman animation
     SDL_Rect pac_in = pac_blank;
@@ -199,6 +255,5 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
     _pacman.y = Pacman.getPos().second;
 
     SDL_SetColorKey(*spriteBoard, true, 0);
-    SDL_BlitScaled(*spriteBoard, &ghost_in2, *windowSurf, &_ghost);
     SDL_BlitScaled(*spriteBoard, &pac_in, *windowSurf, &_pacman);
 }
