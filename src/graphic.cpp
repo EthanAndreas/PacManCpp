@@ -119,12 +119,12 @@ void draw(dir lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
     score.x += 16;
 
     for (auto &coord : vecDot) {
-        SDL_Rect dot = {coord.x * 32 + 10, coord.y * 32 + 10, 10, 10};
+        SDL_Rect dot = {coord.x * 32 + 11, coord.y * 32 + 15, 10, 10};
         SDL_BlitScaled(*spriteBoard, &dot_in, *windowSurf, &dot);
     }
 
     for (auto &coord : vecPowerup) {
-        SDL_Rect powerup = {coord.x * 32 + 5, coord.y * 32 + 5, 20, 20};
+        SDL_Rect powerup = {coord.x * 32 + 6, coord.y * 32 + 10, 20, 20};
         SDL_BlitScaled(*spriteBoard, &powerup_in, *windowSurf, &powerup);
     }
 
