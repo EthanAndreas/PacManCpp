@@ -84,9 +84,34 @@ int main() {
 
             // ghost movement management
             for (auto &Ghost : vecGhost) {
-                Ghost.updateDir(Board.getBoard());
-                Ghost.updatePos();
-                Ghost.updateSquare(Board.getBoard());
+
+                switch (Ghost.getGhost()) {
+                case RED:
+                    break;
+                case PINK:
+                    if (Pacman.getScore() > 10 && Ghost.isGhostInHouse())
+                        Ghost.leaveGhostHouse();
+                    break;
+                case BLUE:
+                    if (Pacman.getScore() > 100 && Ghost.isGhostInHouse())
+                        Ghost.leaveGhostHouse();
+                    break;
+                case ORANGE:
+                    if (Pacman.getScore() > 200 && Ghost.isGhostInHouse())
+                        Ghost.leaveGhostHouse();
+                    break;
+                default:
+                    break;
+                }
+
+                if (!Ghost.isGhostInHouse()) {
+                    Ghost.updateDir(Board.getBoard());
+                    Ghost.updatePos();
+                    Ghost.updateSquare(Board.getBoard());
+                } else {
+                    Ghost.updateDirInHouse();
+                    Ghost.updatePos();
+                }
             }
 
             // update item on the board

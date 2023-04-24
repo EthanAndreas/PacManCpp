@@ -24,9 +24,9 @@ std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
     redGhostSprite.push_back({71, 123, 16, 16});  // up
     redGhostSprite.push_back({105, 123, 16, 16}); // down
     // position
-    redGhostSprite.push_back({GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
-                              GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y, 32,
-                              32});
+    redGhostSprite.push_back({RED_GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
+                              RED_GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y,
+                              32, 32});
 
     // Pink Ghost
     std::vector<SDL_Rect> pinkGhostSprite;
@@ -36,9 +36,9 @@ std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
     pinkGhostSprite.push_back({71, 141, 16, 16});
     pinkGhostSprite.push_back({105, 141, 16, 16});
     // position
-    pinkGhostSprite.push_back({GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
-                               GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y, 32,
-                               32});
+    pinkGhostSprite.push_back({PINK_GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
+                               PINK_GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y,
+                               32, 32});
 
     // Blue Ghost
     std::vector<SDL_Rect> blueGhostSprite;
@@ -48,9 +48,9 @@ std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
     blueGhostSprite.push_back({71, 159, 16, 16});
     blueGhostSprite.push_back({105, 159, 16, 16});
     // position
-    blueGhostSprite.push_back({GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
-                               GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y, 32,
-                               32});
+    blueGhostSprite.push_back({BLUE_GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
+                               BLUE_GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y,
+                               32, 32});
     // Orange Ghost
     std::vector<SDL_Rect> orangeGhostSprite;
     // animation
@@ -59,9 +59,9 @@ std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
     orangeGhostSprite.push_back({71, 177, 16, 16});
     orangeGhostSprite.push_back({105, 177, 16, 16});
     // position
-    orangeGhostSprite.push_back({GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
-                                 GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y,
-                                 32, 32});
+    orangeGhostSprite.push_back(
+        {ORANGE_GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
+         ORANGE_GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y, 32, 32});
 
     std::vector<std::vector<SDL_Rect>> vecGhostSprite;
     vecGhostSprite.push_back(redGhostSprite);
@@ -197,20 +197,20 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
         SDL_Rect *ghost_in = nullptr;
         switch (Ghost.getLastDir()) {
         case LEFT:
-            ghost_in = &(vecGhostSprite[Ghost.getColor()][LEFT]);
+            ghost_in = &(vecGhostSprite[Ghost.getGhost()][LEFT]);
             break;
         case RIGHT:
-            ghost_in = &(vecGhostSprite[Ghost.getColor()][RIGHT]);
+            ghost_in = &(vecGhostSprite[Ghost.getGhost()][RIGHT]);
             break;
         case UP:
-            ghost_in = &(vecGhostSprite[Ghost.getColor()][UP]);
+            ghost_in = &(vecGhostSprite[Ghost.getGhost()][UP]);
             break;
         case DOWN:
-            ghost_in = &(vecGhostSprite[Ghost.getColor()][DOWN]);
+            ghost_in = &(vecGhostSprite[Ghost.getGhost()][DOWN]);
             break;
         case NONE:
             // by default, _ghost looks right
-            ghost_in = &(vecGhostSprite[Ghost.getColor()][RIGHT]);
+            ghost_in = &(vecGhostSprite[Ghost.getGhost()][RIGHT]);
             break;
         }
         count = (count + 1) % (512);
@@ -221,11 +221,12 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
             ghost_in2.x += 17;
 
         // _ghost updated position
-        vecGhostSprite[Ghost.getColor()].back().x = Ghost.getPos().first;
-        vecGhostSprite[Ghost.getColor()].back().y = Ghost.getPos().second;
+        vecGhostSprite[Ghost.getGhost()].back().x = Ghost.getPos().first;
+        vecGhostSprite[Ghost.getGhost()].back().y = Ghost.getPos().second;
 
+        SDL_SetColorKey(*spriteBoard, true, 0);
         SDL_BlitScaled(*spriteBoard, &ghost_in2, *windowSurf,
-                       &vecGhostSprite[Ghost.getColor()].back());
+                       &vecGhostSprite[Ghost.getGhost()].back());
     }
 
     // pacman animation

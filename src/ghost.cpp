@@ -1,18 +1,76 @@
 #include "ghost.h"
 
 ghost::ghost() {
-    _xBoard = GHOST_INIT_X;
-    _yBoard = GHOST_INIT_Y;
-    _xPixel = GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X;
-    _yPixel = GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y;
+    _xBoard = 0;
+    _yBoard = 0;
+    _xPixel = 0;
+    _yPixel = 0;
     _lastDir = NONE;
     srand(time(NULL));
 }
 ghost::~ghost() {}
 
-void ghost::setGhost(color c) { _color = c; }
+void ghost::setGhost(color c) {
+    _color = c;
+    switch (c) {
+    case RED:
+        _isInHouse = false;
+        _xBoard = RED_GHOST_INIT_X;
+        _yBoard = RED_GHOST_INIT_Y;
+        _xPixel = RED_GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X;
+        _yPixel = RED_GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y;
+        break;
+    case PINK:
+        _isInHouse = true;
+        _xBoard = PINK_GHOST_INIT_X;
+        _yBoard = PINK_GHOST_INIT_Y;
+        _xPixel = PINK_GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X;
+        _yPixel = PINK_GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y;
+        break;
+    case BLUE:
+        _isInHouse = true;
+        _xBoard = BLUE_GHOST_INIT_X;
+        _yBoard = BLUE_GHOST_INIT_Y;
+        _xPixel = BLUE_GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X;
+        _yPixel = BLUE_GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y;
+        break;
+    case ORANGE:
+        _isInHouse = true;
+        _xBoard = ORANGE_GHOST_INIT_X;
+        _yBoard = ORANGE_GHOST_INIT_Y;
+        _xPixel = ORANGE_GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X;
+        _yPixel = ORANGE_GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y;
+        break;
+    }
+}
 
-color ghost::getColor() { return _color; }
+color ghost::getGhost() { return _color; }
+
+bool ghost::isGhostInHouse() { return _isInHouse; }
+
+void ghost::updateDirInHouse() {
+
+    if (_xPixel % 32 != GHOST_CENTER_X || _yPixel % 32 != GHOST_CENTER_Y)
+        return;
+
+    if (_yBoard == 13) {
+        _lastDir = UP;
+        _yBoard--;
+    } else if (_yBoard == 12) {
+        _lastDir = DOWN;
+        _yBoard++;
+    }
+}
+
+void ghost::leaveGhostHouse() {
+
+    if (_yBoard == 13) {
+        _yBoard--;
+        _lastDir = UP;
+        _isInHouse = false;
+    } else if (_yBoard == 12)
+        _isInHouse = false;
+}
 
 dir ghost::getLastDir() { return _lastDir; }
 
@@ -48,7 +106,6 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
     while (findPos == false) {
 
         if (vecBoard[_xBoard][_yBoard - 1].getState() == 3) {
-            // TODO : add wait function to launch ghost by ghost
             _yBoard--;
             _lastDir = UP;
             findPos = true;
@@ -56,9 +113,22 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
         }
 
         if (vecBoard[_xBoard][_yBoard].getState() == 3) {
-            // TODO : add wait function to launch ghost by ghost
             _yBoard--;
             _lastDir = UP;
+            findPos = true;
+            break;
+        }
+
+        if (vecBoard[_xBoard + 1][_yBoard - 1].getState() == 3) {
+            _xBoard++;
+            _lastDir = RIGHT;
+            findPos = true;
+            break;
+        }
+
+        if (vecBoard[_xBoard - 1][_yBoard - 1].getState() == 3) {
+            _xBoard--;
+            _lastDir = LEFT;
             findPos = true;
             break;
         }
@@ -68,7 +138,6 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
         switch (randDir) {
 
         case LEFT:
-
             // avoid going back
             if (_lastDir == RIGHT)
                 break;
@@ -86,7 +155,6 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
             break;
 
         case RIGHT:
-
             // avoid going back
             if (_lastDir == LEFT)
                 break;
@@ -104,7 +172,6 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
             break;
 
         case UP:
-
             // avoid going back
             if (_lastDir == DOWN)
                 break;
@@ -118,7 +185,6 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
             break;
 
         case DOWN:
-
             // avoid going back
             if (_lastDir == UP)
                 break;

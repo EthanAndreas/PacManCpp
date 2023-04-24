@@ -5,7 +5,20 @@
 #include "square.h"
 
 #define GHOST_INIT_X 10
-#define GHOST_INIT_Y 12
+#define GHOST_INIT_Y 10
+
+#define RED_GHOST_INIT_X 10
+#define RED_GHOST_INIT_Y 10
+
+#define PINK_GHOST_INIT_X 9
+#define PINK_GHOST_INIT_Y 12
+
+#define BLUE_GHOST_INIT_X 10
+#define BLUE_GHOST_INIT_Y 13
+
+#define ORANGE_GHOST_INIT_X 11
+#define ORANGE_GHOST_INIT_Y 12
+
 #define GHOST_CENTER_X 0
 #define GHOST_CENTER_Y 4
 
@@ -26,7 +39,22 @@ class ghost {
      *
      * @return color
      */
-    color getColor();
+    color getGhost();
+    /**
+     * @brief Check if the ghost is in the ghost house.
+     *
+     * @return true
+     * @return false
+     */
+    bool isGhostInHouse();
+    /**
+     * @brief Update the direction of the ghost in the ghost house.
+     */
+    void updateDirInHouse();
+    /**
+     * @brief Set the ghost in the ghost house
+     */
+    void leaveGhostHouse();
     /**
      * @brief Get the last direction of the ghost.
      *
@@ -69,6 +97,7 @@ class ghost {
     color _color;
     int _xBoard, _yBoard, _xPixel, _yPixel;
     dir _lastDir;
+    bool _isInHouse;
 };
 
 #endif
