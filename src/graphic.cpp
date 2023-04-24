@@ -14,6 +14,7 @@ SDL_Rect pac_u = {75, 89, 16, 16};
 SDL_Rect _pacman = {PACMAN_INIT_X * SCALE_PIXEL + PACMAN_CENTER_X,
                     PACMAN_INIT_Y *SCALE_PIXEL + PACMAN_CENTER_Y, 32, 32};
 
+// Ghost
 std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
 
     // Red Ghost
@@ -72,7 +73,6 @@ std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
     return vecGhostSprite;
 }
 
-// Ghost
 std::vector<std::vector<SDL_Rect>> vecGhostSprite = initGhostSrpite();
 
 // items

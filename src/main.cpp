@@ -85,31 +85,12 @@ int main() {
             // ghost movement management
             for (auto &Ghost : vecGhost) {
 
-                switch (Ghost.getGhost()) {
-                case RED:
-                    break;
-                case PINK:
-                    if (Pacman.getScore() > 10 && Ghost.isGhostInHouse())
-                        Ghost.leaveGhostHouse();
-                    break;
-                case BLUE:
-                    if (Pacman.getScore() > 100 && Ghost.isGhostInHouse())
-                        Ghost.leaveGhostHouse();
-                    break;
-                case ORANGE:
-                    if (Pacman.getScore() > 200 && Ghost.isGhostInHouse())
-                        Ghost.leaveGhostHouse();
-                    break;
-                default:
-                    break;
-                }
-
                 if (!Ghost.isGhostInHouse()) {
                     Ghost.updateDir(Board.getBoard());
                     Ghost.updatePos();
                     Ghost.updateSquare(Board.getBoard());
                 } else {
-                    Ghost.updateDirInHouse();
+                    Ghost.leaveGhostHouse();
                     Ghost.updatePos();
                 }
             }
@@ -117,6 +98,11 @@ int main() {
             // update item on the board
             vecDot = Board.getDotList();
             vecPowerup = Board.getPowerupList();
+
+            if (vecDot.size() == 0 && vecPowerup.size() == 0) {
+                std::cout << "You win!" << std::endl;
+                quit = true;
+            }
 
             // display updated board
             draw(&windowSurf, &spriteBoard, Pacman, vecGhost, vecDot,

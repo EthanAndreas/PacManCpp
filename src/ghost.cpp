@@ -6,6 +6,7 @@ ghost::ghost() {
     _xPixel = 0;
     _yPixel = 0;
     _lastDir = NONE;
+    _timePoint1 = std::chrono::steady_clock::now();
     srand(time(NULL));
 }
 ghost::~ghost() {}
@@ -48,28 +49,53 @@ color ghost::getGhost() { return _color; }
 
 bool ghost::isGhostInHouse() { return _isInHouse; }
 
-void ghost::updateDirInHouse() {
-
-    if (_xPixel % 32 != GHOST_CENTER_X || _yPixel % 32 != GHOST_CENTER_Y)
-        return;
-
-    if (_yBoard == 13) {
-        _lastDir = UP;
-        _yBoard--;
-    } else if (_yBoard == 12) {
-        _lastDir = DOWN;
-        _yBoard++;
-    }
-}
-
 void ghost::leaveGhostHouse() {
 
-    if (_yBoard == 13) {
-        _yBoard--;
-        _lastDir = UP;
-        _isInHouse = false;
-    } else if (_yBoard == 12)
-        _isInHouse = false;
+    time_t timePoint2 = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsedTime = timePoint2 - _timePoint1;
+    bool isTime = false;
+
+    switch (_color) {
+    case RED:
+        if (elapsedTime.count() >= RED_GHOST_WAIT_TIME)
+            isTime = true;
+        break;
+    case PINK:
+        if (elapsedTime.count() >= PINK_GHOST_WAIT_TIME)
+            isTime = true;
+        break;
+    case BLUE:
+        if (elapsedTime.count() >= BLUE_GHOST_WAIT_TIME)
+            isTime = true;
+        break;
+    case ORANGE:
+        if (elapsedTime.count() >= ORANGE_GHOST_WAIT_TIME)
+            isTime = true;
+        break;
+    default:
+        break;
+    }
+
+    if (isTime == false) {
+
+        if (_xPixel % 32 != GHOST_CENTER_X || _yPixel % 32 != GHOST_CENTER_Y)
+            return;
+
+        if (_yBoard == 13) {
+            _lastDir = UP;
+            _yBoard--;
+        } else if (_yBoard == 12) {
+            _lastDir = DOWN;
+            _yBoard++;
+        }
+    } else {
+        if (_yBoard == 13) {
+            _yBoard--;
+            _lastDir = UP;
+            _isInHouse = false;
+        } else if (_yBoard == 12)
+            _isInHouse = false;
+    }
 }
 
 dir ghost::getLastDir() { return _lastDir; }
@@ -102,36 +128,35 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
     if ((_xPixel % 32) != GHOST_CENTER_X || (_yPixel % 32) != GHOST_CENTER_Y)
         return;
 
+    // ghost leaving the house
+    // at the bottom of the door
+    if (vecBoard[_xBoard][_yBoard - 1].getState() == 3) {
+        _yBoard--;
+        _lastDir = UP;
+        return;
+    }
+    // in the door
+    if (vecBoard[_xBoard][_yBoard].getState() == 3) {
+        _yBoard--;
+        _lastDir = UP;
+        return;
+    }
+    // at the bottom left of the door
+    if (vecBoard[_xBoard + 1][_yBoard - 1].getState() == 3) {
+        _xBoard++;
+        _lastDir = RIGHT;
+        return;
+    }
+    // at the bottom right of the door
+    if (vecBoard[_xBoard - 1][_yBoard - 1].getState() == 3) {
+        _xBoard--;
+        _lastDir = LEFT;
+        return;
+    }
+
+    // random movement
     bool findPos = false;
     while (findPos == false) {
-
-        if (vecBoard[_xBoard][_yBoard - 1].getState() == 3) {
-            _yBoard--;
-            _lastDir = UP;
-            findPos = true;
-            break;
-        }
-
-        if (vecBoard[_xBoard][_yBoard].getState() == 3) {
-            _yBoard--;
-            _lastDir = UP;
-            findPos = true;
-            break;
-        }
-
-        if (vecBoard[_xBoard + 1][_yBoard - 1].getState() == 3) {
-            _xBoard++;
-            _lastDir = RIGHT;
-            findPos = true;
-            break;
-        }
-
-        if (vecBoard[_xBoard - 1][_yBoard - 1].getState() == 3) {
-            _xBoard--;
-            _lastDir = LEFT;
-            findPos = true;
-            break;
-        }
 
         int randDir = rand() % 4;
 
