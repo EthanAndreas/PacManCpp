@@ -15,16 +15,28 @@ dir pacman::getLastDir() { return _lastDir; }
 void pacman::updatePos() {
     switch (_lastDir) {
     case LEFT:
-        _xPixel--;
+        if (_xPixel > 0)
+            _xPixel--;
+        else
+            _lastDir = NONE;
         break;
     case RIGHT:
-        _xPixel++;
+        if (_xPixel < 20 * SCALE_PIXEL)
+            _xPixel++;
+        else
+            _lastDir = NONE;
         break;
     case UP:
-        _yPixel--;
+        if (_yPixel > 0)
+            _yPixel--;
+        else
+            _lastDir = NONE;
         break;
     case DOWN:
-        _yPixel++;
+        if (_yPixel < 20 * SCALE_PIXEL)
+            _yPixel++;
+        else
+            _lastDir = NONE;
         break;
     case NONE:
         break;
@@ -46,7 +58,7 @@ void pacman::updateDir(std::vector<std::vector<square>> vecBoard,
     switch (currentDir) {
 
     case LEFT:
-        if (_xBoard <= 0 && _yBoard != 13)
+        if (_xBoard < 0 && _yBoard != 13)
             _lastDir = NONE;
 
         if (vecBoard[_xBoard - 1][_yBoard].getState() == 0) {
@@ -55,7 +67,7 @@ void pacman::updateDir(std::vector<std::vector<square>> vecBoard,
 
         } else if (vecBoard[_xBoard - 1][_yBoard].getState() == 2) {
             _xBoard = 20;
-            _xPixel = 646;
+            _xPixel = 20 * SCALE_PIXEL + PACMAN_CENTER_X;
 
         } else {
             _lastDir = NONE;
@@ -64,7 +76,7 @@ void pacman::updateDir(std::vector<std::vector<square>> vecBoard,
         break;
 
     case RIGHT:
-        if (_xBoard >= 21 && _yBoard != 13)
+        if (_xBoard > 20 && _yBoard != 13)
             _lastDir = NONE;
 
         if (vecBoard[_xBoard + 1][_yBoard].getState() == 0) {
@@ -73,7 +85,7 @@ void pacman::updateDir(std::vector<std::vector<square>> vecBoard,
 
         } else if (vecBoard[_xBoard + 1][_yBoard].getState() == 2) {
             _xBoard = 1;
-            _xPixel = 6;
+            _xPixel = PACMAN_CENTER_X;
 
         } else {
             _lastDir = NONE;

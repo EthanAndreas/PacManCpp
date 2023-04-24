@@ -1,9 +1,16 @@
-#pragma once
+#ifndef PACMAN_H
+#define PACMAN_H
 
-#include "graphic.h"
+#include "lib.h"
+#include "square.h"
 
 #define DOT_PACMAN_CONTACT 20
 #define POWERUP_PACMAN_CONTACT 10
+
+#define PACMAN_INIT_X 10
+#define PACMAN_INIT_Y 15
+#define PACMAN_CENTER_X 0
+#define PACMAN_CENTER_Y 4
 
 class pacman {
   public:
@@ -60,3 +67,5 @@ class pacman {
     dir _lastDir;
     int _score;
 };
+
+#endif

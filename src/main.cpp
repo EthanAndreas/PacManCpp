@@ -29,8 +29,7 @@ int main() {
     std::vector<Coordinate> vecPowerup = Board.getPowerupList();
 
     // display initial board
-    draw(NONE, NONE, &windowSurf, &spriteBoard, Pacman.getPos(), Ghost.getPos(),
-         vecDot, vecPowerup, 0);
+    draw(&windowSurf, &spriteBoard, Pacman, Ghost, vecDot, vecPowerup, 0);
     SDL_UpdateWindowSurface(Window);
 
     bool start = false, quit = false;
@@ -88,9 +87,8 @@ int main() {
             vecPowerup = Board.getPowerupList();
 
             // display updated board
-            draw(Pacman.getLastDir(), Ghost.getLastDir(), &windowSurf,
-                 &spriteBoard, Pacman.getPos(), Ghost.getPos(), vecDot,
-                 vecPowerup, Pacman.getScore());
+            draw(&windowSurf, &spriteBoard, Pacman, Ghost, vecDot, vecPowerup,
+                 Pacman.getScore());
             SDL_UpdateWindowSurface(Window);
         }
 

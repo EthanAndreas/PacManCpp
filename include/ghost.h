@@ -1,6 +1,13 @@
-#pragma once
+#ifndef GHOST_H
+#define GHOST_H
 
-#include "graphic.h"
+#include "lib.h"
+#include "square.h"
+
+#define GHOST_INIT_X 10
+#define GHOST_INIT_Y 12
+#define GHOST_CENTER_X 0
+#define GHOST_CENTER_Y 4
 
 class ghost {
   public:
@@ -48,3 +55,5 @@ class ghost {
     int _xBoard, _yBoard, _xPixel, _yPixel;
     dir _lastDir;
 };
+
+#endif

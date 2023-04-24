@@ -15,16 +15,28 @@ dir ghost::getLastDir() { return _lastDir; }
 void ghost::updatePos() {
     switch (_lastDir) {
     case LEFT:
-        _xPixel--;
+        if (_xPixel > 0)
+            _xPixel--;
+        else
+            _lastDir = NONE;
         break;
     case RIGHT:
-        _xPixel++;
+        if (_xPixel < 20 * SCALE_PIXEL)
+            _xPixel++;
+        else
+            _lastDir = NONE;
         break;
     case UP:
-        _yPixel--;
+        if (_yPixel > 0)
+            _yPixel--;
+        else
+            _lastDir = NONE;
         break;
     case DOWN:
-        _yPixel++;
+        if (_yPixel < 20 * SCALE_PIXEL)
+            _yPixel++;
+        else
+            _lastDir = NONE;
         break;
     case NONE:
         break;

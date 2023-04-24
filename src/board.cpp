@@ -1,21 +1,5 @@
 #include "board.h"
 
-/*----------------------------------Square-----------------------------------*/
-
-square::square() {}
-
-square::~square() {}
-
-void square::setState(short state) { _state = state; }
-
-short square::getState() { return _state; }
-
-void square::setItem(item *item) { _item = item; }
-
-item *square::getItem() { return _item; }
-
-/*-----------------------------------Board------------------------------------*/
-
 board::board() { _board = std::vector<std::vector<square>>(); }
 
 board::~board() {
@@ -50,6 +34,7 @@ void board::load() {
 std::vector<std::vector<square>> board::getBoard() { return _board; }
 
 void board::transpose() {
+
     const size_t numRows = _board.size();
     const size_t numCols = _board.empty() ? 0 : _board[0].size();
     std::vector<std::vector<square>> tBoard(numCols,

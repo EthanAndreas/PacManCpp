@@ -1,70 +1,10 @@
-#pragma once
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "debug.h"
-#include "item.h"
-#include <fstream>
-#include <iostream>
-#include <vector>
-
-#define PACMAN_INIT_X 10
-#define PACMAN_INIT_Y 15
-#define PACMAN_CENTER_X 0
-#define PACMAN_CENTER_Y 4
-
-#define GHOST_INIT_X 10
-#define GHOST_INIT_Y 12
-#define GHOST_CENTER_X 0
-#define GHOST_CENTER_Y 4
-
-struct Coordinate {
-    int x;
-    int y;
-};
-
-/*----------------------------------Square-----------------------------------*/
-
-/**
- * @brief This class contains the square's state (wall or hall)
- * and the item on this square (pacman, ghost, dot...).
- */
-class square {
-  public:
-    square();
-    ~square();
-    /**
-     * @brief Set the state of the square.
-     *
-     * @param state short
-     *
-     * @note Short value defines the state : 0 for hall, 1 for wall, 2 for
-     * teleportation and 3 for cage's door.
-     */
-    void setState(short state);
-    /**
-     * @brief Get the state of the square.
-     *
-     * @return short
-     */
-    short getState();
-    /**
-     * @brief Set the item on the square.
-     *
-     * @param item*
-     */
-    void setItem(item *item);
-    /**
-     * @brief Get the item on the square.
-     *
-     * @return item*
-     */
-    item *getItem();
-
-  private:
-    short _state;
-    item *_item;
-};
-
-/*-----------------------------------Board------------------------------------*/
+#include "ghost.h"
+#include "pacman.h"
+#include "square.h"
 
 /**
  * @brief The board is formed by vector of square's vector.
@@ -115,3 +55,5 @@ class board {
   private:
     std::vector<std::vector<square>> _board;
 };
+
+#endif

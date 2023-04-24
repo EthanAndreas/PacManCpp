@@ -10,8 +10,8 @@ SDL_Rect ghost_l = {37, 123, 16, 16};
 SDL_Rect ghost_d = {105, 123, 16, 16};
 SDL_Rect ghost_u = {71, 123, 16, 16};
 // position
-SDL_Rect ghost = {GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
-                  GHOST_INIT_Y *SCALE_PIXEL + GHOST_CENTER_Y, 32, 32};
+SDL_Rect _ghost = {GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
+                   GHOST_INIT_Y *SCALE_PIXEL + GHOST_CENTER_Y, 32, 32};
 
 // PacMan
 // animation
@@ -21,8 +21,8 @@ SDL_Rect pac_l = {46, 89, 16, 16};
 SDL_Rect pac_d = {109, 90, 16, 16};
 SDL_Rect pac_u = {75, 89, 16, 16};
 // position
-SDL_Rect pac = {PACMAN_INIT_X * SCALE_PIXEL + PACMAN_CENTER_X,
-                PACMAN_INIT_Y *SCALE_PIXEL + PACMAN_CENTER_Y, 32, 32};
+SDL_Rect _pacman = {PACMAN_INIT_X * SCALE_PIXEL + PACMAN_CENTER_X,
+                    PACMAN_INIT_Y *SCALE_PIXEL + PACMAN_CENTER_Y, 32, 32};
 
 // items
 SDL_Rect dot_in = {4, 81, 2, 2};
@@ -85,9 +85,8 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
     count = 0;
 }
 
-void draw(dir pacmanLastDir, dir ghostLastDir, SDL_Surface **windowSurf,
-          SDL_Surface **spriteBoard, std::pair<int, int> pacPos,
-          std::pair<int, int> ghostPos, std::vector<Coordinate> vecDot,
+void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
+          ghost Ghost, std::vector<Coordinate> vecDot,
           std::vector<Coordinate> vecPowerup, int cur_score) {
 
     SDL_SetColorKey(*spriteBoard, false, 0);
@@ -142,9 +141,9 @@ void draw(dir pacmanLastDir, dir ghostLastDir, SDL_Surface **windowSurf,
         SDL_BlitScaled(*spriteBoard, &powerup_in, *windowSurf, &powerup);
     }
 
-    // ghost look animation
+    // _ghost look animation
     SDL_Rect *ghost_in = nullptr;
-    switch (ghostLastDir) {
+    switch (Ghost.getLastDir()) {
     case RIGHT:
         ghost_in = &(ghost_r);
         break;
@@ -158,25 +157,25 @@ void draw(dir pacmanLastDir, dir ghostLastDir, SDL_Surface **windowSurf,
         ghost_in = &(ghost_u);
         break;
     case NONE:
-        // by default, ghost looks right
+        // by default, _ghost looks right
         ghost_in = &(ghost_r);
         break;
     }
     count = (count + 1) % (512);
 
-    // ghost wave animation
+    // _ghost wave animation
     SDL_Rect ghost_in2 = *ghost_in;
     if ((count / 4) % 2)
         ghost_in2.x += 17;
 
-    // ghost updated position
-    ghost.x = ghostPos.first;
-    ghost.y = ghostPos.second;
+    // _ghost updated position
+    _ghost.x = Ghost.getPos().first;
+    _ghost.y = Ghost.getPos().second;
 
     // pacman animation
     SDL_Rect pac_in = pac_blank;
     if ((count / 4) % 2) {
-        switch (pacmanLastDir) {
+        switch (Pacman.getLastDir()) {
         case RIGHT:
             pac_in = pac_r;
             break;
@@ -196,10 +195,10 @@ void draw(dir pacmanLastDir, dir ghostLastDir, SDL_Surface **windowSurf,
     }
 
     // pacman updated position
-    pac.x = pacPos.first;
-    pac.y = pacPos.second;
+    _pacman.x = Pacman.getPos().first;
+    _pacman.y = Pacman.getPos().second;
 
     SDL_SetColorKey(*spriteBoard, true, 0);
-    SDL_BlitScaled(*spriteBoard, &ghost_in2, *windowSurf, &ghost);
-    SDL_BlitScaled(*spriteBoard, &pac_in, *windowSurf, &pac);
+    SDL_BlitScaled(*spriteBoard, &ghost_in2, *windowSurf, &_ghost);
+    SDL_BlitScaled(*spriteBoard, &pac_in, *windowSurf, &_pacman);
 }
