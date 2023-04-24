@@ -87,6 +87,21 @@ SDL_Rect galaxian_in = {369, 235, 14, 14};
 SDL_Rect bell_in = {385, 235, 16, 16};
 SDL_Rect key_in = {400, 235, 14, 16};
 
+// Score
+SDL_Rect score100 = {180, 133, 13, 7};
+SDL_Rect score300 = {179, 142, 14, 7};
+SDL_Rect score500 = {179, 151, 14, 7};
+SDL_Rect score700 = {179, 160, 14, 7};
+SDL_Rect score1000 = {177, 169, 16, 7};
+SDL_Rect score2000 = {177, 178, 16, 7};
+SDL_Rect score3000 = {177, 187, 16, 7};
+SDL_Rect score5000 = {177, 196, 16, 7};
+SDL_Rect score200 = {155, 176, 14, 7};
+SDL_Rect score400 = {155, 185, 14, 7};
+SDL_Rect score800 = {155, 194, 14, 7};
+SDL_Rect score1600 = {154, 203, 15, 7};
+SDL_Rect pts = {177, 204, 16, 7};
+
 // Letters and numbers for SDL
 SDL_Rect letter_a = {12, 61, 8, 8};
 SDL_Rect letter_b = {20, 61, 8, 8};
