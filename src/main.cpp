@@ -80,8 +80,9 @@ int main() {
         vecPowerup = Board.getPowerupList();
 
         // display updated board
-        draw(Pacman.getLastDir(), &windowSurf, &spriteBoard, Pacman.getPos(),
-             Ghost.getPos(), vecDot, vecPowerup, Pacman.getScore());
+        draw(Pacman.getLastDir(), Ghost.getLastDir(), &windowSurf, &spriteBoard,
+             Pacman.getPos(), Ghost.getPos(), vecDot, vecPowerup,
+             Pacman.getScore());
 
         SDL_UpdateWindowSurface(Window);
 

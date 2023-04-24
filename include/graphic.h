@@ -25,7 +25,7 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
  * @param windowSurf
  * @param spriteBoard
  */
-void draw(dir lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
-          std::pair<int, int> pacPos, std::pair<int, int> ghostPos,
-          std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup,
-          int const cur_score);
+void draw(dir pacmanLastDir, dir ghostLastDir, SDL_Surface **windowSurf,
+          SDL_Surface **spriteBoard, std::pair<int, int> pacPos,
+          std::pair<int, int> ghostPos, std::vector<Coordinate> vecDot,
+          std::vector<Coordinate> vecPowerup, int const cur_score);

@@ -85,10 +85,10 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
     count = 0;
 }
 
-void draw(dir lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
-          std::pair<int, int> pacPos, std::pair<int, int> ghostPos,
-          std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup,
-          int const cur_score) {
+void draw(dir pacmanLastDir, dir ghostLastDir, SDL_Surface **windowSurf,
+          SDL_Surface **spriteBoard, std::pair<int, int> pacPos,
+          std::pair<int, int> ghostPos, std::vector<Coordinate> vecDot,
+          std::vector<Coordinate> vecPowerup, int const cur_score) {
 
     SDL_SetColorKey(*spriteBoard, false, 0);
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
@@ -140,29 +140,29 @@ void draw(dir lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
         SDL_BlitScaled(*spriteBoard, &powerup_in, *windowSurf, &powerup);
     }
 
-    // ghost rotation
+    // Ghost look animation
     SDL_Rect *ghost_in = nullptr;
-    switch (count / 128) {
-    case 0:
+    switch (ghostLastDir) {
+    case RIGHT:
         ghost_in = &(ghost_r);
-        ghost.x++;
         break;
-    case 1:
+    case DOWN:
         ghost_in = &(ghost_d);
-        ghost.y++;
         break;
-    case 2:
+    case LEFT:
         ghost_in = &(ghost_l);
-        ghost.x--;
         break;
-    case 3:
+    case UP:
         ghost_in = &(ghost_u);
-        ghost.y--;
+        break;
+    case NONE:
+        // By default, ghost looks right
+        ghost_in = &(ghost_r);
         break;
     }
     count = (count + 1) % (512);
 
-    // swap sprite
+    // Ghost wave animation
     SDL_Rect ghost_in2 = *ghost_in;
     if ((count / 4) % 2)
         ghost_in2.x += 17;
@@ -174,7 +174,7 @@ void draw(dir lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
     // pacman animation
     SDL_Rect pac_in = pac_blank;
     if ((count / 4) % 2) {
-        switch (lastDir) {
+        switch (pacmanLastDir) {
         case RIGHT:
             pac_in = pac_r;
             break;
