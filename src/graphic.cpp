@@ -78,14 +78,14 @@ std::vector<std::vector<SDL_Rect>> vecGhostSprite = initGhostSrpite();
 // items
 SDL_Rect dot_in = {4, 81, 2, 2};
 SDL_Rect powerup_in = {9, 79, 7, 7};
-SDL_Rect cherry_in = {290, 238, 12, 12};
-SDL_Rect strawberry_in = {307, 238, 12, 12};
-SDL_Rect orange_in = {322, 238, 12, 12};
-SDL_Rect apple_in = {338, 238, 12, 12};
-SDL_Rect melon_in = {354, 236, 12, 14};
-SDL_Rect galaxian_in = {371, 238, 12, 12};
-SDL_Rect bell_in = {387, 237, 12, 13};
-SDL_Rect key_in = {405, 237, 12, 13};
+SDL_Rect cherry_in = {289, 236, 14, 14};
+SDL_Rect strawberry_in = {305, 236, 14, 14};
+SDL_Rect orange_in = {320, 236, 14, 14};
+SDL_Rect apple_in = {337, 236, 14, 14};
+SDL_Rect melon_in = {352, 234, 14, 16};
+SDL_Rect galaxian_in = {369, 235, 14, 14};
+SDL_Rect bell_in = {385, 235, 16, 16};
+SDL_Rect key_in = {400, 235, 14, 16};
 
 // Letters and numbers for SDL
 SDL_Rect letter_a = {12, 61, 8, 8};
