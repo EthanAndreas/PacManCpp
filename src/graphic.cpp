@@ -79,8 +79,7 @@ std::vector<std::vector<SDL_Rect>> vecGhostSprite = initGhostSrpite();
 SDL_Rect dot_in = {4, 81, 2, 2};
 SDL_Rect powerup_in = {9, 79, 7, 7};
 
-// Letters and numbers
-// TODO: use a dictionary
+// Letters and numbers for SDL
 SDL_Rect letter_a = {12, 61, 8, 8};
 SDL_Rect letter_b = {20, 61, 8, 8};
 SDL_Rect letter_c = {28, 61, 8, 8};
@@ -120,8 +119,18 @@ SDL_Rect letter_8 = {68, 53, 8, 8};
 SDL_Rect letter_9 = {76, 53, 8, 8};
 SDL_Rect letter_blank = {108, 69, 8, 8};
 
-SDL_Rect number[] = {letter_0, letter_1, letter_2, letter_3, letter_4,
-                     letter_5, letter_6, letter_7, letter_8, letter_9};
+// Dictionary for letters
+std::map<char, SDL_Rect> sdlChar = {
+    {'a', letter_a}, {'b', letter_b}, {'c', letter_c},     {'d', letter_d},
+    {'e', letter_e}, {'f', letter_f}, {'g', letter_g},     {'h', letter_h},
+    {'i', letter_i}, {'j', letter_j}, {'k', letter_k},     {'l', letter_l},
+    {'m', letter_m}, {'n', letter_n}, {'o', letter_o},     {'p', letter_p},
+    {'q', letter_q}, {'r', letter_r}, {'s', letter_s},     {'t', letter_t},
+    {'u', letter_u}, {'v', letter_v}, {'w', letter_w},     {'x', letter_x},
+    {'y', letter_y}, {'z', letter_z}, {'.', letter_point}, {' ', letter_blank},
+    {'1', letter_1}, {'2', letter_2}, {'3', letter_3},     {'4', letter_4},
+    {'5', letter_5}, {'6', letter_6}, {'7', letter_7},     {'8', letter_8},
+    {'9', letter_9}, {'0', letter_0}, {' ', letter_blank}};
 
 int count;
 
@@ -143,42 +152,11 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
     SDL_SetColorKey(*spriteBoard, false, 0);
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
 
-    // TODO: create a function to print text using a dictionary
-    // Erase score area
-    SDL_Rect score_area = {4, 874, 16 * 36, 16};
-    SDL_FillRect(*windowSurf, &score_area, 0);
+    // combine the score string and the score number into one string
+    std::string score_string = "score " + std::to_string(cur_score);
 
-    // score display
-    SDL_Rect score = {4, 874, 16, 16};
-    SDL_BlitScaled(*spriteBoard, &letter_s, *windowSurf, &score);
-    score.x += 16;
-    SDL_BlitScaled(*spriteBoard, &letter_c, *windowSurf, &score);
-    score.x += 16;
-    SDL_BlitScaled(*spriteBoard, &letter_o, *windowSurf, &score);
-    score.x += 16;
-    SDL_BlitScaled(*spriteBoard, &letter_r, *windowSurf, &score);
-    score.x += 16;
-    SDL_BlitScaled(*spriteBoard, &letter_e, *windowSurf, &score);
-    score.x += 16;
-    SDL_BlitScaled(*spriteBoard, &letter_blank, *windowSurf, &score);
-    score.x += 16;
-
-    // get all score digits
-    int score_number = cur_score;
-    int digits[10];
-    int i = 0;
-
-    while (score_number > 0) {
-        digits[i] = score_number % 10;
-        score_number /= 10;
-        i++;
-    }
-
-    // score display
-    for (int j = i - 1; j >= 0; j--) {
-        SDL_BlitScaled(*spriteBoard, &number[digits[j]], *windowSurf, &score);
-        score.x += 16;
-    }
+    // print the score string
+    drawString(windowSurf, spriteBoard, 4, 874, score_string);
 
     // dot display
     for (auto &coord : vecDot) {
@@ -257,4 +235,23 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
 
     SDL_SetColorKey(*spriteBoard, true, 0);
     SDL_BlitScaled(*spriteBoard, &pac_in, *windowSurf, &_pacman);
+}
+
+void drawString(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int x,
+                int y, std::string str) {
+    // Get the string length
+    int len = str.length();
+
+    // Create a rectangle for the text
+    SDL_Rect area = {x, y, 16 * len, 16};
+
+    // Erase the area
+    SDL_FillRect(*windowSurf, &area, 0);
+
+    // Print the text
+    SDL_Rect textRect = {x, y, 16, 16};
+    for (int i = 0; i < len; i++) {
+        SDL_BlitScaled(*spriteBoard, &sdlChar[str[i]], *windowSurf, &textRect);
+        textRect.x += 16;
+    }
 }

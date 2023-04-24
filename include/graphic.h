@@ -3,6 +3,7 @@
 
 #include "board.h"
 #include <SDL2/SDL.h>
+#include <map>
 
 /**
  * @brief Initialize SDL and create the window
@@ -24,5 +25,8 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
 void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
           std::vector<ghost> vecGhost, std::vector<Coordinate> vecDot,
           std::vector<Coordinate> vecPowerup, int cur_score);
+
+void drawString(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int x,
+                int y, std::string str);
 
 #endif
