@@ -3,7 +3,7 @@
 #include "graphic.h"
 
 #define DOT_PACMAN_CONTACT 20
-#define POWERUP_PACMAN_CONTACT 30
+#define POWERUP_PACMAN_CONTACT 10
 
 class pacman {
   public:

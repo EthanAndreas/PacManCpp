@@ -28,7 +28,12 @@ int main() {
     std::vector<Coordinate> vecDot = Board.getDotList();
     std::vector<Coordinate> vecPowerup = Board.getPowerupList();
 
-    bool quit = false;
+    // display initial board
+    draw(NONE, NONE, &windowSurf, &spriteBoard, Pacman.getPos(), Ghost.getPos(),
+         vecDot, vecPowerup, 0);
+    SDL_UpdateWindowSurface(Window);
+
+    bool start = false, quit = false;
     int nbk;
     const Uint8 *keys;
     SDL_Event event;
@@ -52,46 +57,49 @@ int main() {
         keys = SDL_GetKeyboardState(&nbk);
         if (keys[SDL_SCANCODE_ESCAPE])
             quit = true;
-        if (keys[SDL_SCANCODE_LEFT]) {
+        else if (keys[SDL_SCANCODE_LEFT]) {
+            start = true;
             currentDir = LEFT;
-        }
-        if (keys[SDL_SCANCODE_RIGHT]) {
+        } else if (keys[SDL_SCANCODE_RIGHT]) {
+            start = true;
             currentDir = RIGHT;
-        }
-        if (keys[SDL_SCANCODE_UP]) {
+        } else if (keys[SDL_SCANCODE_UP]) {
+            start = true;
             currentDir = UP;
-        }
-        if (keys[SDL_SCANCODE_DOWN]) {
+        } else if (keys[SDL_SCANCODE_DOWN]) {
+            start = true;
             currentDir = DOWN;
         }
 
-        // pacman movement management
-        Pacman.updateDir(Board.getBoard(), currentDir);
-        Pacman.updatePos();
-        Pacman.updateSquare(Board.getBoard());
+        // press any key to start the game
+        if (start) {
+            // pacman movement management
+            Pacman.updateDir(Board.getBoard(), currentDir);
+            Pacman.updatePos();
+            Pacman.updateSquare(Board.getBoard());
 
-        // ghost movement management
-        Ghost.updateDir(Board.getBoard());
-        Ghost.updatePos();
-        Ghost.updateSquare(Board.getBoard());
+            // ghost movement management
+            Ghost.updateDir(Board.getBoard());
+            Ghost.updatePos();
+            Ghost.updateSquare(Board.getBoard());
 
-        // update item on the board
-        vecDot = Board.getDotList();
-        vecPowerup = Board.getPowerupList();
+            // update item on the board
+            vecDot = Board.getDotList();
+            vecPowerup = Board.getPowerupList();
 
-        // display updated board
-        draw(Pacman.getLastDir(), Ghost.getLastDir(), &windowSurf, &spriteBoard,
-             Pacman.getPos(), Ghost.getPos(), vecDot, vecPowerup,
-             Pacman.getScore());
-
-        SDL_UpdateWindowSurface(Window);
+            // display updated board
+            draw(Pacman.getLastDir(), Ghost.getLastDir(), &windowSurf,
+                 &spriteBoard, Pacman.getPos(), Ghost.getPos(), vecDot,
+                 vecPowerup, Pacman.getScore());
+            SDL_UpdateWindowSurface(Window);
+        }
 
         Uint64 fps_end = SDL_GetTicks();
         float elapsed = (fps_end - fps_start) /
                         (float)SDL_GetPerformanceFrequency() * 1000.0f;
 
-        // 60 fps
-        SDL_Delay(floor(16.666f - elapsed));
+        // 120 fps
+        SDL_Delay(floor(8.888f - elapsed));
     }
 
     Board.~board();

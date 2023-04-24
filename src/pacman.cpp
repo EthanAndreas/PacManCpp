@@ -146,64 +146,37 @@ void pacman::updateSquare(std::vector<std::vector<square>> vecBoard) {
 
     // update edible item
     if (vecBoard[_xBoard][_yBoard].getItem()->getEdible() == _DOT) {
-        // TODO : correct the contact for the case of the Y axis
-        switch (_lastDir) {
-        case LEFT:
-            if ((_xPixel % 32) - PACMAN_CENTER_X >= DOT_PACMAN_CONTACT) {
+
+        if (_lastDir == LEFT || _lastDir == RIGHT) {
+            if (abs(_xPixel % 32 - PACMAN_CENTER_X) != DOT_PACMAN_CONTACT) {
                 return;
             }
-            break;
-        case RIGHT:
-            if ((_xPixel % 32) - PACMAN_CENTER_X <= DOT_PACMAN_CONTACT) {
+        } else if (_lastDir == UP || _lastDir == DOWN) {
+            if (abs(_yPixel % 32 - PACMAN_CENTER_Y) != DOT_PACMAN_CONTACT) {
                 return;
             }
-            break;
-        case UP:
-            if (abs((_yPixel % 32) - PACMAN_CENTER_Y) != 20) {
-                return;
-            }
-            break;
-        case DOWN:
-            if ((_yPixel % 32) - PACMAN_CENTER_Y <= DOT_PACMAN_CONTACT) {
-                return;
-            }
-            break;
-        case NONE:
+        } else
             return;
-        }
 
         vecBoard[_xBoard][_yBoard].getItem()->setEdible(_EMPTY);
         _score = _score + 10;
 
     } else if (vecBoard[_xBoard][_yBoard].getItem()->getEdible() == _POWERUP) {
 
-        switch (_lastDir) {
-        case LEFT:
-            if (_xPixel % 32 > POWERUP_PACMAN_CONTACT) {
+        if (_lastDir == LEFT || _lastDir == RIGHT) {
+            if (abs(_xPixel % 32 - PACMAN_CENTER_X) != POWERUP_PACMAN_CONTACT) {
                 return;
             }
-            break;
-        case RIGHT:
-            if (_xPixel % 32 < POWERUP_PACMAN_CONTACT) {
+        } else if (_lastDir == UP || _lastDir == DOWN) {
+            if (abs(_yPixel % 32 - PACMAN_CENTER_Y) != POWERUP_PACMAN_CONTACT) {
                 return;
             }
-            break;
-        case UP:
-            if (_yPixel % 32 > POWERUP_PACMAN_CONTACT) {
-                return;
-            }
-            break;
-        case DOWN:
-            if (_yPixel % 32 < POWERUP_PACMAN_CONTACT) {
-                return;
-            }
-            break;
-        case NONE:
+        } else
             return;
-        }
 
         vecBoard[_xBoard][_yBoard].getItem()->setEdible(_EMPTY);
         _score = _score + 50;
     }
 }
+
 int pacman::getScore() const { return _score; }

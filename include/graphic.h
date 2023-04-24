@@ -28,4 +28,4 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
 void draw(dir pacmanLastDir, dir ghostLastDir, SDL_Surface **windowSurf,
           SDL_Surface **spriteBoard, std::pair<int, int> pacPos,
           std::pair<int, int> ghostPos, std::vector<Coordinate> vecDot,
-          std::vector<Coordinate> vecPowerup, int const cur_score);
+          std::vector<Coordinate> vecPowerup, int cur_score);

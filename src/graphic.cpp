@@ -88,7 +88,7 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
 void draw(dir pacmanLastDir, dir ghostLastDir, SDL_Surface **windowSurf,
           SDL_Surface **spriteBoard, std::pair<int, int> pacPos,
           std::pair<int, int> ghostPos, std::vector<Coordinate> vecDot,
-          std::vector<Coordinate> vecPowerup, int const cur_score) {
+          std::vector<Coordinate> vecPowerup, int cur_score) {
 
     SDL_SetColorKey(*spriteBoard, false, 0);
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
@@ -113,7 +113,7 @@ void draw(dir pacmanLastDir, dir ghostLastDir, SDL_Surface **windowSurf,
     SDL_BlitScaled(*spriteBoard, &letter_blank, *windowSurf, &score);
     score.x += 16;
 
-    // Get all digits of score
+    // get all score digits
     int score_number = cur_score;
     int digits[10];
     int i = 0;
@@ -124,23 +124,25 @@ void draw(dir pacmanLastDir, dir ghostLastDir, SDL_Surface **windowSurf,
         i++;
     }
 
-    // Print score
+    // score display
     for (int j = i - 1; j >= 0; j--) {
         SDL_BlitScaled(*spriteBoard, &number[digits[j]], *windowSurf, &score);
         score.x += 16;
     }
 
+    // dot display
     for (auto &coord : vecDot) {
         SDL_Rect dot = {coord.x * 32 + 11, coord.y * 32 + 15, 10, 10};
         SDL_BlitScaled(*spriteBoard, &dot_in, *windowSurf, &dot);
     }
 
+    // powerup display
     for (auto &coord : vecPowerup) {
         SDL_Rect powerup = {coord.x * 32 + 6, coord.y * 32 + 10, 20, 20};
         SDL_BlitScaled(*spriteBoard, &powerup_in, *windowSurf, &powerup);
     }
 
-    // Ghost look animation
+    // ghost look animation
     SDL_Rect *ghost_in = nullptr;
     switch (ghostLastDir) {
     case RIGHT:
@@ -156,13 +158,13 @@ void draw(dir pacmanLastDir, dir ghostLastDir, SDL_Surface **windowSurf,
         ghost_in = &(ghost_u);
         break;
     case NONE:
-        // By default, ghost looks right
+        // by default, ghost looks right
         ghost_in = &(ghost_r);
         break;
     }
     count = (count + 1) % (512);
 
-    // Ghost wave animation
+    // ghost wave animation
     SDL_Rect ghost_in2 = *ghost_in;
     if ((count / 4) % 2)
         ghost_in2.x += 17;
