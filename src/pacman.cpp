@@ -152,28 +152,21 @@ void pacman::updateSquare(std::vector<std::vector<square>> vecBoard) {
             if ((_xPixel % 32) - PACMAN_CENTER_X >= DOT_PACMAN_CONTACT) {
                 return;
             }
-            std::cout << "LEFT" << std::endl;
             break;
         case RIGHT:
             if ((_xPixel % 32) - PACMAN_CENTER_X <= DOT_PACMAN_CONTACT) {
                 return;
             }
-            std::cout << "RIGHT" << std::endl;
             break;
         case UP:
-            if (abs((_yPixel % 32) - PACMAN_CENTER_Y) <= DOT_PACMAN_CONTACT) {
-                std::cout << "IN : " << abs((_yPixel % 32) - PACMAN_CENTER_Y)
-                          << std::endl;
+            if (abs((_yPixel % 32) - PACMAN_CENTER_Y) != 20) {
                 return;
             }
-            std::cout << "UP : " << abs((_yPixel % 32) - PACMAN_CENTER_Y)
-                      << std::endl;
             break;
         case DOWN:
             if ((_yPixel % 32) - PACMAN_CENTER_Y <= DOT_PACMAN_CONTACT) {
                 return;
             }
-            std::cout << "DOWN" << std::endl;
             break;
         case NONE:
             return;
