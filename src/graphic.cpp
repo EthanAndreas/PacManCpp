@@ -1,6 +1,6 @@
 #include "graphic.h"
 
-SDL_Rect src_bg = {370, 3, 169, 217};
+SDL_Rect src_bg = {370, 3, 168, 216};
 SDL_Rect bg = {4, 4, 672, 864};
 
 // Red Ghost
