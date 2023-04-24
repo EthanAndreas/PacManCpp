@@ -146,25 +146,25 @@ void pacman::updateSquare(std::vector<std::vector<square>> vecBoard) {
 
     // update edible item
     if (vecBoard[_xBoard][_yBoard].getItem()->getEdible() == _DOT) {
-
+        // TODO : correct the contact for the case of the Y axis
         switch (_lastDir) {
         case LEFT:
-            if (_xPixel % 32 > DOT_PACMAN_CONTACT) {
+            if (_xPixel % 32 >= DOT_PACMAN_CONTACT) {
                 return;
             }
             break;
         case RIGHT:
-            if (_xPixel % 32 < DOT_PACMAN_CONTACT) {
+            if (_xPixel % 32 <= DOT_PACMAN_CONTACT) {
                 return;
             }
             break;
         case UP:
-            if (_yPixel % 32 > DOT_PACMAN_CONTACT) {
+            if (_yPixel % 32 >= DOT_PACMAN_CONTACT) {
                 return;
             }
             break;
         case DOWN:
-            if (_yPixel % 32 < DOT_PACMAN_CONTACT) {
+            if ((_yPixel % 32) - 5 <= DOT_PACMAN_CONTACT) {
                 return;
             }
             break;
