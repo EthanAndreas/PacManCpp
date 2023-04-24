@@ -81,7 +81,7 @@ int main() {
 
         // display updated board
         draw(Pacman.getLastDir(), &windowSurf, &spriteBoard, Pacman.getPos(),
-             Ghost.getPos(), vecDot, vecPowerup);
+             Ghost.getPos(), vecDot, vecPowerup, Pacman.getScore());
 
         SDL_UpdateWindowSurface(Window);
 

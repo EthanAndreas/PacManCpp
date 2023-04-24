@@ -87,7 +87,8 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
 
 void draw(dir lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
           std::pair<int, int> pacPos, std::pair<int, int> ghostPos,
-          std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup) {
+          std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup,
+          int const cur_score) {
 
     SDL_SetColorKey(*spriteBoard, false, 0);
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
@@ -111,12 +112,23 @@ void draw(dir lastDir, SDL_Surface **windowSurf, SDL_Surface **spriteBoard,
     score.x += 16;
     SDL_BlitScaled(*spriteBoard, &letter_blank, *windowSurf, &score);
     score.x += 16;
-    SDL_BlitScaled(*spriteBoard, &number[1], *windowSurf, &score);
-    score.x += 16;
-    SDL_BlitScaled(*spriteBoard, &number[2], *windowSurf, &score);
-    score.x += 16;
-    SDL_BlitScaled(*spriteBoard, &number[3], *windowSurf, &score);
-    score.x += 16;
+
+    // Get all digits of score
+    int score_number = cur_score;
+    int digits[10];
+    int i = 0;
+
+    while (score_number > 0) {
+        digits[i] = score_number % 10;
+        score_number /= 10;
+        i++;
+    }
+
+    // Print score
+    for (int j = i - 1; j >= 0; j--) {
+        SDL_BlitScaled(*spriteBoard, &number[digits[j]], *windowSurf, &score);
+        score.x += 16;
+    }
 
     for (auto &coord : vecDot) {
         SDL_Rect dot = {coord.x * 32 + 11, coord.y * 32 + 15, 10, 10};

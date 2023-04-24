@@ -206,3 +206,4 @@ void pacman::updateSquare(std::vector<std::vector<square>> vecBoard) {
         _score = _score + 50;
     }
 }
+int pacman::getScore() const { return _score; }

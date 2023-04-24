@@ -48,6 +48,12 @@ class pacman {
      * @param vecBoard
      */
     void updateSquare(std::vector<std::vector<square>> vecBoard);
+    /**
+     * @brief Get the score of pacman.
+     *
+     * @return int
+     */
+    int getScore() const;
 
   private:
     int _xBoard, _yBoard, _xPixel, _yPixel;
