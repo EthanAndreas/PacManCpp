@@ -52,25 +52,32 @@ std::pair<int, int> pacman::getPos() {
 void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
                        dir currentDir) {
 
-    // each square is 32x32 pixels
+    if (_xBoard < 0 || _xBoard > 20 || _yBoard <= 0 || _yBoard >= 26)
+        exit(EXIT_FAILURE);
+
     // wait until pacman reaches the middle of the next square
-    if ((_xPixel % 32) != PACMAN_CENTER_X || (_yPixel % 32) != PACMAN_CENTER_Y)
+    if ((_xPixel % SCALE_PIXEL) != PACMAN_CENTER_X ||
+        (_yPixel % SCALE_PIXEL) != PACMAN_CENTER_Y)
         return;
 
     switch (currentDir) {
 
     case LEFT:
-        if (_xBoard < 0 && _yBoard != 13)
+        // out of the board
+        if (_xBoard <= 0 && _yBoard != 13) {
             _lastDir = NONE;
-
-        if (vecBoard[_xBoard - 1][_yBoard]->getState() == 0) {
-            _xBoard--;
-            _lastDir = LEFT;
-
-        } else if (vecBoard[_xBoard - 1][_yBoard]->getState() == 2) {
+            break;
+        }
+        // teleportation
+        else if (_xBoard == 0 && _yBoard == 13) {
             _xBoard = 20;
             _xPixel = 20 * SCALE_PIXEL + PACMAN_CENTER_X;
+            break;
+        }
 
+        if (vecBoard[_xBoard - 1][_yBoard]->getState() == HALL) {
+            _xBoard--;
+            _lastDir = LEFT;
         } else {
             _lastDir = NONE;
         }
@@ -78,17 +85,21 @@ void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
         break;
 
     case RIGHT:
-        if (_xBoard > 20 && _yBoard != 13)
+        // out of the board
+        if (_xBoard >= 20 && _yBoard != 13) {
             _lastDir = NONE;
+            break;
+        }
+        // teleportation
+        else if (_xBoard == 20 && _yBoard == 13) {
+            _xBoard = 0;
+            _xPixel = PACMAN_CENTER_X;
+            break;
+        }
 
-        if (vecBoard[_xBoard + 1][_yBoard]->getState() == 0) {
+        if (vecBoard[_xBoard + 1][_yBoard]->getState() == HALL) {
             _xBoard++;
             _lastDir = RIGHT;
-
-        } else if (vecBoard[_xBoard + 1][_yBoard]->getState() == 2) {
-            _xBoard = 1;
-            _xPixel = PACMAN_CENTER_X;
-
         } else {
             _lastDir = NONE;
         }
@@ -96,10 +107,13 @@ void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
         break;
 
     case UP:
-        if (_yBoard >= 26)
+        // out of the board
+        if (_yBoard >= 26) {
             _lastDir = NONE;
+            break;
+        }
 
-        if (vecBoard[_xBoard][_yBoard - 1]->getState() == 0) {
+        if (vecBoard[_xBoard][_yBoard - 1]->getState() == HALL) {
             _yBoard--;
             _lastDir = UP;
 
@@ -110,10 +124,13 @@ void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
         break;
 
     case DOWN:
-        if (_yBoard <= 0)
+        // out of the board
+        if (_yBoard <= 0) {
             _lastDir = NONE;
+            break;
+        }
 
-        if (vecBoard[_xBoard][_yBoard + 1]->getState() == 0) {
+        if (vecBoard[_xBoard][_yBoard + 1]->getState() == HALL) {
             _yBoard++;
             _lastDir = DOWN;
 
@@ -132,16 +149,21 @@ dir pacman::getDir() { return _lastDir; }
 
 void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard) {
 
+    if (_xBoard < 0 || _xBoard > 20 || _yBoard <= 0 || _yBoard >= 26)
+        exit(EXIT_FAILURE);
+
     // update item
     if (vecBoard[_xBoard][_yBoard]->getItem() == _DOT) {
 
         if (_lastDir == LEFT || _lastDir == RIGHT) {
-            if (abs(_xPixel % 32 - PACMAN_CENTER_X) != DOT_PACMAN_CONTACT) {
+            if (abs(_xPixel % SCALE_PIXEL - PACMAN_CENTER_X) !=
+                DOT_PACMAN_CONTACT) {
                 return;
             }
 
         } else if (_lastDir == UP || _lastDir == DOWN) {
-            if (abs(_yPixel % 32 - PACMAN_CENTER_Y) != DOT_PACMAN_CONTACT) {
+            if (abs(_yPixel % SCALE_PIXEL - PACMAN_CENTER_Y) !=
+                DOT_PACMAN_CONTACT) {
                 return;
             }
         } else
@@ -155,11 +177,13 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard) {
     } else if (vecBoard[_xBoard][_yBoard]->getItem() == _POWERUP) {
 
         if (_lastDir == LEFT || _lastDir == RIGHT) {
-            if (abs(_xPixel % 32 - PACMAN_CENTER_X) != POWERUP_PACMAN_CONTACT) {
+            if (abs(_xPixel % SCALE_PIXEL - PACMAN_CENTER_X) !=
+                POWERUP_PACMAN_CONTACT) {
                 return;
             }
         } else if (_lastDir == UP || _lastDir == DOWN) {
-            if (abs(_yPixel % 32 - PACMAN_CENTER_Y) != POWERUP_PACMAN_CONTACT) {
+            if (abs(_yPixel % SCALE_PIXEL - PACMAN_CENTER_Y) !=
+                POWERUP_PACMAN_CONTACT) {
                 return;
             }
         } else
@@ -209,8 +233,10 @@ bool pacman::ghostCollision(std::vector<ghost *> vecGhost) {
     } else {
         for (auto ghost : vecGhost) {
             if (abs(_xPixel - ghost->getPos().first) < GHOST_PACMAN_CONTACT &&
-                abs(_yPixel - ghost->getPos().second) < GHOST_PACMAN_CONTACT)
+                abs(_yPixel - ghost->getPos().second) < GHOST_PACMAN_CONTACT) {
                 ghost->houseReturn();
+                _score = _score + GHOST_SCORE;
+            }
         }
     }
 

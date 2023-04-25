@@ -78,7 +78,8 @@ void ghost::leaveGhostHouse() {
 
     if (isTime == false) {
 
-        if (_xPixel % 32 != GHOST_CENTER_X || _yPixel % 32 != GHOST_CENTER_Y)
+        if (_xPixel % SCALE_PIXEL != GHOST_CENTER_X ||
+            _yPixel % SCALE_PIXEL != GHOST_CENTER_Y)
             return;
 
         if (_yBoard == 13) {
@@ -89,6 +90,7 @@ void ghost::leaveGhostHouse() {
             _yBoard++;
         }
     } else {
+
         if (_yBoard == 13) {
             _yBoard--;
             _lastDir = UP;
@@ -123,32 +125,35 @@ std::pair<int, int> ghost::getPos() { return std::make_pair(_xPixel, _yPixel); }
 
 void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
 
-    // each square is 32x32 pixels
+    if (_xBoard <= 0 || _xBoard >= 20 || _yBoard <= 0 || _yBoard >= 26)
+        exit(EXIT_FAILURE);
+
     // wait until ghost reaches the middle of the next square
-    if ((_xPixel % 32) != GHOST_CENTER_X || (_yPixel % 32) != GHOST_CENTER_Y)
+    if ((_xPixel % SCALE_PIXEL) != GHOST_CENTER_X ||
+        (_yPixel % SCALE_PIXEL) != GHOST_CENTER_Y)
         return;
 
     // ghost leaving the house
     // at the bottom of the door
-    if (vecBoard[_xBoard][_yBoard - 1]->getState() == 3) {
+    if (vecBoard[_xBoard][_yBoard - 1]->getState() == DOOR) {
         _yBoard--;
         _lastDir = UP;
         return;
     }
     // in the door
-    if (vecBoard[_xBoard][_yBoard]->getState() == 3) {
+    if (vecBoard[_xBoard][_yBoard]->getState() == DOOR) {
         _yBoard--;
         _lastDir = UP;
         return;
     }
     // at the bottom left of the door
-    if (vecBoard[_xBoard + 1][_yBoard - 1]->getState() == 3) {
+    if (vecBoard[_xBoard + 1][_yBoard - 1]->getState() == DOOR) {
         _xBoard++;
         _lastDir = RIGHT;
         return;
     }
     // at the bottom right of the door
-    if (vecBoard[_xBoard - 1][_yBoard - 1]->getState() == 3) {
+    if (vecBoard[_xBoard - 1][_yBoard - 1]->getState() == DOOR) {
         _xBoard--;
         _lastDir = LEFT;
         return;
@@ -171,7 +176,7 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
             if (_xBoard - 1 == 4 && _yBoard == 13)
                 break;
 
-            if (vecBoard[_xBoard - 1][_yBoard]->getState() == 0) {
+            if (vecBoard[_xBoard - 1][_yBoard]->getState() == HALL) {
                 _xBoard--;
                 _lastDir = LEFT;
                 findPos = true;
@@ -188,7 +193,7 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
             if (_xBoard + 1 == 16 && _yBoard == 13)
                 break;
 
-            if (vecBoard[_xBoard + 1][_yBoard]->getState() == 0) {
+            if (vecBoard[_xBoard + 1][_yBoard]->getState() == HALL) {
                 _xBoard++;
                 _lastDir = RIGHT;
                 findPos = true;
@@ -201,7 +206,7 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
             if (_lastDir == DOWN)
                 break;
 
-            if (vecBoard[_xBoard][_yBoard - 1]->getState() == 0) {
+            if (vecBoard[_xBoard][_yBoard - 1]->getState() == HALL) {
                 _yBoard--;
                 _lastDir = UP;
                 findPos = true;
@@ -214,7 +219,7 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
             if (_lastDir == UP)
                 break;
 
-            if (vecBoard[_xBoard][_yBoard + 1]->getState() == 0) {
+            if (vecBoard[_xBoard][_yBoard + 1]->getState() == HALL) {
                 _yBoard++;
                 _lastDir = DOWN;
                 findPos = true;

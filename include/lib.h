@@ -6,7 +6,11 @@
 #include <utility>
 #include <vector>
 
-#define SCALE_PIXEL 32
+#define HALL 0
+#define WALL 1
+#define DOOR 2
+
+#define SCALE_PIXEL 32 // each square is 32x32 pixels
 
 #define DIFFICULTY 1
 

@@ -1,13 +1,16 @@
 #include "board.h"
 
-board::board() { _board = std::vector<std::vector<square *>>(); }
+board::board() {}
 
 board::~board() {
-    for (auto &line : _board) {
-        for (auto &square : line) {
-            square->~square();
-        }
+    for (size_t i = 0; i < _board.size(); i++) {
+        for (size_t j = 0; j < _board[i].size(); j++)
+            delete _board[i][j];
+
+        _board[i].clear();
     }
+
+    _board.clear();
 }
 
 void board::load() {
