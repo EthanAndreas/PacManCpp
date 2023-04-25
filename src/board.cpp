@@ -55,7 +55,7 @@ void board::setItem() {
     _board[PACMAN_INIT_X][PACMAN_INIT_Y].getItem()->setCarater(_PACMAN);
 
     // Ghost
-    _board[GHOST_INIT_X][GHOST_INIT_Y].getItem()->setCarater(_GHOST);
+    _board[GHOST_INIT_X][GHOST_INIT_Y].getItem()->setCarater(_REDGHOST);
 
     // Dot
     size_t i = 0, j = 0;

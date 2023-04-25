@@ -1,6 +1,7 @@
 #include "board.h"
 #include "ghost.h"
 #include "graphic.h"
+#include "item.h"
 #include "pacman.h"
 
 int main() {
@@ -99,8 +100,15 @@ int main() {
             vecDot = Board.getDotList();
             vecPowerup = Board.getPowerupList();
 
+            // win statement
             if (vecDot.size() == 0 && vecPowerup.size() == 0) {
                 std::cout << "You win!" << std::endl;
+                quit = true;
+            }
+
+            // loose statement
+            if (Pacman.ghostCollision(Board.getBoard(), vecGhost)) {
+                std::cout << "You loose!" << std::endl;
                 quit = true;
             }
 

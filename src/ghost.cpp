@@ -15,7 +15,7 @@ void ghost::setGhost(color c) {
     _color = c;
     switch (c) {
     case RED:
-        _isInHouse = false;
+        _isInHouse = true;
         _xBoard = RED_GHOST_INIT_X;
         _yBoard = RED_GHOST_INIT_Y;
         _xPixel = RED_GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X;
@@ -58,7 +58,7 @@ void ghost::leaveGhostHouse() {
     switch (_color) {
     case RED:
         if (elapsedTime.count() >= RED_GHOST_WAIT_TIME)
-            isTime = true;
+            _isInHouse = false;
         break;
     case PINK:
         if (elapsedTime.count() >= PINK_GHOST_WAIT_TIME)
@@ -249,5 +249,5 @@ void ghost::updateSquare(std::vector<std::vector<square>> vecBoard) {
         break;
     }
 
-    vecBoard[_xBoard][_yBoard].getItem()->setCarater(_GHOST);
+    vecBoard[_xBoard][_yBoard].getItem()->setCarater(typeCaracter(_color));
 }

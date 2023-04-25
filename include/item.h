@@ -1,8 +1,15 @@
 #ifndef ITEM_H
 #define ITEM_H
 
-enum typeCaracter { _NONE, _PACMAN, _GHOST };
-enum typeEdible { _EMPTY, _FRUIT, _POWERUP, _DOT };
+enum typeCaracter {
+    _REDGHOST,
+    _PINKGHOST,
+    _BLUEGHOST,
+    _ORANGEGHOST,
+    _PACMAN,
+    _NONE,
+};
+enum typeEdible { _DOT, _POWERUP, _FRUIT, _EMPTY };
 
 /**
  * @brief Correspond to the item.

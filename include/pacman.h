@@ -1,11 +1,13 @@
 #ifndef PACMAN_H
 #define PACMAN_H
 
+#include "ghost.h"
 #include "lib.h"
 #include "square.h"
 
 #define DOT_PACMAN_CONTACT 20
 #define POWERUP_PACMAN_CONTACT 10
+#define GHOST_PACMAN_CONTACT 5
 
 #define PACMAN_INIT_X 10
 #define PACMAN_INIT_Y 15
@@ -61,6 +63,9 @@ class pacman {
      * @return int
      */
     int getScore() const;
+
+    bool ghostCollision(std::vector<std::vector<square>> vecBoard,
+                        std::vector<ghost> vecGhost);
 
   private:
     int _xBoard, _yBoard, _xPixel, _yPixel;

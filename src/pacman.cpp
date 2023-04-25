@@ -192,3 +192,19 @@ void pacman::updateSquare(std::vector<std::vector<square>> vecBoard) {
 }
 
 int pacman::getScore() const { return _score; }
+
+bool pacman::ghostCollision(std::vector<std::vector<square>> vecBoard,
+                            std::vector<ghost> vecGhost) {
+
+    typeCaracter ghostCollision =
+        vecBoard[_xBoard][_yBoard].getItem()->getCaracter();
+    if (ghostCollision != _NONE) {
+        if (abs(_xPixel - vecGhost[ghostCollision].getPos().first) <
+                GHOST_PACMAN_CONTACT &&
+            abs(_yPixel - vecGhost[ghostCollision].getPos().second) <
+                GHOST_PACMAN_CONTACT)
+            return true;
+    }
+
+    return false;
+}

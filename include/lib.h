@@ -8,7 +8,7 @@
 
 #define SCALE_PIXEL 32
 
-#define DIFFICULTY 1
+#define DIFFICULTY 4
 
 enum dir { LEFT, RIGHT, UP, DOWN, NONE };
 

@@ -31,10 +31,10 @@ enum color { RED, PINK, BLUE, ORANGE };
         std::chrono::duration<long int, std::ratio<1, 1000000000>>>
 
 // macro for wait time in function of difficulty
-#define RED_GHOST_WAIT_TIME (8 / DIFFICULTY)
-#define PINK_GHOST_WAIT_TIME (14 / DIFFICULTY)
-#define BLUE_GHOST_WAIT_TIME (20 / DIFFICULTY)
-#define ORANGE_GHOST_WAIT_TIME (26 / DIFFICULTY)
+#define RED_GHOST_WAIT_TIME (6 / DIFFICULTY)     // 6s for easy
+#define PINK_GHOST_WAIT_TIME (12 / DIFFICULTY)   // 12s for easy
+#define BLUE_GHOST_WAIT_TIME (18 / DIFFICULTY)   // 18s for easy
+#define ORANGE_GHOST_WAIT_TIME (24 / DIFFICULTY) // 24s for easy
 
 class ghost {
   public:
