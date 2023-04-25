@@ -15,6 +15,8 @@ enum typeFruit {
     _KEY
 };
 
+enum fruitState { _INACTIVE, _ACTIVE };
+
 #define FRUIT_X 10
 #define FRUIT_Y 15
 

@@ -162,6 +162,10 @@ std::map<char, SDL_Rect> sdlChar = {
 
 int count;
 
+// TODO: Do not use global variables
+int fruitActive = _INACTIVE;
+time_t beginTimeFruit;
+
 void init(SDL_Window **Window, SDL_Surface **windowSurf,
           SDL_Surface **spriteBoard) {
 
@@ -198,17 +202,27 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
         SDL_BlitScaled(*spriteBoard, &powerup_in, *windowSurf, &powerup);
     }
 
-    // Fruit display only if dot counter is 170 and timer is less than 10
-    // seconds
-    if (Pacman.getDotCounter() >= 3) {
-        // vecFruitSprite.erase(vecFruitSprite.begin());
+    // Fruit display only if dot counter is 170
+    if (Pacman.getDotCounter() == 169) {
+        fruitActive = _ACTIVE;
+        // start a timer for 10 seconds
+        beginTimeFruit = std::chrono::steady_clock::now();
+    }
+
+    time_t stopTimeFruit = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsedTimeFruit =
+        stopTimeFruit - beginTimeFruit;
+
+    if (fruitActive == _ACTIVE &&
+        (elapsedTimeFruit.count() < TIME_TO_SPAWN_FRUIT)) {
         SDL_Rect fruit = {FRUIT_X * 32, FRUIT_Y * 32, 32, 32};
         SDL_BlitScaled(*spriteBoard, &vecFruitSprite.front(), *windowSurf,
                        &fruit);
-    } else if (Pacman.getDotCounter() >= 1) {
-        SDL_Rect fruit = {FRUIT_X * 32, FRUIT_Y * 32, 32, 32};
-        SDL_BlitScaled(*spriteBoard, &vecFruitSprite.front(), *windowSurf,
-                       &fruit);
+        Pacman.resetDotCounter();
+    } else if (fruitActive == _ACTIVE) {
+        fruitActive = _INACTIVE;
+        Pacman.resetDotCounter();
+        vecFruitSprite.erase(vecFruitSprite.begin());
     }
 
     for (auto &Ghost : vecGhost) {
