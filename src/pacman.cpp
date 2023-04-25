@@ -167,7 +167,21 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard) {
 
         _powerup = true;
         timePoint1 = std::chrono::steady_clock::now();
-    }
+    } else if (vecBoard[_xBoard][_yBoard]->getItem() == _FRUIT) {
+
+        if (_lastDir == LEFT || _lastDir == RIGHT) {
+            if (abs(_xPixel % 32 - PACMAN_CENTER_X) != FRUIT_PACMAN_CONTACT) {
+                return;
+            }
+        } else if (_lastDir == UP || _lastDir == DOWN) {
+            if (abs(_yPixel % 32 - PACMAN_CENTER_Y) != FRUIT_PACMAN_CONTACT) {
+                return;
+            }
+        } else
+            return;
+
+        vecBoard[_xBoard][_yBoard]->setItem(_EMPTY);
+        }
 
     if (_powerup) {
         time_t timePoint2 = std::chrono::steady_clock::now();
