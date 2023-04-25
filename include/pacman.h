@@ -5,16 +5,21 @@
 #include "lib.h"
 #include "square.h"
 
-#define DOT_PACMAN_CONTACT 20
-#define POWERUP_PACMAN_CONTACT 10
-#define GHOST_PACMAN_CONTACT 5
-
-#define POWERUP_MODE 5 // 5s
-
 #define PACMAN_INIT_X 10
 #define PACMAN_INIT_Y 15
 #define PACMAN_CENTER_X 0
 #define PACMAN_CENTER_Y 4
+
+#define DOT_PACMAN_CONTACT 20
+#define POWERUP_PACMAN_CONTACT 10
+#define GHOST_PACMAN_CONTACT 5
+
+#define DOT_SCORE 10
+#define POWERUP_SCORE 50
+#define GHOST_SCORE 200
+#define FRUIT_SCORE 1000
+
+#define POWERUP_MODE 10 // 10s
 
 class pacman {
   public:
