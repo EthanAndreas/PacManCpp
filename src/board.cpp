@@ -119,16 +119,3 @@ std::vector<Coordinate> board::getPowerupList() {
     }
     return vecPowerup;
 }
-
-std::vector<typeFruit> getFruitList() {
-    std::vector<typeFruit> vecFruit;
-    vecFruit.push_back(_CHERRY);
-    vecFruit.push_back(_STRAWBERRY);
-    vecFruit.push_back(_ORANGE);
-    vecFruit.push_back(_APPLE);
-    vecFruit.push_back(_MELON);
-    vecFruit.push_back(_GALAXIAN);
-    vecFruit.push_back(_BELL);
-    vecFruit.push_back(_KEY);
-    return vecFruit;
-}

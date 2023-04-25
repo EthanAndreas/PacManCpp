@@ -207,6 +207,7 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
         fruitActive = _ACTIVE;
         // start a timer for 10 seconds
         beginTimeFruit = std::chrono::steady_clock::now();
+        // Add the fruit on the board
     }
 
     time_t stopTimeFruit = std::chrono::steady_clock::now();
@@ -219,7 +220,7 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
         SDL_BlitScaled(*spriteBoard, &vecFruitSprite.front(), *windowSurf,
                        &fruit);
         Pacman.resetDotCounter();
-    } else if (fruitActive == _ACTIVE) {
+    } else if (fruitActive == _ACTIVE || fruitActive == _EATEN) {
         fruitActive = _INACTIVE;
         Pacman.resetDotCounter();
         vecFruitSprite.erase(vecFruitSprite.begin());

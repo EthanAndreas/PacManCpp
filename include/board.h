@@ -52,12 +52,6 @@ class board {
      * @return std::vector<Coordinate>
      */
     std::vector<Coordinate> getPowerupList();
-    /**
-     * @brief Get the list of the fruit's.
-     *
-     * @return std::vector<typeFruit>
-     */
-    std::vector<typeFruit> getFruitList();
 
   private:
     std::vector<std::vector<square *>> _board;
