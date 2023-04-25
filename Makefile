@@ -67,6 +67,14 @@ valgrind:
 	valgrind --leak-check=full --show-leak-kinds=all ./$(BINDIR)/$(TARGET)
 	@echo "\033[92mExit properly\033[0m"
 
+valgrind-segfault:
+	@make clean -s 1>/dev/null 
+	@echo "\033[93mCompilation...\033[0m"
+	@make -s 2>/dev/null || (echo "\033[91mError on compilation, re-run with \"make\" to see the errors\033[0m" && exit 1)
+	@echo "\033[93mRun Application with valgrind...\033[0m"
+	valgrind --show-possibly-lost=yes --show-reachable=yes ./$(BINDIR)/$(TARGET)
+	@echo "\033[92mExit properly\033[0m"
+
 all:
 	make
 	make doc

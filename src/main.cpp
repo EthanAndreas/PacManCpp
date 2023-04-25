@@ -5,6 +5,7 @@
 
 int main() {
 
+    // initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 
         std::cerr << "SDL initialization" << SDL_GetError() << std::endl;
@@ -18,115 +19,129 @@ int main() {
     dir currentDir = NONE;
     init(&Window, &windowSurf, &spriteBoard);
 
-    // initialize board, pacman, ghost and edible
-    board Board;
-    Board.load();
-    Board.transpose();
-    Board.setItem();
-    pacman Pacman;
-    std::vector<ghost *> vecGhost;
-    for (int i = 0; i < 4; i++) {
-        ghost *Ghost = new ghost();
-        Ghost->setGhost(color(i));
-        vecGhost.push_back(Ghost);
-    }
-    std::vector<Coordinate> vecDot = Board.getDotList();
-    std::vector<Coordinate> vecPowerup = Board.getPowerupList();
-
-    // display initial board
-    draw(&windowSurf, &spriteBoard, Pacman, vecGhost, vecDot, vecPowerup, 0);
-    SDL_UpdateWindowSurface(Window);
-
-    bool start = false, quit = false;
-    int nbk;
-    const Uint8 *keys;
-    SDL_Event event;
-    while (!quit) {
-
-        // fps management
-        Uint64 fps_start = SDL_GetTicks();
-
-        // event management
-        while (!quit && SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT:
-                quit = true;
-                break;
-            default:
-                break;
-            }
+    bool restart = true;
+    while (restart) {
+        // initialize board, pacman, ghost and item
+        board Board;
+        Board.load();
+        Board.transpose();
+        Board.setItem();
+        pacman Pacman;
+        std::vector<ghost *> vecGhost;
+        for (int i = 0; i < 4; i++) {
+            ghost *Ghost = new ghost();
+            Ghost->setGhost(color(i));
+            vecGhost.push_back(Ghost);
         }
+        std::vector<Coordinate> vecDot = Board.getDotList();
+        std::vector<Coordinate> vecPowerup = Board.getPowerupList();
 
-        // keyboard management
-        keys = SDL_GetKeyboardState(&nbk);
-        if (keys[SDL_SCANCODE_ESCAPE])
-            quit = true;
-        else if (keys[SDL_SCANCODE_LEFT]) {
-            start = true;
-            currentDir = LEFT;
-        } else if (keys[SDL_SCANCODE_RIGHT]) {
-            start = true;
-            currentDir = RIGHT;
-        } else if (keys[SDL_SCANCODE_UP]) {
-            start = true;
-            currentDir = UP;
-        } else if (keys[SDL_SCANCODE_DOWN]) {
-            start = true;
-            currentDir = DOWN;
-        }
+        // display initial board
+        draw(&windowSurf, &spriteBoard, Pacman, vecGhost, vecDot, vecPowerup,
+             0);
+        SDL_UpdateWindowSurface(Window);
 
-        // press any key to start the game
-        if (start) {
-            // pacman movement management
-            Pacman.updateDir(Board.getBoard(), currentDir);
-            Pacman.updatePos();
-            Pacman.updateSquare(Board.getBoard());
+        bool start = false, quit = false;
+        int nbk;
+        const Uint8 *keys;
+        SDL_Event event;
+        while (!quit) {
 
-            // ghost movement management
-            for (auto Ghost : vecGhost) {
+            // fps management
+            Uint64 fps_start = SDL_GetTicks();
 
-                if (!Ghost->isGhostInHouse()) {
-                    Ghost->updatePos();
-                    Ghost->updateDir(Board.getBoard());
-                } else {
-                    Ghost->leaveGhostHouse();
-                    Ghost->updatePos();
+            // event management
+            if (!quit && SDL_PollEvent(&event)) {
+                switch (event.type) {
+                // leave the game
+                case SDL_QUIT:
+                    quit = true;
+                    restart = false;
+                    // vecDot.clear();
+                    // vecPowerup.clear();
+                    // for (auto Ghost : vecGhost)
+                    //     Ghost->~ghost();
+                    // vecGhost.clear();
+                    // Pacman.~pacman();
+                    // Board.~board();
+                    break;
+                default:
+                    break;
                 }
             }
 
-            // update item on the board
-            vecDot = Board.getDotList();
-            vecPowerup = Board.getPowerupList();
-
-            // win statement
-            if (vecDot.size() == 0 && vecPowerup.size() == 0) {
-                std::cout << "You win!" << std::endl;
+            // keyboard management
+            keys = SDL_GetKeyboardState(&nbk);
+            if (keys[SDL_SCANCODE_ESCAPE])
                 quit = true;
+            else if (keys[SDL_SCANCODE_LEFT]) {
+                start = true;
+                currentDir = LEFT;
+            } else if (keys[SDL_SCANCODE_RIGHT]) {
+                start = true;
+                currentDir = RIGHT;
+            } else if (keys[SDL_SCANCODE_UP]) {
+                start = true;
+                currentDir = UP;
+            } else if (keys[SDL_SCANCODE_DOWN]) {
+                start = true;
+                currentDir = DOWN;
             }
 
-            // loose statement
-            if (Pacman.ghostCollision(vecGhost)) {
-                std::cout << "You loose!" << std::endl;
-                quit = true;
+            // press any key to start the game
+            if (start) {
+                // pacman movement management
+                Pacman.updateDir(Board.getBoard(), currentDir);
+                Pacman.updatePos();
+                Pacman.updateSquare(Board.getBoard());
+
+                // ghost movement management
+                for (auto Ghost : vecGhost) {
+
+                    if (!Ghost->isGhostInHouse()) {
+                        Ghost->updatePos();
+                        Ghost->updateDir(Board.getBoard());
+                    } else {
+                        Ghost->leaveGhostHouse();
+                        Ghost->updatePos();
+                    }
+                }
+
+                // update item on the board
+                vecDot = Board.getDotList();
+                vecPowerup = Board.getPowerupList();
+
+                // win statement
+                if (vecDot.size() == 0 && vecPowerup.size() == 0) {
+                    std::cout << "You win!" << std::endl;
+                    // next level
+                    quit = true;
+                    break;
+                }
+
+                // loose statement
+                if (Pacman.ghostCollision(vecGhost)) {
+                    std::cout << "You loose!" << std::endl;
+                    // restart level
+                    quit = true;
+                    break;
+                }
+
+                // display updated board
+                draw(&windowSurf, &spriteBoard, Pacman, vecGhost, vecDot,
+                     vecPowerup, Pacman.getScore());
+                SDL_UpdateWindowSurface(Window);
             }
 
-            // display updated board
-            draw(&windowSurf, &spriteBoard, Pacman, vecGhost, vecDot,
-                 vecPowerup, Pacman.getScore());
-            SDL_UpdateWindowSurface(Window);
+            Uint64 fps_end = SDL_GetTicks();
+            float elapsed = (fps_end - fps_start) /
+                            (float)SDL_GetPerformanceFrequency() * 1000.0f;
+
+            // 120 fps
+            SDL_Delay(floor(8.888f - elapsed));
         }
-
-        Uint64 fps_end = SDL_GetTicks();
-        float elapsed = (fps_end - fps_start) /
-                        (float)SDL_GetPerformanceFrequency() * 1000.0f;
-
-        // 120 fps
-        SDL_Delay(floor(8.888f - elapsed));
     }
 
-    Board.~board();
-    Pacman.~pacman();
     SDL_Quit();
-
     exit(EXIT_SUCCESS);
 }

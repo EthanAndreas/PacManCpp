@@ -89,6 +89,7 @@ void ghost::leaveGhostHouse() {
             _yBoard++;
         }
     } else {
+
         if (_yBoard == 13) {
             _yBoard--;
             _lastDir = UP;
@@ -122,6 +123,9 @@ void ghost::updatePos() {
 std::pair<int, int> ghost::getPos() { return std::make_pair(_xPixel, _yPixel); }
 
 void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
+
+    if (_xBoard < 0 || _xBoard > 20 || _yBoard < 0 || _yBoard > 26)
+        exit(EXIT_FAILURE);
 
     // each square is 32x32 pixels
     // wait until ghost reaches the middle of the next square

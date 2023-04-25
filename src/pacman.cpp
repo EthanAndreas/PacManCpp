@@ -51,6 +51,9 @@ std::pair<int, int> pacman::getPos() {
 void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
                        dir currentDir) {
 
+    if (_xBoard < 0 || _xBoard > 20 || _yBoard < 0 || _yBoard > 26)
+        exit(EXIT_FAILURE);
+
     // each square is 32x32 pixels
     // wait until pacman reaches the middle of the next square
     if ((_xPixel % 32) != PACMAN_CENTER_X || (_yPixel % 32) != PACMAN_CENTER_Y)
@@ -130,6 +133,9 @@ void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
 dir pacman::getDir() { return _lastDir; }
 
 void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard) {
+
+    if (_xBoard < 0 || _xBoard > 20 || _yBoard < 0 || _yBoard > 26)
+        exit(EXIT_FAILURE);
 
     // update item
     if (vecBoard[_xBoard][_yBoard]->getItem() == _DOT) {
