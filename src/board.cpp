@@ -66,20 +66,20 @@ void board::setItem() {
                     square->setItem(_EMPTY);
                 else
                     square->setItem(_DOT);
-                square->setScore(10);
+                square->setScore(DOT_POINT);
             }
         }
     }
 
     // Powerup
     _board[1][3]->setItem(_POWERUP);
-    _board[1][3]->setScore(50);
+    _board[1][3]->setScore(POWERUP_POINT);
     _board[19][3]->setItem(_POWERUP);
-    _board[19][3]->setScore(50);
+    _board[19][3]->setScore(POWERUP_POINT);
     _board[1][20]->setItem(_POWERUP);
-    _board[1][20]->setScore(50);
+    _board[1][20]->setScore(POWERUP_POINT);
     _board[19][20]->setItem(_POWERUP);
-    _board[19][20]->setScore(50);
+    _board[19][20]->setScore(POWERUP_POINT);
 }
 
 std::vector<Coordinate> board::getDotList() {

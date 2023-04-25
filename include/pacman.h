@@ -66,6 +66,17 @@ class pacman {
      * @return int
      */
     int getScore() const;
+    /**
+     * @brief Get the number of dots eaten by pacman.
+     *
+     * @return int
+     */
+    int getDotCounter() const;
+    /**
+     * @brief Reset the dot counter.
+     *
+     */
+    void resetDotCounter();
 
     bool ghostCollision(std::vector<ghost *> vecGhost);
 
@@ -73,6 +84,7 @@ class pacman {
     int _xBoard, _yBoard, _xPixel, _yPixel;
     dir _lastDir;
     int _score;
+    int _dotCounter;
     bool _powerup;
     time_t timePoint1;
 };

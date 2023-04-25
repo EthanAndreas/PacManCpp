@@ -8,6 +8,7 @@ pacman::pacman() {
     _lastDir = NONE;
     _score = 0;
     _powerup = false;
+    _dotCounter = 0;
 }
 pacman::~pacman() {}
 
@@ -147,6 +148,7 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard) {
             return;
 
         _score = _score + vecBoard[_xBoard][_yBoard]->getScore();
+        _dotCounter++;
         vecBoard[_xBoard][_yBoard]->setItem(_EMPTY);
         vecBoard[_xBoard][_yBoard]->setScore(0);
 
@@ -214,3 +216,7 @@ bool pacman::ghostCollision(std::vector<ghost *> vecGhost) {
 
     return false;
 }
+
+int pacman::getDotCounter() const { return _dotCounter; }
+
+void pacman::resetDotCounter() { _dotCounter = 0; }
