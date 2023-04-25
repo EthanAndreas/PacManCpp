@@ -284,7 +284,7 @@ void drawString(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int x,
     int len = str.length();
 
     // Create a rectangle for the text
-    SDL_Rect area = {x, y, 16 * len, 16};
+    SDL_Rect area = {x, y, 16 * (len + 5), 16};
 
     // Erase the area
     SDL_FillRect(*windowSurf, &area, 0);
