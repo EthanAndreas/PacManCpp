@@ -4,6 +4,17 @@
 #include "lib.h"
 #include <chrono>
 
+enum typeFruit {
+    _CHERRY,
+    _STRAWBERRY,
+    _ORANGE,
+    _APPLE,
+    _MELON,
+    _GALAXIAN,
+    _BELL,
+    _KEY
+};
+
 #define FRUIT_X 10
 #define FRUIT_Y 15
 

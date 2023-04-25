@@ -66,15 +66,20 @@ void board::setItem() {
                     square->setItem(_EMPTY);
                 else
                     square->setItem(_DOT);
+                square->setScore(10);
             }
         }
     }
 
     // Powerup
     _board[1][3]->setItem(_POWERUP);
+    _board[1][3]->setScore(50);
     _board[19][3]->setItem(_POWERUP);
+    _board[19][3]->setScore(50);
     _board[1][20]->setItem(_POWERUP);
+    _board[1][20]->setScore(50);
     _board[19][20]->setItem(_POWERUP);
+    _board[19][20]->setScore(50);
 }
 
 std::vector<Coordinate> board::getDotList() {
@@ -110,4 +115,17 @@ std::vector<Coordinate> board::getPowerupList() {
         }
     }
     return vecPowerup;
+}
+
+std::vector<typeFruit> getFruitList() {
+    std::vector<typeFruit> vecFruit;
+    vecFruit.push_back(_CHERRY);
+    vecFruit.push_back(_STRAWBERRY);
+    vecFruit.push_back(_ORANGE);
+    vecFruit.push_back(_APPLE);
+    vecFruit.push_back(_MELON);
+    vecFruit.push_back(_GALAXIAN);
+    vecFruit.push_back(_BELL);
+    vecFruit.push_back(_KEY);
+    return vecFruit;
 }

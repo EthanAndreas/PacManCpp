@@ -2,6 +2,7 @@
 #define BOARD_H
 
 #include "debug.h"
+#include "fruit.h"
 #include "ghost.h"
 #include "pacman.h"
 #include "square.h"
@@ -51,6 +52,12 @@ class board {
      * @return std::vector<Coordinate>
      */
     std::vector<Coordinate> getPowerupList();
+    /**
+     * @brief Get the list of the fruit's.
+     *
+     * @return std::vector<typeFruit>
+     */
+    std::vector<typeFruit> getFruitList();
 
   private:
     std::vector<std::vector<square *>> _board;

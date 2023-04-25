@@ -146,8 +146,9 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard) {
         } else
             return;
 
+        _score = _score + vecBoard[_xBoard][_yBoard]->getScore();
         vecBoard[_xBoard][_yBoard]->setItem(_EMPTY);
-        _score = _score + 10;
+        vecBoard[_xBoard][_yBoard]->setScore(0);
 
     } else if (vecBoard[_xBoard][_yBoard]->getItem() == _POWERUP) {
 
@@ -162,8 +163,9 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard) {
         } else
             return;
 
+        _score = _score + vecBoard[_xBoard][_yBoard]->getScore();
         vecBoard[_xBoard][_yBoard]->setItem(_EMPTY);
-        _score = _score + 50;
+        vecBoard[_xBoard][_yBoard]->setScore(0);
 
         _powerup = true;
         timePoint1 = std::chrono::steady_clock::now();
@@ -181,7 +183,8 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard) {
             return;
 
         vecBoard[_xBoard][_yBoard]->setItem(_EMPTY);
-        }
+        vecBoard[_xBoard][_yBoard]->setScore(0);
+    }
 
     if (_powerup) {
         time_t timePoint2 = std::chrono::steady_clock::now();

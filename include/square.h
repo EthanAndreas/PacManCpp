@@ -1,6 +1,9 @@
 #ifndef SQUARE_H
 #define SQUARE_H
 
+#define DOT_POINT 10
+#define POWERUP_POINT 50
+
 enum typeItem { _DOT, _POWERUP, _FRUIT, _EMPTY };
 
 /**
@@ -27,6 +30,17 @@ class square {
      */
     short getState();
     /**
+     * @brief Set the score of the square.
+     * @param score
+     */
+    void setScore(int score);
+    /**
+     * @brief Get the score of the square.
+     *
+     * @return int
+     */
+    int getScore();
+    /**
      * @brief Set the item on the square.
      *
      * @param typeItem
@@ -42,6 +56,7 @@ class square {
   private:
     short _state;
     typeItem _item;
+    int _score;
 };
 
 #endif
