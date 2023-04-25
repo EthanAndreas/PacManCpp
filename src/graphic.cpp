@@ -87,6 +87,11 @@ SDL_Rect galaxian_in = {369, 235, 14, 14};
 SDL_Rect bell_in = {385, 235, 16, 16};
 SDL_Rect key_in = {400, 235, 14, 16};
 
+// Vector of fruits
+std::vector<SDL_Rect> vecFruitSprite = {cherry_in, strawberry_in, orange_in,
+                                        apple_in,  melon_in,      galaxian_in,
+                                        bell_in,   key_in};
+
 // Score
 SDL_Rect score100 = {180, 133, 13, 7};
 SDL_Rect score300 = {179, 142, 14, 7};
@@ -191,6 +196,19 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
     for (auto &coord : vecPowerup) {
         SDL_Rect powerup = {coord.x * 32 + 6, coord.y * 32 + 10, 20, 20};
         SDL_BlitScaled(*spriteBoard, &powerup_in, *windowSurf, &powerup);
+    }
+
+    // Fruit display only if dot counter is 170 and timer is less than 10
+    // seconds
+    if (Pacman.getDotCounter() >= 3) {
+        // vecFruitSprite.erase(vecFruitSprite.begin());
+        SDL_Rect fruit = {FRUIT_X * 32, FRUIT_Y * 32, 32, 32};
+        SDL_BlitScaled(*spriteBoard, &vecFruitSprite.front(), *windowSurf,
+                       &fruit);
+    } else if (Pacman.getDotCounter() >= 1) {
+        SDL_Rect fruit = {FRUIT_X * 32, FRUIT_Y * 32, 32, 32};
+        SDL_BlitScaled(*spriteBoard, &vecFruitSprite.front(), *windowSurf,
+                       &fruit);
     }
 
     for (auto &Ghost : vecGhost) {
