@@ -1,7 +1,7 @@
 #ifndef SQUARE_H
 #define SQUARE_H
 
-#include "item.h"
+enum typeItem { _DOT, _POWERUP, _FRUIT, _EMPTY };
 
 /**
  * @brief This class contains the square's state (wall or hall)
@@ -29,19 +29,19 @@ class square {
     /**
      * @brief Set the item on the square.
      *
-     * @param item*
+     * @param typeItem
      */
-    void setItem(item *item);
+    void setItem(typeItem item);
     /**
      * @brief Get the item on the square.
      *
-     * @return item*
+     * @return typeItem
      */
-    item *getItem();
+    typeItem getItem();
 
   private:
     short _state;
-    item *_item;
+    typeItem _item;
 };
 
 #endif

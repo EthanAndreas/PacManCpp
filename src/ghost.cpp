@@ -6,7 +6,7 @@ ghost::ghost() {
     _xPixel = 0;
     _yPixel = 0;
     _lastDir = NONE;
-    _timePoint1 = std::chrono::steady_clock::now();
+    timePoint1 = std::chrono::steady_clock::now();
     srand(time(NULL));
 }
 ghost::~ghost() {}
@@ -52,7 +52,7 @@ bool ghost::isGhostInHouse() { return _isInHouse; }
 void ghost::leaveGhostHouse() {
 
     time_t timePoint2 = std::chrono::steady_clock::now();
-    std::chrono::duration<double> elapsedTime = timePoint2 - _timePoint1;
+    std::chrono::duration<double> elapsedTime = timePoint2 - timePoint1;
     bool isTime = false;
 
     switch (_color) {
@@ -121,7 +121,7 @@ void ghost::updatePos() {
 
 std::pair<int, int> ghost::getPos() { return std::make_pair(_xPixel, _yPixel); }
 
-void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
+void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
 
     // each square is 32x32 pixels
     // wait until ghost reaches the middle of the next square
@@ -130,25 +130,25 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
 
     // ghost leaving the house
     // at the bottom of the door
-    if (vecBoard[_xBoard][_yBoard - 1].getState() == 3) {
+    if (vecBoard[_xBoard][_yBoard - 1]->getState() == 3) {
         _yBoard--;
         _lastDir = UP;
         return;
     }
     // in the door
-    if (vecBoard[_xBoard][_yBoard].getState() == 3) {
+    if (vecBoard[_xBoard][_yBoard]->getState() == 3) {
         _yBoard--;
         _lastDir = UP;
         return;
     }
     // at the bottom left of the door
-    if (vecBoard[_xBoard + 1][_yBoard - 1].getState() == 3) {
+    if (vecBoard[_xBoard + 1][_yBoard - 1]->getState() == 3) {
         _xBoard++;
         _lastDir = RIGHT;
         return;
     }
     // at the bottom right of the door
-    if (vecBoard[_xBoard - 1][_yBoard - 1].getState() == 3) {
+    if (vecBoard[_xBoard - 1][_yBoard - 1]->getState() == 3) {
         _xBoard--;
         _lastDir = LEFT;
         return;
@@ -171,7 +171,7 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
             if (_xBoard - 1 == 4 && _yBoard == 13)
                 break;
 
-            if (vecBoard[_xBoard - 1][_yBoard].getState() == 0) {
+            if (vecBoard[_xBoard - 1][_yBoard]->getState() == 0) {
                 _xBoard--;
                 _lastDir = LEFT;
                 findPos = true;
@@ -188,7 +188,7 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
             if (_xBoard + 1 == 16 && _yBoard == 13)
                 break;
 
-            if (vecBoard[_xBoard + 1][_yBoard].getState() == 0) {
+            if (vecBoard[_xBoard + 1][_yBoard]->getState() == 0) {
                 _xBoard++;
                 _lastDir = RIGHT;
                 findPos = true;
@@ -201,7 +201,7 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
             if (_lastDir == DOWN)
                 break;
 
-            if (vecBoard[_xBoard][_yBoard - 1].getState() == 0) {
+            if (vecBoard[_xBoard][_yBoard - 1]->getState() == 0) {
                 _yBoard--;
                 _lastDir = UP;
                 findPos = true;
@@ -214,7 +214,7 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
             if (_lastDir == UP)
                 break;
 
-            if (vecBoard[_xBoard][_yBoard + 1].getState() == 0) {
+            if (vecBoard[_xBoard][_yBoard + 1]->getState() == 0) {
                 _yBoard++;
                 _lastDir = DOWN;
                 findPos = true;
@@ -230,24 +230,13 @@ void ghost::updateDir(std::vector<std::vector<square>> vecBoard) {
 
 dir ghost::getDir() { return _lastDir; }
 
-void ghost::updateSquare(std::vector<std::vector<square>> vecBoard) {
+void ghost::houseReturn() {
 
-    switch (_lastDir) {
-    case LEFT:
-        vecBoard[_xBoard - 1][_yBoard].getItem()->setCarater(_NONE);
-        break;
-    case RIGHT:
-        vecBoard[_xBoard + 1][_yBoard].getItem()->setCarater(_NONE);
-        break;
-    case UP:
-        vecBoard[_xBoard][_yBoard - 1].getItem()->setCarater(_NONE);
-        break;
-    case DOWN:
-        vecBoard[_xBoard][_yBoard + 1].getItem()->setCarater(_NONE);
-        break;
-    case NONE:
-        break;
-    }
-
-    vecBoard[_xBoard][_yBoard].getItem()->setCarater(typeCaracter(_color));
+    _xPixel = GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X;
+    _yPixel = GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y;
+    _xBoard = GHOST_INIT_X;
+    _yBoard = GHOST_INIT_Y;
+    _lastDir = NONE;
+    _isInHouse = true;
+    timePoint1 = std::chrono::steady_clock::now();
 }

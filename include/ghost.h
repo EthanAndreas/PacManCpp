@@ -91,7 +91,7 @@ class ghost {
      *
      * @param vecBoard
      */
-    void updateDir(std::vector<std::vector<square>> vecBoard);
+    void updateDir(std::vector<std::vector<square *>> vecBoard);
     /**
      * @brief Get the last direction of the ghost.
      *
@@ -99,18 +99,17 @@ class ghost {
      */
     dir getDir();
     /**
-     * @brief Fill the new square with the ghost and empty the previous square.
+     * @brief Ghost go back to the house.
      *
-     * @param vecBoard
      */
-    void updateSquare(std::vector<std::vector<square>> vecBoard);
+    void houseReturn();
 
   private:
     color _color;
     int _xBoard, _yBoard, _xPixel, _yPixel;
     dir _lastDir;
     bool _isInHouse;
-    time_t _timePoint1;
+    time_t timePoint1;
 };
 
 #endif

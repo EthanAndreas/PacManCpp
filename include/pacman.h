@@ -9,6 +9,8 @@
 #define POWERUP_PACMAN_CONTACT 10
 #define GHOST_PACMAN_CONTACT 5
 
+#define POWERUP_MODE 5 // 5s
+
 #define PACMAN_INIT_X 10
 #define PACMAN_INIT_Y 15
 #define PACMAN_CENTER_X 0
@@ -43,7 +45,7 @@ class pacman {
      * @param vecBoard
      * @param currentDir
      */
-    void updateDir(std::vector<std::vector<square>> vecBoard, dir currentDir);
+    void updateDir(std::vector<std::vector<square *>> vecBoard, dir currentDir);
     /**
      * @brief Get the last direction of pacman.
      *
@@ -56,7 +58,7 @@ class pacman {
      *
      * @param vecBoard
      */
-    void updateSquare(std::vector<std::vector<square>> vecBoard);
+    void updateSquare(std::vector<std::vector<square *>> vecBoard);
     /**
      * @brief Get the score of pacman.
      *
@@ -64,13 +66,14 @@ class pacman {
      */
     int getScore() const;
 
-    bool ghostCollision(std::vector<std::vector<square>> vecBoard,
-                        std::vector<ghost> vecGhost);
+    bool ghostCollision(std::vector<ghost> vecGhost);
 
   private:
     int _xBoard, _yBoard, _xPixel, _yPixel;
     dir _lastDir;
     int _score;
+    bool _powerup;
+    time_t timePoint1;
 };
 
 #endif

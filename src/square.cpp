@@ -1,6 +1,6 @@
 #include "square.h"
 
-square::square() {}
+square::square() { _item = _EMPTY; }
 
 square::~square() {}
 
@@ -8,6 +8,6 @@ void square::setState(short state) { _state = state; }
 
 short square::getState() { return _state; }
 
-void square::setItem(item *item) { _item = item; }
+void square::setItem(typeItem item) { _item = item; }
 
-item *square::getItem() { return _item; }
+typeItem square::getItem() { return _item; }

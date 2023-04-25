@@ -19,7 +19,7 @@ class board {
      *
      * @return std::vector<std::vector<square>>
      */
-    std::vector<std::vector<square>> getBoard();
+    std::vector<std::vector<square *>> getBoard();
     /**
      * @brief Set the state of each square with the map defined
      * in "assets/pacman_board.txt".
@@ -53,7 +53,7 @@ class board {
     std::vector<Coordinate> getPowerupList();
 
   private:
-    std::vector<std::vector<square>> _board;
+    std::vector<std::vector<square *>> _board;
 };
 
 #endif

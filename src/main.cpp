@@ -1,7 +1,6 @@
 #include "board.h"
 #include "ghost.h"
 #include "graphic.h"
-#include "item.h"
 #include "pacman.h"
 
 int main() {
@@ -89,7 +88,6 @@ int main() {
                 if (!Ghost.isGhostInHouse()) {
                     Ghost.updateDir(Board.getBoard());
                     Ghost.updatePos();
-                    Ghost.updateSquare(Board.getBoard());
                 } else {
                     Ghost.leaveGhostHouse();
                     Ghost.updatePos();
@@ -107,7 +105,7 @@ int main() {
             }
 
             // loose statement
-            if (Pacman.ghostCollision(Board.getBoard(), vecGhost)) {
+            if (Pacman.ghostCollision(vecGhost)) {
                 std::cout << "You loose!" << std::endl;
                 quit = true;
             }
