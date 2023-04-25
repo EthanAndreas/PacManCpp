@@ -66,7 +66,7 @@ class pacman {
      */
     int getScore() const;
 
-    bool ghostCollision(std::vector<ghost> vecGhost);
+    bool ghostCollision(std::vector<ghost *> vecGhost);
 
   private:
     int _xBoard, _yBoard, _xPixel, _yPixel;

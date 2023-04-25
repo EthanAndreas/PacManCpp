@@ -165,7 +165,6 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard) {
         vecBoard[_xBoard][_yBoard]->setItem(_EMPTY);
         _score = _score + 50;
 
-        std::cout << "powerup eaten" << std::endl;
         _powerup = true;
         timePoint1 = std::chrono::steady_clock::now();
     }
@@ -173,30 +172,26 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard) {
     if (_powerup) {
         time_t timePoint2 = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsedTime = timePoint2 - timePoint1;
-        if (elapsedTime.count() > POWERUP_MODE) {
+        if (elapsedTime.count() > POWERUP_MODE)
             _powerup = false;
-            std::cout << "powerup expired" << std::endl;
-        }
     }
 }
 
 int pacman::getScore() const { return _score; }
 
-bool pacman::ghostCollision(std::vector<ghost> vecGhost) {
+bool pacman::ghostCollision(std::vector<ghost *> vecGhost) {
 
     if (_powerup == false) {
         for (auto ghost : vecGhost) {
-            if (abs(_xPixel - ghost.getPos().first) < GHOST_PACMAN_CONTACT &&
-                abs(_yPixel - ghost.getPos().second) < GHOST_PACMAN_CONTACT)
+            if (abs(_xPixel - ghost->getPos().first) < GHOST_PACMAN_CONTACT &&
+                abs(_yPixel - ghost->getPos().second) < GHOST_PACMAN_CONTACT)
                 return true;
         }
     } else {
         for (auto ghost : vecGhost) {
-            if (abs(_xPixel - ghost.getPos().first) < GHOST_PACMAN_CONTACT &&
-                abs(_yPixel - ghost.getPos().second) < GHOST_PACMAN_CONTACT) {
-                ghost.houseReturn();
-                return false;
-            }
+            if (abs(_xPixel - ghost->getPos().first) < GHOST_PACMAN_CONTACT &&
+                abs(_yPixel - ghost->getPos().second) < GHOST_PACMAN_CONTACT)
+                ghost->houseReturn();
         }
     }
 

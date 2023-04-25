@@ -169,7 +169,7 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
 }
 
 void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
-          std::vector<ghost> vecGhost, std::vector<Coordinate> vecDot,
+          std::vector<ghost *> vecGhost, std::vector<Coordinate> vecDot,
           std::vector<Coordinate> vecPowerup, int cur_score) {
 
     SDL_SetColorKey(*spriteBoard, false, 0);
@@ -196,22 +196,22 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
     for (auto &Ghost : vecGhost) {
         // _ghost look animation
         SDL_Rect *ghost_in = nullptr;
-        switch (Ghost.getLastDir()) {
+        switch (Ghost->getLastDir()) {
         case LEFT:
-            ghost_in = &(vecGhostSprite[Ghost.getGhost()][LEFT]);
+            ghost_in = &(vecGhostSprite[Ghost->getGhost()][LEFT]);
             break;
         case RIGHT:
-            ghost_in = &(vecGhostSprite[Ghost.getGhost()][RIGHT]);
+            ghost_in = &(vecGhostSprite[Ghost->getGhost()][RIGHT]);
             break;
         case UP:
-            ghost_in = &(vecGhostSprite[Ghost.getGhost()][UP]);
+            ghost_in = &(vecGhostSprite[Ghost->getGhost()][UP]);
             break;
         case DOWN:
-            ghost_in = &(vecGhostSprite[Ghost.getGhost()][DOWN]);
+            ghost_in = &(vecGhostSprite[Ghost->getGhost()][DOWN]);
             break;
         case NONE:
             // by default, _ghost looks right
-            ghost_in = &(vecGhostSprite[Ghost.getGhost()][RIGHT]);
+            ghost_in = &(vecGhostSprite[Ghost->getGhost()][RIGHT]);
             break;
         }
         count = (count + 1) % (512);
@@ -222,12 +222,12 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
             ghost_in2.x += 17;
 
         // _ghost updated position
-        vecGhostSprite[Ghost.getGhost()].back().x = Ghost.getPos().first;
-        vecGhostSprite[Ghost.getGhost()].back().y = Ghost.getPos().second;
+        vecGhostSprite[Ghost->getGhost()].back().x = Ghost->getPos().first;
+        vecGhostSprite[Ghost->getGhost()].back().y = Ghost->getPos().second;
 
         SDL_SetColorKey(*spriteBoard, true, 0);
         SDL_BlitScaled(*spriteBoard, &ghost_in2, *windowSurf,
-                       &vecGhostSprite[Ghost.getGhost()].back());
+                       &vecGhostSprite[Ghost->getGhost()].back());
     }
 
     // pacman animation

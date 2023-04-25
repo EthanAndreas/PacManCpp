@@ -24,10 +24,10 @@ int main() {
     Board.transpose();
     Board.setItem();
     pacman Pacman;
-    std::vector<ghost> vecGhost;
+    std::vector<ghost *> vecGhost;
     for (int i = 0; i < 4; i++) {
-        ghost Ghost;
-        Ghost.setGhost(color(i));
+        ghost *Ghost = new ghost();
+        Ghost->setGhost(color(i));
         vecGhost.push_back(Ghost);
     }
     std::vector<Coordinate> vecDot = Board.getDotList();
@@ -83,14 +83,14 @@ int main() {
             Pacman.updateSquare(Board.getBoard());
 
             // ghost movement management
-            for (auto &Ghost : vecGhost) {
+            for (auto Ghost : vecGhost) {
 
-                if (!Ghost.isGhostInHouse()) {
-                    Ghost.updateDir(Board.getBoard());
-                    Ghost.updatePos();
+                if (!Ghost->isGhostInHouse()) {
+                    Ghost->updatePos();
+                    Ghost->updateDir(Board.getBoard());
                 } else {
-                    Ghost.leaveGhostHouse();
-                    Ghost.updatePos();
+                    Ghost->leaveGhostHouse();
+                    Ghost->updatePos();
                 }
             }
 

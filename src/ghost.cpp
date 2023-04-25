@@ -232,10 +232,7 @@ dir ghost::getDir() { return _lastDir; }
 
 void ghost::houseReturn() {
 
-    _xPixel = GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X;
-    _yPixel = GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y;
-    _xBoard = GHOST_INIT_X;
-    _yBoard = GHOST_INIT_Y;
+    setGhost(_color);
     _lastDir = NONE;
     _isInHouse = true;
     timePoint1 = std::chrono::steady_clock::now();
