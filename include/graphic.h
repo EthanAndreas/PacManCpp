@@ -6,6 +6,8 @@
 #include <SDL2/SDL.h>
 #include <map>
 
+#define GHOST_BLINK 3 // 3s
+
 /**
  * @brief Initialize SDL and create the window
  * and the surface to draw on

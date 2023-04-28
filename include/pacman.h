@@ -75,6 +75,12 @@ class pacman {
      */
     bool isPowerup();
     /**
+     * @brief Set the powerup of pacman.
+     *
+     * @param powerup
+     */
+    time_t getTimePoint1();
+    /**
      * @brief Get the score of pacman.
      *
      * @return int

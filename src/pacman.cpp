@@ -224,6 +224,8 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard,
 
 bool pacman::isPowerup() { return _powerup; }
 
+time_t pacman::getTimePoint1() { return timePoint1; }
+
 int pacman::getScore() { return _score; }
 
 bool pacman::ghostCollision(std::vector<ghost *> vecGhost) {

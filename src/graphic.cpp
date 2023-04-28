@@ -75,10 +75,8 @@ std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
     return vecGhostSprite;
 }
 
-SDL_Rect fearWhiteGhostSprite1{37, 195, 16, 16};
-SDL_Rect fearWhiteGhostSprite2{54, 195, 16, 16};
-SDL_Rect fearBlueGhostSprite1{3, 195, 16, 16};
-SDL_Rect fearBlueGhostSprite2{20, 195, 16, 16};
+SDL_Rect fearWhiteGhostSprite{37, 195, 16, 16};
+SDL_Rect fearBlueGhostSprite{3, 195, 16, 16};
 
 std::vector<std::vector<SDL_Rect>> vecGhostSprite = initGhostSrpite();
 
@@ -237,8 +235,15 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
                 ghost_in = &(vecGhostSprite[Ghost->getGhost()][RIGHT]);
                 break;
             }
+
         } else {
-            ghost_in = &(fearBlueGhostSprite1);
+            time_t timePoint2 = std::chrono::steady_clock::now();
+            std::chrono::duration<double> elapsedTime =
+                timePoint2 - Pacman.getTimePoint1();
+            if (elapsedTime.count() < POWERUP_MODE - GHOST_BLINK)
+                ghost_in = &(fearBlueGhostSprite);
+            else
+                ghost_in = &(fearWhiteGhostSprite);
         }
 
         count = (count + 1) % (512);
