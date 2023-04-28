@@ -125,7 +125,7 @@ std::pair<int, int> ghost::getPos() { return std::make_pair(_xPixel, _yPixel); }
 
 void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
 
-    if (_xBoard <= 0 || _xBoard >= 20 || _yBoard <= 0 || _yBoard >= 26)
+    if (_xBoard < 0 || _xBoard > 20 || _yBoard <= 0 || _yBoard >= 26)
         exit(EXIT_FAILURE);
 
     // wait until ghost reaches the middle of the next square
@@ -135,28 +135,31 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
 
     // ghost leaving the house
     // at the bottom of the door
-    if (vecBoard[_xBoard][_yBoard - 1]->getState() == DOOR) {
-        _yBoard--;
-        _lastDir = UP;
-        return;
-    }
-    // in the door
-    if (vecBoard[_xBoard][_yBoard]->getState() == DOOR) {
-        _yBoard--;
-        _lastDir = UP;
-        return;
-    }
-    // at the bottom left of the door
-    if (vecBoard[_xBoard + 1][_yBoard - 1]->getState() == DOOR) {
-        _xBoard++;
-        _lastDir = RIGHT;
-        return;
-    }
-    // at the bottom right of the door
-    if (vecBoard[_xBoard - 1][_yBoard - 1]->getState() == DOOR) {
-        _xBoard--;
-        _lastDir = LEFT;
-        return;
+    if (_xBoard >= 9 && _xBoard <= 11 && _yBoard >= 11 && _yBoard <= 13) {
+
+        if (vecBoard[_xBoard][_yBoard - 1]->getState() == DOOR) {
+            _yBoard--;
+            _lastDir = UP;
+            return;
+        }
+        // in the door
+        if (vecBoard[_xBoard][_yBoard]->getState() == DOOR) {
+            _yBoard--;
+            _lastDir = UP;
+            return;
+        }
+        // at the bottom left of the door
+        if (vecBoard[_xBoard + 1][_yBoard - 1]->getState() == DOOR) {
+            _xBoard++;
+            _lastDir = RIGHT;
+            return;
+        }
+        // at the bottom right of the door
+        if (vecBoard[_xBoard - 1][_yBoard - 1]->getState() == DOOR) {
+            _xBoard--;
+            _lastDir = LEFT;
+            return;
+        }
     }
 
     // random movement
@@ -172,9 +175,15 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
             if (_lastDir == RIGHT)
                 break;
 
-            // avoid teleporation hall
-            if (_xBoard - 1 == 4 && _yBoard == 13)
+            // out of the board
+            if (_xBoard <= 0 && _yBoard != 13)
                 break;
+
+            // teleportation
+            else if (_xBoard == 0 && _yBoard == 13) {
+                _xBoard = 20;
+                _xPixel = 20 * SCALE_PIXEL + GHOST_CENTER_X;
+            }
 
             if (vecBoard[_xBoard - 1][_yBoard]->getState() == HALL) {
                 _xBoard--;
@@ -189,9 +198,15 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
             if (_lastDir == LEFT)
                 break;
 
-            // avoid teleporation hall
-            if (_xBoard + 1 == 16 && _yBoard == 13)
+            // out of the board
+            if (_xBoard >= 20 && _yBoard != 13)
                 break;
+
+            // teleportation
+            else if (_xBoard == 20 && _yBoard == 13) {
+                _xBoard = 0;
+                _xPixel = GHOST_CENTER_X;
+            }
 
             if (vecBoard[_xBoard + 1][_yBoard]->getState() == HALL) {
                 _xBoard++;
@@ -206,6 +221,10 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
             if (_lastDir == DOWN)
                 break;
 
+            // out of the board
+            if (_yBoard >= 26)
+                break;
+
             if (vecBoard[_xBoard][_yBoard - 1]->getState() == HALL) {
                 _yBoard--;
                 _lastDir = UP;
@@ -217,6 +236,10 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
         case DOWN:
             // avoid going back
             if (_lastDir == UP)
+                break;
+
+            // out of the board
+            if (_yBoard <= 0)
                 break;
 
             if (vecBoard[_xBoard][_yBoard + 1]->getState() == HALL) {
