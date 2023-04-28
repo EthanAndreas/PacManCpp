@@ -75,6 +75,11 @@ std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
     return vecGhostSprite;
 }
 
+SDL_Rect fearWhiteGhostSprite1{37, 195, 16, 16};
+SDL_Rect fearWhiteGhostSprite2{54, 195, 16, 16};
+SDL_Rect fearBlueGhostSprite1{3, 195, 16, 16};
+SDL_Rect fearBlueGhostSprite2{20, 195, 16, 16};
+
 std::vector<std::vector<SDL_Rect>> vecGhostSprite = initGhostSrpite();
 
 // items
@@ -213,24 +218,29 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
     for (auto &Ghost : vecGhost) {
         // _ghost look animation
         SDL_Rect *ghost_in = nullptr;
-        switch (Ghost->getLastDir()) {
-        case LEFT:
-            ghost_in = &(vecGhostSprite[Ghost->getGhost()][LEFT]);
-            break;
-        case RIGHT:
-            ghost_in = &(vecGhostSprite[Ghost->getGhost()][RIGHT]);
-            break;
-        case UP:
-            ghost_in = &(vecGhostSprite[Ghost->getGhost()][UP]);
-            break;
-        case DOWN:
-            ghost_in = &(vecGhostSprite[Ghost->getGhost()][DOWN]);
-            break;
-        case NONE:
-            // by default, _ghost looks right
-            ghost_in = &(vecGhostSprite[Ghost->getGhost()][RIGHT]);
-            break;
+        if (Pacman.isPowerup() == false) {
+            switch (Ghost->getLastDir()) {
+            case LEFT:
+                ghost_in = &(vecGhostSprite[Ghost->getGhost()][LEFT]);
+                break;
+            case RIGHT:
+                ghost_in = &(vecGhostSprite[Ghost->getGhost()][RIGHT]);
+                break;
+            case UP:
+                ghost_in = &(vecGhostSprite[Ghost->getGhost()][UP]);
+                break;
+            case DOWN:
+                ghost_in = &(vecGhostSprite[Ghost->getGhost()][DOWN]);
+                break;
+            case NONE:
+                // by default, _ghost looks right
+                ghost_in = &(vecGhostSprite[Ghost->getGhost()][RIGHT]);
+                break;
+            }
+        } else {
+            ghost_in = &(fearBlueGhostSprite1);
         }
+
         count = (count + 1) % (512);
 
         // _ghost wave animation

@@ -68,6 +68,13 @@ class pacman {
     void updateSquare(std::vector<std::vector<square *>> vecBoard,
                       fruit *Fruit);
     /**
+     * @brief Set the powerup of pacman.
+     *
+     * @return true
+     * @return false
+     */
+    bool isPowerup();
+    /**
      * @brief Get the score of pacman.
      *
      * @return int
