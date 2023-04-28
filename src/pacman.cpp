@@ -72,7 +72,6 @@ void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
         else if (_xBoard == 0 && _yBoard == 13) {
             _xBoard = 20;
             _xPixel = 20 * SCALE_PIXEL + PACMAN_CENTER_X;
-            break;
         }
 
         if (vecBoard[_xBoard - 1][_yBoard]->getState() == HALL) {
@@ -94,7 +93,6 @@ void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
         else if (_xBoard == 20 && _yBoard == 13) {
             _xBoard = 0;
             _xPixel = PACMAN_CENTER_X;
-            break;
         }
 
         if (vecBoard[_xBoard + 1][_yBoard]->getState() == HALL) {
