@@ -2,6 +2,7 @@
 #define GRAPHIC_H
 
 #include "board.h"
+#include "fruit.h"
 #include <SDL2/SDL.h>
 #include <map>
 
@@ -24,7 +25,7 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
  */
 void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
           std::vector<ghost *> vecGhost, std::vector<Coordinate> vecDot,
-          std::vector<Coordinate> vecPowerup, int cur_score);
+          std::vector<Coordinate> vecPowerup, typeFruit fruit, int curScore);
 
 void drawString(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int x,
                 int y, std::string str);

@@ -1,6 +1,7 @@
 #ifndef PACMAN_H
 #define PACMAN_H
 
+#include "fruit.h"
 #include "ghost.h"
 #include "lib.h"
 #include "square.h"
@@ -64,19 +65,20 @@ class pacman {
      *
      * @param vecBoard
      */
-    void updateSquare(std::vector<std::vector<square *>> vecBoard);
+    void updateSquare(std::vector<std::vector<square *>> vecBoard,
+                      fruit *Fruit);
     /**
      * @brief Get the score of pacman.
      *
      * @return int
      */
-    int getScore() const;
+    int getScore();
     /**
      * @brief Get the number of dots eaten by pacman.
      *
      * @return int
      */
-    int getDotCounter() const;
+    int getDotCounter();
     /**
      * @brief Reset the dot counter.
      *

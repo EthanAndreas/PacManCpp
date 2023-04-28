@@ -3,7 +3,6 @@
 
 #include "lib.h"
 #include "square.h"
-#include <chrono>
 
 #define GHOST_INIT_X 10
 #define GHOST_INIT_Y 10
@@ -24,11 +23,6 @@
 #define GHOST_CENTER_Y 4
 
 enum color { RED, PINK, BLUE, ORANGE };
-
-#define time_t                          \
-    std::chrono::time_point<            \
-        std::chrono::_V2::steady_clock, \
-        std::chrono::duration<long int, std::ratio<1, 1000000000>>>
 
 // macro for wait time in function of difficulty
 #define RED_GHOST_WAIT_TIME (6 / DIFFICULTY)     // 6s for easy

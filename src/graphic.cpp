@@ -12,7 +12,8 @@ SDL_Rect pac_d = {109, 90, 16, 16};
 SDL_Rect pac_u = {75, 89, 16, 16};
 // position
 SDL_Rect _pacman = {PACMAN_INIT_X * SCALE_PIXEL + PACMAN_CENTER_X,
-                    PACMAN_INIT_Y *SCALE_PIXEL + PACMAN_CENTER_Y, 32, 32};
+                    PACMAN_INIT_Y *SCALE_PIXEL + PACMAN_CENTER_Y, SCALE_PIXEL,
+                    SCALE_PIXEL};
 
 // Ghost
 std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
@@ -27,7 +28,7 @@ std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
     // position
     redGhostSprite.push_back({RED_GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
                               RED_GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y,
-                              32, 32});
+                              SCALE_PIXEL, SCALE_PIXEL});
 
     // Pink Ghost
     std::vector<SDL_Rect> pinkGhostSprite;
@@ -39,7 +40,7 @@ std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
     // position
     pinkGhostSprite.push_back({PINK_GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
                                PINK_GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y,
-                               32, 32});
+                               SCALE_PIXEL, SCALE_PIXEL});
 
     // Blue Ghost
     std::vector<SDL_Rect> blueGhostSprite;
@@ -51,7 +52,7 @@ std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
     // position
     blueGhostSprite.push_back({BLUE_GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
                                BLUE_GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y,
-                               32, 32});
+                               SCALE_PIXEL, SCALE_PIXEL});
     // Orange Ghost
     std::vector<SDL_Rect> orangeGhostSprite;
     // animation
@@ -62,7 +63,8 @@ std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
     // position
     orangeGhostSprite.push_back(
         {ORANGE_GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X,
-         ORANGE_GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y, 32, 32});
+         ORANGE_GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y, SCALE_PIXEL,
+         SCALE_PIXEL});
 
     std::vector<std::vector<SDL_Rect>> vecGhostSprite;
     vecGhostSprite.push_back(redGhostSprite);
@@ -162,10 +164,6 @@ std::map<char, SDL_Rect> sdlChar = {
 
 int count;
 
-// TODO: Do not use global variables
-int fruitActive = _INACTIVE;
-time_t beginTimeFruit;
-
 void init(SDL_Window **Window, SDL_Surface **windowSurf,
           SDL_Surface **spriteBoard) {
 
@@ -179,51 +177,37 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
 
 void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
           std::vector<ghost *> vecGhost, std::vector<Coordinate> vecDot,
-          std::vector<Coordinate> vecPowerup, int cur_score) {
+          std::vector<Coordinate> vecPowerup, typeFruit fruit, int curScore) {
 
     SDL_SetColorKey(*spriteBoard, false, 0);
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
 
     // combine the score string and the score number into one string
-    std::string score_string = "score " + std::to_string(cur_score);
+    std::string scoreString = "score " + std::to_string(curScore);
 
     // print the score string
-    drawString(windowSurf, spriteBoard, 4, 874, score_string);
+    drawString(windowSurf, spriteBoard, 4, 874, scoreString);
 
     // dot display
     for (auto &coord : vecDot) {
-        SDL_Rect dot = {coord.x * 32 + 11, coord.y * 32 + 15, 10, 10};
+        SDL_Rect dot = {coord.x * SCALE_PIXEL + 11, coord.y * SCALE_PIXEL + 15,
+                        10, 10};
         SDL_BlitScaled(*spriteBoard, &dot_in, *windowSurf, &dot);
     }
 
     // powerup display
     for (auto &coord : vecPowerup) {
-        SDL_Rect powerup = {coord.x * 32 + 6, coord.y * 32 + 10, 20, 20};
+        SDL_Rect powerup = {coord.x * SCALE_PIXEL + 6,
+                            coord.y * SCALE_PIXEL + 10, 20, 20};
         SDL_BlitScaled(*spriteBoard, &powerup_in, *windowSurf, &powerup);
     }
 
-    // Fruit display only if dot counter is 170
-    if (Pacman.getDotCounter() == 169) {
-        fruitActive = _ACTIVE;
-        // start a timer for 10 seconds
-        beginTimeFruit = std::chrono::steady_clock::now();
-        // Add the fruit on the board
-    }
-
-    time_t stopTimeFruit = std::chrono::steady_clock::now();
-    std::chrono::duration<double> elapsedTimeFruit =
-        stopTimeFruit - beginTimeFruit;
-
-    if (fruitActive == _ACTIVE &&
-        (elapsedTimeFruit.count() < TIME_TO_SPAWN_FRUIT)) {
-        SDL_Rect fruit = {FRUIT_X * 32, FRUIT_Y * 32, 32, 32};
-        SDL_BlitScaled(*spriteBoard, &vecFruitSprite.front(), *windowSurf,
-                       &fruit);
-        Pacman.resetDotCounter();
-    } else if (fruitActive == _ACTIVE || fruitActive == _EATEN) {
-        fruitActive = _INACTIVE;
-        Pacman.resetDotCounter();
-        vecFruitSprite.erase(vecFruitSprite.begin());
+    // Fruit display
+    if (fruit != _NONE) {
+        SDL_Rect fruitSdl = {FRUIT_X * SCALE_PIXEL, FRUIT_Y * SCALE_PIXEL,
+                             SCALE_PIXEL, SCALE_PIXEL};
+        SDL_BlitScaled(*spriteBoard, &vecFruitSprite[fruit - 1], *windowSurf,
+                       &fruitSdl);
     }
 
     for (auto &Ghost : vecGhost) {

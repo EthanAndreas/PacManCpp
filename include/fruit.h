@@ -2,9 +2,10 @@
 #define FRUIT_H
 
 #include "lib.h"
-#include <chrono>
+#include "square.h"
 
 enum typeFruit {
+    _NONE,
     _CHERRY,
     _STRAWBERRY,
     _ORANGE,
@@ -15,10 +16,10 @@ enum typeFruit {
     _KEY
 };
 
-enum fruitState { _INACTIVE, _ACTIVE, _EATEN };
-
 #define FRUIT_X 10
 #define FRUIT_Y 15
+
+#define MIN_DOT_FRUIT 3
 
 #define CHERRY_SCORE 100
 #define STRAWBERRY_SCORE 300
@@ -30,5 +31,40 @@ enum fruitState { _INACTIVE, _ACTIVE, _EATEN };
 #define KEY_SCORE 5000
 
 #define TIME_TO_SPAWN_FRUIT 10 // 10s
+
+#define NO_UPDATE 0
+#define SET 1
+#define EXCEED 2
+
+class fruit {
+  public:
+    fruit();
+    ~fruit();
+    /**
+     * @brief Get the item of the fruit.
+     *
+     * @return typeFruit
+     */
+    typeFruit getFruit();
+    /**
+     * @brief Update the fruit.
+     *
+     * @param vecBoard
+     * @param _dotCounter
+     */
+    int updateFruit(std::vector<std::vector<square *>> vecBoard,
+                    int dotCounter);
+    /**
+     * @brief Eat the fruit.
+     *
+     * @param vecBoard
+     */
+    void eatFruit(std::vector<std::vector<square *>> vecBoard);
+
+  private:
+    typeFruit _fruit;
+    int _lastFruit;
+    std::chrono::time_point<std::chrono::steady_clock> timeFruit1;
+};
 
 #endif

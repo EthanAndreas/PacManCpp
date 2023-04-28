@@ -147,7 +147,8 @@ void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
 
 dir pacman::getDir() { return _lastDir; }
 
-void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard) {
+void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard,
+                          fruit *Fruit) {
 
     if (_xBoard < 0 || _xBoard > 20 || _yBoard <= 0 || _yBoard >= 26)
         exit(EXIT_FAILURE);
@@ -195,7 +196,9 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard) {
 
         _powerup = true;
         timePoint1 = std::chrono::steady_clock::now();
-    } else if (vecBoard[_xBoard][_yBoard]->getItem() == _FRUIT) {
+
+    } else if (_xBoard == FRUIT_X && _yBoard == FRUIT_Y &&
+               vecBoard[_xBoard][_yBoard]->getItem() == _FRUIT) {
 
         if (_lastDir == LEFT || _lastDir == RIGHT) {
             if (abs(_xPixel % 32 - PACMAN_CENTER_X) != FRUIT_PACMAN_CONTACT) {
@@ -208,8 +211,9 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard) {
         } else
             return;
 
-        vecBoard[_xBoard][_yBoard]->setItem(_EMPTY);
-        vecBoard[_xBoard][_yBoard]->setScore(0);
+        _score = _score + vecBoard[_xBoard][_yBoard]->getScore();
+        Fruit->eatFruit(vecBoard);
+        _dotCounter = 0;
     }
 
     if (_powerup) {
@@ -220,7 +224,7 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard) {
     }
 }
 
-int pacman::getScore() const { return _score; }
+int pacman::getScore() { return _score; }
 
 bool pacman::ghostCollision(std::vector<ghost *> vecGhost) {
 
@@ -243,6 +247,6 @@ bool pacman::ghostCollision(std::vector<ghost *> vecGhost) {
     return false;
 }
 
-int pacman::getDotCounter() const { return _dotCounter; }
+int pacman::getDotCounter() { return _dotCounter; }
 
 void pacman::resetDotCounter() { _dotCounter = 0; }

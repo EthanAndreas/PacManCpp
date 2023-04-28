@@ -1,4 +1,5 @@
 #include "board.h"
+#include "fruit.h"
 #include "ghost.h"
 #include "graphic.h"
 #include "pacman.h"
@@ -35,10 +36,11 @@ int main() {
         }
         std::vector<Coordinate> vecDot = Board.getDotList();
         std::vector<Coordinate> vecPowerup = Board.getPowerupList();
+        fruit Fruit;
 
         // display initial board
         draw(&windowSurf, &spriteBoard, Pacman, vecGhost, vecDot, vecPowerup,
-             0);
+             _NONE, 0);
         SDL_UpdateWindowSurface(Window);
 
         bool start = false, quit = false;
@@ -93,7 +95,14 @@ int main() {
                 // pacman movement management
                 Pacman.updateDir(Board.getBoard(), currentDir);
                 Pacman.updatePos();
-                Pacman.updateSquare(Board.getBoard());
+                Pacman.updateSquare(Board.getBoard(), &Fruit);
+
+                // pacman eat fruit management
+
+                if (Fruit.updateFruit(Board.getBoard(),
+                                      Pacman.getDotCounter()) == EXCEED) {
+                    Pacman.resetDotCounter();
+                }
 
                 // ghost movement management
                 for (auto Ghost : vecGhost) {
@@ -129,7 +138,7 @@ int main() {
 
                 // display updated board
                 draw(&windowSurf, &spriteBoard, Pacman, vecGhost, vecDot,
-                     vecPowerup, Pacman.getScore());
+                     vecPowerup, Fruit.getFruit(), Pacman.getScore());
                 SDL_UpdateWindowSurface(Window);
             }
 
