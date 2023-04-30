@@ -109,7 +109,8 @@ int main() {
 
                     if (!Ghost->isGhostInHouse()) {
                         Ghost->updatePos();
-                        Ghost->updateDir(Board.getBoard());
+                        Ghost->updateDir(Board.getBoard(), Pacman.getPos(),
+                                         Pacman.getDir());
                     } else {
                         Ghost->leaveGhostHouse();
                         Ghost->updatePos();

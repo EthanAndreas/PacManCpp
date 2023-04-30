@@ -1,8 +1,7 @@
 #ifndef GHOST_H
 #define GHOST_H
 
-#include "lib.h"
-#include "square.h"
+#include "shortestpath.h"
 
 #define GHOST_INIT_X 10
 #define GHOST_INIT_Y 10
@@ -85,7 +84,30 @@ class ghost {
      *
      * @param vecBoard
      */
-    void updateDir(std::vector<std::vector<square *>> vecBoard);
+    void updateDir(std::vector<std::vector<square *>> vecBoard,
+                   std::pair<int, int> pacPos, dir dirPac);
+    /**
+     * @brief Update the direction of the ghost with a valid random direction.
+     *
+     * @param vecBoard
+     * @param avoidDir
+     */
+    void updateDirRandom(std::vector<std::vector<square *>> vecBoard);
+    /**
+     * @brief Update direction of red ghost. Red ghost is following the pacman.
+     *
+     * @param vecBoard
+     * @param xPac
+     * @param yPac
+     */
+    void updateDirRed(std::vector<std::vector<square *>> vecBoard, int xPac,
+                      int yPac);
+    void updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
+                       int yPac, dir dirPac);
+    void updateDirBlue(std::vector<std::vector<square *>> vecBoard, int xPac,
+                       int yPac, dir dirPac);
+    void updateDirOrange(std::vector<std::vector<square *>> vecBoard, int xPac,
+                         int yPac, dir dirPac);
     /**
      * @brief Get the last direction of the ghost.
      *

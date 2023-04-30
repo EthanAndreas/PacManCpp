@@ -123,7 +123,8 @@ void ghost::updatePos() {
 
 std::pair<int, int> ghost::getPos() { return std::make_pair(_xPixel, _yPixel); }
 
-void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
+void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
+                      std::pair<int, int> pacPos, dir dirPac) {
 
     if (_xBoard < 0 || _xBoard > 20 || _yBoard <= 0 || _yBoard >= 26)
         exit(EXIT_FAILURE);
@@ -162,6 +163,28 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
         }
     }
 
+    switch (_color) {
+    case RED:
+        updateDirRed(vecBoard, pacPos.first / SCALE_PIXEL,
+                     pacPos.second / SCALE_PIXEL);
+        break;
+    case PINK:
+        updateDirPink(vecBoard, pacPos.first / SCALE_PIXEL,
+                      pacPos.second / SCALE_PIXEL, dirPac);
+        break;
+    case BLUE:
+        updateDirBlue(vecBoard, pacPos.first / SCALE_PIXEL,
+                      pacPos.second / SCALE_PIXEL, dirPac);
+        break;
+    case ORANGE:
+        updateDirOrange(vecBoard, pacPos.first / SCALE_PIXEL,
+                        pacPos.second / SCALE_PIXEL, dirPac);
+        break;
+    }
+}
+
+void ghost::updateDirRandom(std::vector<std::vector<square *>> vecBoard) {
+
     // random movement
     bool findPos = false;
     while (findPos == false) {
@@ -177,7 +200,7 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
 
             // out of the board
             if (_xBoard <= 0 && _yBoard != 13)
-                break;
+                exit(EXIT_FAILURE);
 
             // teleportation
             else if (_xBoard == 0 && _yBoard == 13) {
@@ -200,7 +223,7 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
 
             // out of the board
             if (_xBoard >= 20 && _yBoard != 13)
-                break;
+                exit(EXIT_FAILURE);
 
             // teleportation
             else if (_xBoard == 20 && _yBoard == 13) {
@@ -223,7 +246,7 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
 
             // out of the board
             if (_yBoard >= 26)
-                break;
+                exit(EXIT_FAILURE);
 
             if (vecBoard[_xBoard][_yBoard - 1]->getState() == HALL) {
                 _yBoard--;
@@ -240,7 +263,7 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
 
             // out of the board
             if (_yBoard <= 0)
-                break;
+                exit(EXIT_FAILURE);
 
             if (vecBoard[_xBoard][_yBoard + 1]->getState() == HALL) {
                 _yBoard++;
@@ -254,6 +277,64 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard) {
             break;
         }
     }
+}
+
+void ghost::updateDirRed(std::vector<std::vector<square *>> vecBoard, int xPac,
+                         int yPac) {
+
+    // get the shortest path to pacman
+    std::vector<Node *> path =
+        findShortestPath(vecBoard, _xBoard, _yBoard, xPac, yPac);
+    // if a shortest path is found, assign the new direction
+    if (path.size() != 0) {
+        _lastDir = findDir(path[0], path[1]);
+        switch (_lastDir) {
+        case LEFT:
+            _xBoard--;
+            break;
+        case RIGHT:
+            _xBoard++;
+            break;
+        case UP:
+            _yBoard--;
+            break;
+        case DOWN:
+            _yBoard++;
+            break;
+        case NONE:
+            break;
+        }
+    }
+    // if an error occurs on A* algorithm, take a random direction
+    else
+        updateDirRandom(vecBoard);
+}
+
+void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
+                          int yPac, dir dirPac) {
+
+    updateDirRandom(vecBoard);
+    (void)xPac;
+    (void)yPac;
+    (void)dirPac;
+}
+
+void ghost::updateDirBlue(std::vector<std::vector<square *>> vecBoard, int xPac,
+                          int yPac, dir dirPac) {
+
+    updateDirRandom(vecBoard);
+    (void)xPac;
+    (void)yPac;
+    (void)dirPac;
+}
+
+void ghost::updateDirOrange(std::vector<std::vector<square *>> vecBoard,
+                            int xPac, int yPac, dir dirPac) {
+
+    updateDirRandom(vecBoard);
+    (void)xPac;
+    (void)yPac;
+    (void)dirPac;
 }
 
 dir ghost::getDir() { return _lastDir; }
