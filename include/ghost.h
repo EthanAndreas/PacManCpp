@@ -2,6 +2,7 @@
 #define GHOST_H
 
 #include "shortestpath.h"
+#include <random>
 
 #define GHOST_INIT_X 10
 #define GHOST_INIT_Y 10
@@ -28,6 +29,10 @@ enum color { RED, PINK, BLUE, ORANGE };
 #define PINK_GHOST_WAIT_TIME (12 / DIFFICULTY)   // 12s for easy
 #define BLUE_GHOST_WAIT_TIME (18 / DIFFICULTY)   // 18s for easy
 #define ORANGE_GHOST_WAIT_TIME (24 / DIFFICULTY) // 24s for easy
+
+#define updateWithShortestPath(vecBoard, xPac, yPac) \
+    updateDirRed(vecBoard, xPac, yPac)
+#define updateDirRandom(vecBoard) updateDirOrange(vecBoard)
 
 class ghost {
   public:
@@ -129,6 +134,7 @@ class ghost {
     bool _isInHouse;
     bool _isReturnHouse;
     time_t timePoint1;
+    std::mt19937 _rng;
 };
 
 #endif

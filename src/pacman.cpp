@@ -235,17 +235,19 @@ int pacman::getScore() { return _score; }
 bool pacman::ghostCollision(std::vector<ghost *> vecGhost) {
 
     if (_powerup == false) {
-        for (auto ghost : vecGhost) {
-            if (abs(_xPixel - ghost->getPos().first) < GHOST_PACMAN_CONTACT &&
-                abs(_yPixel - ghost->getPos().second) < GHOST_PACMAN_CONTACT)
+        for (auto Ghost : vecGhost) {
+            if (abs(_xPixel - Ghost->getPos().first) < GHOST_PACMAN_CONTACT &&
+                abs(_yPixel - Ghost->getPos().second) < GHOST_PACMAN_CONTACT)
                 return true;
         }
     } else {
-        for (auto ghost : vecGhost) {
-            if (abs(_xPixel - ghost->getPos().first) < GHOST_PACMAN_CONTACT &&
-                abs(_yPixel - ghost->getPos().second) < GHOST_PACMAN_CONTACT) {
-                ghost->houseReturn();
-                _score = _score + GHOST_SCORE;
+        for (auto Ghost : vecGhost) {
+            if (abs(_xPixel - Ghost->getPos().first) < GHOST_PACMAN_CONTACT &&
+                abs(_yPixel - Ghost->getPos().second) < GHOST_PACMAN_CONTACT) {
+                if (Ghost->isReturnHouse() == false) {
+                    Ghost->houseReturn();
+                    _score = _score + GHOST_SCORE;
+                }
             }
         }
     }

@@ -12,7 +12,8 @@ ghost::~ghost() {}
 
 void ghost::setTimer() {
     timePoint1 = std::chrono::steady_clock::now();
-    srand(time(NULL));
+    std::mt19937 _rng(
+        std::chrono::steady_clock::now().time_since_epoch().count());
 }
 
 void ghost::setGhost(color c) {
@@ -146,7 +147,15 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
 
     if (_isReturnHouse == true) {
 
-        if (_xBoard == GHOST_INIT_X && _yBoard == GHOST_INIT_Y) {
+        // arrive at the house
+        if ((_color == RED && _xBoard == RED_GHOST_INIT_X &&
+             _yBoard == RED_GHOST_INIT_Y) ||
+            (_color == PINK && _xBoard == PINK_GHOST_INIT_X &&
+             _yBoard == PINK_GHOST_INIT_Y) ||
+            (_color == BLUE && _xBoard == BLUE_GHOST_INIT_X &&
+             _yBoard == BLUE_GHOST_INIT_Y) ||
+            (_color == ORANGE && _xBoard == ORANGE_GHOST_INIT_X &&
+             _yBoard == ORANGE_GHOST_INIT_Y)) {
 
             _isReturnHouse = false;
             _lastDir = NONE;
@@ -155,28 +164,46 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
             return;
         }
 
-        std::vector<Node *> path = findShortestPath(vecBoard, _xBoard, _yBoard,
-                                                    GHOST_INIT_X, GHOST_INIT_Y);
-        if (path.size() >= 2)
-            _lastDir = findDir(path[0], path[1]);
-
-        switch (_lastDir) {
-        case LEFT:
-            _xBoard--;
-            break;
-        case RIGHT:
-            _xBoard++;
-            break;
-        case UP:
-            _yBoard--;
-            break;
-        case DOWN:
+        // go the initial position
+        if (_xBoard == 10 && _yBoard == 10) {
+            _lastDir = DOWN;
             _yBoard++;
+            return;
+        } else if (_xBoard == 10 && _yBoard == 11) {
+            _lastDir = DOWN;
+            _yBoard++;
+            return;
+        }
+
+        switch (_color) {
+        case RED:
             break;
-        case NONE:
+        case PINK:
+
+            if (_xBoard == 10 && _yBoard == 12) {
+                _lastDir = LEFT;
+                _xBoard--;
+                return;
+            }
+            break;
+        case BLUE:
+            if (_xBoard == 10 && _yBoard == 12) {
+                _lastDir = DOWN;
+                _yBoard++;
+                return;
+            }
+            break;
+        case ORANGE:
+            if (_xBoard == 10 && _yBoard == 12) {
+                _lastDir = RIGHT;
+                _xBoard++;
+                return;
+            }
             break;
         }
 
+        // update direction with shortest path
+        updateWithShortestPath(vecBoard, GHOST_INIT_X, GHOST_INIT_Y);
         return;
     }
 
@@ -207,6 +234,24 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
             _lastDir = LEFT;
             return;
         }
+    }
+
+    // if ghost is on the teleportation, take it
+    if (_xBoard == 0 && _yBoard == 13) {
+        _xBoard = 20;
+        _xPixel = 20 * SCALE_PIXEL + GHOST_CENTER_X;
+    } else if (_xBoard == 20 && _yBoard == 13) {
+        _xBoard = 0;
+        _xPixel = GHOST_CENTER_X;
+    }
+
+    // if ghost enters in the teleportation hall, go to the teleportation hall
+    if (_xBoard <= 4 && _yBoard == 13 && _lastDir == LEFT) {
+        _xBoard--;
+        return;
+    } else if (_xBoard >= 16 && _yBoard == 13 && _lastDir == RIGHT) {
+        _xBoard++;
+        return;
     }
 
     switch (_color) {
@@ -256,7 +301,7 @@ void ghost::updateDirRed(std::vector<std::vector<square *>> vecBoard, int xPac,
     }
     // if an error occurs on A* algorithm, take a random direction
     else
-        updateDirOrange(vecBoard);
+        updateDirRandom(vecBoard);
 }
 
 void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
@@ -266,12 +311,8 @@ void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
     int xPac4 = xPac;
     int yPac4 = yPac;
 
-    if (xPac == 0 && yPac == 13)
-        xPac4 = 1;
-    else if (xPac == 20 && yPac == 13)
-        xPac4 = 19;
-
-    if (xPac <= 0 || xPac >= 20 || yPac <= 0 || yPac >= 26) {
+    if ((xPac <= 0 && yPac != 13) || (xPac >= 20 && yPac != 13) || yPac <= 0 ||
+        yPac >= 26) {
         std::cerr << "Pacman out of the board in updateDirPink" << std::endl;
         exit(EXIT_FAILURE);
     }
@@ -281,29 +322,23 @@ void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
 
         switch (dirPac) {
         case LEFT:
-            if (xPac4 <= 0)
+            if (xPac4 <= 0 && yPac4 != 13)
                 break;
 
             if (vecBoard[xPac4 - 1][yPac4]->getState() == WALL) {
-                // find a random direction
-                if (vecBoard[xPac4][yPac4 - 1]->getState() == HALL)
-                    yPac4--;
-                else if (vecBoard[xPac4][yPac4 + 1]->getState() == HALL)
-                    yPac4++;
+                dist = 4;
+                break;
             }
             xPac4--;
             break;
 
         case RIGHT:
-            if (xPac4 >= 20)
+            if (xPac4 >= 20 && yPac4 != 13)
                 break;
 
             if (vecBoard[xPac4 + 1][yPac4]->getState() == WALL) {
-                // find a random direction
-                if (vecBoard[xPac4][yPac4 - 1]->getState() == HALL)
-                    yPac4--;
-                else if (vecBoard[xPac4][yPac4 + 1]->getState() == HALL)
-                    yPac4++;
+                dist = 4;
+                break;
             }
             xPac4++;
             break;
@@ -313,11 +348,8 @@ void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
                 break;
 
             if (vecBoard[xPac4][yPac4 - 1]->getState() == WALL) {
-                // find a random direction
-                if (vecBoard[xPac4 - 1][yPac4]->getState() == HALL)
-                    xPac4--;
-                else if (vecBoard[xPac4 + 1][yPac4]->getState() == HALL)
-                    xPac4++;
+                dist = 4;
+                break;
             }
             yPac4--;
             break;
@@ -327,11 +359,8 @@ void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
                 break;
 
             if (vecBoard[xPac4][yPac4 + 1]->getState() == WALL) {
-                // find a random direction
-                if (vecBoard[xPac4 - 1][yPac4]->getState() == HALL)
-                    xPac4--;
-                else if (vecBoard[xPac4 + 1][yPac4]->getState() == HALL)
-                    xPac4++;
+                dist = 4;
+                break;
             }
             yPac4++;
             break;
@@ -342,33 +371,9 @@ void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
         dist++;
     }
 
-    // get the shortest path to the 4th square in front of pacman
-    std::vector<Node *> path =
-        findShortestPath(vecBoard, _xBoard, _yBoard, xPac4, yPac4);
-
-    // if a shortest path is found, assign the new direction
-    if (path.size() >= 2) {
-        _lastDir = findDir(path[0], path[1]);
-        switch (_lastDir) {
-        case LEFT:
-            _xBoard--;
-            break;
-        case RIGHT:
-            _xBoard++;
-            break;
-        case UP:
-            _yBoard--;
-            break;
-        case DOWN:
-            _yBoard++;
-            break;
-        case NONE:
-            break;
-        }
-    }
-    // if an error occurs on A* algorithm, take a random direction
-    else
-        updateDirOrange(vecBoard);
+    // update direction with the shortest path to the 4th square in front of
+    // pacman
+    updateWithShortestPath(vecBoard, xPac4, yPac4);
 }
 
 void ghost::updateDirBlue(std::vector<std::vector<square *>> vecBoard, int xPac,
@@ -386,7 +391,7 @@ void ghost::updateDirOrange(std::vector<std::vector<square *>> vecBoard) {
     bool findPos = false;
     while (findPos == false) {
 
-        int randDir = rand() % 4;
+        int randDir = std::uniform_int_distribution<int>(0, 3)(_rng);
 
         switch (randDir) {
 
@@ -399,12 +404,6 @@ void ghost::updateDirOrange(std::vector<std::vector<square *>> vecBoard) {
             if (_xBoard <= 0 && _yBoard != 13) {
                 std::cerr << "Ghost out of the board in updateDir" << std::endl;
                 exit(EXIT_FAILURE);
-            }
-
-            // teleportation
-            else if (_xBoard == 0 && _yBoard == 13) {
-                _xBoard = 20;
-                _xPixel = 20 * SCALE_PIXEL + GHOST_CENTER_X;
             }
 
             if (vecBoard[_xBoard - 1][_yBoard]->getState() == HALL) {
@@ -424,12 +423,6 @@ void ghost::updateDirOrange(std::vector<std::vector<square *>> vecBoard) {
             if (_xBoard >= 20 && _yBoard != 13) {
                 std::cerr << "Ghost out of the board in updateDir" << std::endl;
                 exit(EXIT_FAILURE);
-            }
-
-            // teleportation
-            else if (_xBoard == 20 && _yBoard == 13) {
-                _xBoard = 0;
-                _xPixel = GHOST_CENTER_X;
             }
 
             if (vecBoard[_xBoard + 1][_yBoard]->getState() == HALL) {
