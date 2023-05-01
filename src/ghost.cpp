@@ -223,13 +223,164 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
                       pacPos.second / SCALE_PIXEL, dirPac);
         break;
     case ORANGE:
-        updateDirOrange(vecBoard, pacPos.first / SCALE_PIXEL,
-                        pacPos.second / SCALE_PIXEL, dirPac);
+        updateDirOrange(vecBoard);
         break;
     }
 }
 
-void ghost::updateDirRandom(std::vector<std::vector<square *>> vecBoard) {
+void ghost::updateDirRed(std::vector<std::vector<square *>> vecBoard, int xPac,
+                         int yPac) {
+
+    // get the shortest path to pacman
+    std::vector<Node *> path =
+        findShortestPath(vecBoard, _xBoard, _yBoard, xPac, yPac);
+    // if a shortest path is found, assign the new direction
+    if (path.size() >= 2) {
+        _lastDir = findDir(path[0], path[1]);
+        switch (_lastDir) {
+        case LEFT:
+            _xBoard--;
+            break;
+        case RIGHT:
+            _xBoard++;
+            break;
+        case UP:
+            _yBoard--;
+            break;
+        case DOWN:
+            _yBoard++;
+            break;
+        case NONE:
+            break;
+        }
+    }
+    // if an error occurs on A* algorithm, take a random direction
+    else
+        updateDirOrange(vecBoard);
+}
+
+void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
+                          int yPac, dir dirPac) {
+
+    // get the 4th square in front of pacman
+    int xPac4 = xPac;
+    int yPac4 = yPac;
+
+    if (xPac == 0 && yPac == 13)
+        xPac4 = 1;
+    else if (xPac == 20 && yPac == 13)
+        xPac4 = 19;
+
+    if (xPac <= 0 || xPac >= 20 || yPac <= 0 || yPac >= 26) {
+        std::cerr << "Pacman out of the board in updateDirPink" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    int dist = 0;
+    while (dist < 4) {
+
+        switch (dirPac) {
+        case LEFT:
+            if (xPac4 <= 0)
+                break;
+
+            if (vecBoard[xPac4 - 1][yPac4]->getState() == WALL) {
+                // find a random direction
+                if (vecBoard[xPac4][yPac4 - 1]->getState() == HALL)
+                    yPac4--;
+                else if (vecBoard[xPac4][yPac4 + 1]->getState() == HALL)
+                    yPac4++;
+            }
+            xPac4--;
+            break;
+
+        case RIGHT:
+            if (xPac4 >= 20)
+                break;
+
+            if (vecBoard[xPac4 + 1][yPac4]->getState() == WALL) {
+                // find a random direction
+                if (vecBoard[xPac4][yPac4 - 1]->getState() == HALL)
+                    yPac4--;
+                else if (vecBoard[xPac4][yPac4 + 1]->getState() == HALL)
+                    yPac4++;
+            }
+            xPac4++;
+            break;
+
+        case UP:
+            if (yPac4 <= 0)
+                break;
+
+            if (vecBoard[xPac4][yPac4 - 1]->getState() == WALL) {
+                // find a random direction
+                if (vecBoard[xPac4 - 1][yPac4]->getState() == HALL)
+                    xPac4--;
+                else if (vecBoard[xPac4 + 1][yPac4]->getState() == HALL)
+                    xPac4++;
+            }
+            yPac4--;
+            break;
+
+        case DOWN:
+            if (yPac4 >= 26)
+                break;
+
+            if (vecBoard[xPac4][yPac4 + 1]->getState() == WALL) {
+                // find a random direction
+                if (vecBoard[xPac4 - 1][yPac4]->getState() == HALL)
+                    xPac4--;
+                else if (vecBoard[xPac4 + 1][yPac4]->getState() == HALL)
+                    xPac4++;
+            }
+            yPac4++;
+            break;
+
+        case NONE:
+            break;
+        }
+        dist++;
+    }
+
+    // get the shortest path to the 4th square in front of pacman
+    std::vector<Node *> path =
+        findShortestPath(vecBoard, _xBoard, _yBoard, xPac4, yPac4);
+
+    // if a shortest path is found, assign the new direction
+    if (path.size() >= 2) {
+        _lastDir = findDir(path[0], path[1]);
+        switch (_lastDir) {
+        case LEFT:
+            _xBoard--;
+            break;
+        case RIGHT:
+            _xBoard++;
+            break;
+        case UP:
+            _yBoard--;
+            break;
+        case DOWN:
+            _yBoard++;
+            break;
+        case NONE:
+            break;
+        }
+    }
+    // if an error occurs on A* algorithm, take a random direction
+    else
+        updateDirOrange(vecBoard);
+}
+
+void ghost::updateDirBlue(std::vector<std::vector<square *>> vecBoard, int xPac,
+                          int yPac, dir dirPac) {
+
+    updateDirOrange(vecBoard);
+    (void)xPac;
+    (void)yPac;
+    (void)dirPac;
+}
+
+void ghost::updateDirOrange(std::vector<std::vector<square *>> vecBoard) {
 
     // random movement
     bool findPos = false;
@@ -331,62 +482,4 @@ void ghost::updateDirRandom(std::vector<std::vector<square *>> vecBoard) {
             break;
         }
     }
-}
-
-void ghost::updateDirRed(std::vector<std::vector<square *>> vecBoard, int xPac,
-                         int yPac) {
-
-    // get the shortest path to pacman
-    std::vector<Node *> path =
-        findShortestPath(vecBoard, _xBoard, _yBoard, xPac, yPac);
-    // if a shortest path is found, assign the new direction
-    if (path.size() >= 2) {
-        _lastDir = findDir(path[0], path[1]);
-        switch (_lastDir) {
-        case LEFT:
-            _xBoard--;
-            break;
-        case RIGHT:
-            _xBoard++;
-            break;
-        case UP:
-            _yBoard--;
-            break;
-        case DOWN:
-            _yBoard++;
-            break;
-        case NONE:
-            break;
-        }
-    }
-    // if an error occurs on A* algorithm, take a random direction
-    else
-        updateDirRandom(vecBoard);
-}
-
-void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
-                          int yPac, dir dirPac) {
-
-    updateDirRandom(vecBoard);
-    (void)xPac;
-    (void)yPac;
-    (void)dirPac;
-}
-
-void ghost::updateDirBlue(std::vector<std::vector<square *>> vecBoard, int xPac,
-                          int yPac, dir dirPac) {
-
-    updateDirRandom(vecBoard);
-    (void)xPac;
-    (void)yPac;
-    (void)dirPac;
-}
-
-void ghost::updateDirOrange(std::vector<std::vector<square *>> vecBoard,
-                            int xPac, int yPac, dir dirPac) {
-
-    updateDirRandom(vecBoard);
-    (void)xPac;
-    (void)yPac;
-    (void)dirPac;
 }

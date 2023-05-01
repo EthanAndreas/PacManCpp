@@ -94,13 +94,6 @@ class ghost {
     void updateDir(std::vector<std::vector<square *>> vecBoard,
                    std::pair<int, int> pacPos, dir dirPac);
     /**
-     * @brief Update the direction of the ghost with a valid random direction.
-     *
-     * @param vecBoard
-     * @param avoidDir
-     */
-    void updateDirRandom(std::vector<std::vector<square *>> vecBoard);
-    /**
      * @brief Update direction of red ghost. Red ghost is following the pacman.
      *
      * @param vecBoard
@@ -109,12 +102,25 @@ class ghost {
      */
     void updateDirRed(std::vector<std::vector<square *>> vecBoard, int xPac,
                       int yPac);
+    /**
+     * @brief Update direction of pink ghost. Pink ghost is anticipating the
+     * pacman, it is going to the position of the pacman + 4.
+     *
+     * @param vecBoard
+     * @param xPac
+     * @param yPac
+     * @param dirPac
+     */
     void updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
                        int yPac, dir dirPac);
     void updateDirBlue(std::vector<std::vector<square *>> vecBoard, int xPac,
                        int yPac, dir dirPac);
-    void updateDirOrange(std::vector<std::vector<square *>> vecBoard, int xPac,
-                         int yPac, dir dirPac);
+    /**
+     * @brief Update of the orange ghost. Orange ghost takes a random direction.
+     *
+     * @param vecBoard
+     */
+    void updateDirOrange(std::vector<std::vector<square *>> vecBoard);
 
   private:
     color _color;
