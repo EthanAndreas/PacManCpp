@@ -77,15 +77,31 @@ int main() {
             if (keys[SDL_SCANCODE_ESCAPE])
                 quit = true;
             else if (keys[SDL_SCANCODE_LEFT]) {
+                if (start == false) {
+                    for (auto Ghost : vecGhost)
+                        Ghost->setTimer();
+                }
                 start = true;
                 currentDir = LEFT;
             } else if (keys[SDL_SCANCODE_RIGHT]) {
+                if (start == false) {
+                    for (auto Ghost : vecGhost)
+                        Ghost->setTimer();
+                }
                 start = true;
                 currentDir = RIGHT;
             } else if (keys[SDL_SCANCODE_UP]) {
+                if (start == false) {
+                    for (auto Ghost : vecGhost)
+                        Ghost->setTimer();
+                }
                 start = true;
                 currentDir = UP;
             } else if (keys[SDL_SCANCODE_DOWN]) {
+                if (start == false) {
+                    for (auto Ghost : vecGhost)
+                        Ghost->setTimer();
+                }
                 start = true;
                 currentDir = DOWN;
             }

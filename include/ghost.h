@@ -34,6 +34,11 @@ class ghost {
     ghost();
     ~ghost();
     /**
+     * @brief Set the timer object.
+     *
+     */
+    void setTimer();
+    /**
      * @brief Set the color of the ghost.
      *
      * @param c

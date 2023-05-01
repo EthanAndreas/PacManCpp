@@ -7,10 +7,13 @@ ghost::ghost() {
     _yPixel = 0;
     _lastDir = NONE;
     _isReturnHouse = false;
+}
+ghost::~ghost() {}
+
+void ghost::setTimer() {
     timePoint1 = std::chrono::steady_clock::now();
     srand(time(NULL));
 }
-ghost::~ghost() {}
 
 void ghost::setGhost(color c) {
     _color = c;
