@@ -25,9 +25,10 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
  * @param windowSurf
  * @param spriteBoard
  */
-void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
-          std::vector<ghost *> vecGhost, std::vector<Coordinate> vecDot,
-          std::vector<Coordinate> vecPowerup, typeFruit fruit, int curScore);
+int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
+         pacman Pacman, std::vector<ghost *> vecGhost,
+         std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup,
+         typeFruit fruit, int curScore);
 
 void drawString(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int x,
                 int y, std::string str);

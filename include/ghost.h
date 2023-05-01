@@ -30,7 +30,7 @@ enum color { RED, PINK, BLUE, ORANGE };
 #define BLUE_GHOST_WAIT_TIME (18 / DIFFICULTY)   // 18s for easy
 #define ORANGE_GHOST_WAIT_TIME (24 / DIFFICULTY) // 24s for easy
 
-#define updateWithShortestPath(vecBoard, xPac, yPac) \
+#define updateDirWithShortestPath(vecBoard, xPac, yPac) \
     updateDirRed(vecBoard, xPac, yPac)
 #define updateDirRandom(vecBoard) updateDirOrange(vecBoard)
 
@@ -61,7 +61,13 @@ class ghost {
      * @return true
      * @return false
      */
-    bool isGhostInHouse();
+    bool isInHouse();
+    /**
+     * @brief Check if the ghost is returning in the ghost house.
+     *
+     * @return true
+     * @return false
+     */
     bool isReturnHouse();
     /**
      * @brief Set the ghost in the ghost house
@@ -73,6 +79,19 @@ class ghost {
      */
     void houseReturn();
     /**
+     * @brief Set the frightened object.
+     *
+     * @param isFear
+     */
+    void setFrightened(bool isFear);
+    /**
+     * @brief Check if the ghost is frightened.
+     *
+     * @return true
+     * @return false
+     */
+    bool isFrightened();
+    /**
      * @brief Get the last direction of the ghost.
      *
      * @return dir*
@@ -81,6 +100,7 @@ class ghost {
     /**
      * @brief Update the sprite position of the ghost.
      *
+     * @param count - frame number
      * @note The sprite position represents the pixel position of the ghost.
      */
     void updatePos();
@@ -133,6 +153,7 @@ class ghost {
     dir _lastDir;
     bool _isInHouse;
     bool _isReturnHouse;
+    bool _isFear;
     time_t timePoint1;
     std::mt19937 _rng;
 };

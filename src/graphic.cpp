@@ -169,8 +169,6 @@ std::map<char, SDL_Rect> sdlChar = {
     {'5', letter_5}, {'6', letter_6}, {'7', letter_7},     {'8', letter_8},
     {'9', letter_9}, {'0', letter_0}, {' ', letter_blank}};
 
-int count;
-
 void init(SDL_Window **Window, SDL_Surface **windowSurf,
           SDL_Surface **spriteBoard) {
 
@@ -179,12 +177,12 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
                          SDL_WINDOWPOS_UNDEFINED, 700, 900, SDL_WINDOW_SHOWN);
     *windowSurf = SDL_GetWindowSurface(*Window);
     *spriteBoard = SDL_LoadBMP("assets/pacman_sprites.bmp");
-    count = 0;
 }
 
-void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
-          std::vector<ghost *> vecGhost, std::vector<Coordinate> vecDot,
-          std::vector<Coordinate> vecPowerup, typeFruit fruit, int curScore) {
+int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
+         pacman Pacman, std::vector<ghost *> vecGhost,
+         std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup,
+         typeFruit fruit, int curScore) {
 
     SDL_SetColorKey(*spriteBoard, false, 0);
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
@@ -248,7 +246,7 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
             ghost_in2.x += 17;
 
         // fear mode
-        if (Pacman.isPowerup() == true && Ghost->isGhostInHouse() == false &&
+        if (Pacman.isPowerup() == true && Ghost->isInHouse() == false &&
             Ghost->isReturnHouse() == false) {
 
             time_t timePoint2 = std::chrono::steady_clock::now();
@@ -286,7 +284,7 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
             }
         }
 
-        // _ghost updated position
+        // ghost updated position
         vecGhostSprite[Ghost->getGhost()].back().x = Ghost->getPos().first;
         vecGhostSprite[Ghost->getGhost()].back().y = Ghost->getPos().second;
 
@@ -323,6 +321,8 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
 
     SDL_SetColorKey(*spriteBoard, true, 0);
     SDL_BlitScaled(*spriteBoard, &pac_in, *windowSurf, &_pacman);
+
+    return count;
 }
 
 void drawString(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int x,

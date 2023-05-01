@@ -7,6 +7,7 @@ ghost::ghost() {
     _yPixel = 0;
     _lastDir = NONE;
     _isReturnHouse = false;
+    _isFear = false;
 }
 ghost::~ghost() {}
 
@@ -52,7 +53,7 @@ void ghost::setGhost(color c) {
 
 color ghost::getGhost() { return _color; }
 
-bool ghost::isGhostInHouse() { return _isInHouse; }
+bool ghost::isInHouse() { return _isInHouse; }
 
 bool ghost::isReturnHouse() { return _isReturnHouse; }
 
@@ -107,26 +108,73 @@ void ghost::leaveGhostHouse() {
     }
 }
 
-void ghost::houseReturn() { _isReturnHouse = true; }
+void ghost::houseReturn() {
+    _isReturnHouse = true;
+    _isFear = false;
+}
+
+void ghost::setFrightened(bool isFear) { _isFear = isFear; }
+
+bool ghost::isFrightened() { return _isFear; }
 
 dir ghost::getLastDir() { return _lastDir; }
 
 void ghost::updatePos() {
-    switch (_lastDir) {
-    case LEFT:
-        _xPixel--;
-        break;
-    case RIGHT:
-        _xPixel++;
-        break;
-    case UP:
-        _yPixel--;
-        break;
-    case DOWN:
-        _yPixel++;
-        break;
-    case NONE:
-        break;
+
+    if (_isReturnHouse == false && _isFear == false) {
+
+        switch (_lastDir) {
+        case LEFT:
+            _xPixel -= 2;
+            break;
+        case RIGHT:
+            _xPixel += 2;
+            break;
+        case UP:
+            _yPixel -= 2;
+            break;
+        case DOWN:
+            _yPixel += 2;
+            break;
+        case NONE:
+            break;
+        }
+    } else if (_isReturnHouse == true && _isFear == false) {
+
+        switch (_lastDir) {
+        case LEFT:
+            _xPixel -= 2;
+            break;
+        case RIGHT:
+            _xPixel += 2;
+            break;
+        case UP:
+            _yPixel -= 2;
+            break;
+        case DOWN:
+            _yPixel += 2;
+            break;
+        case NONE:
+            break;
+        }
+    } else if (_isReturnHouse == false && _isFear == true) {
+        // slow down the ghost by moving him each even value
+        switch (_lastDir) {
+        case LEFT:
+            _xPixel--;
+            break;
+        case RIGHT:
+            _xPixel++;
+            break;
+        case UP:
+            _yPixel--;
+            break;
+        case DOWN:
+            _yPixel++;
+            break;
+        case NONE:
+            break;
+        }
     }
 }
 
@@ -141,9 +189,19 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
     }
 
     // wait until ghost reaches the middle of the next square
-    if ((_xPixel % SCALE_PIXEL) != GHOST_CENTER_X ||
-        (_yPixel % SCALE_PIXEL) != GHOST_CENTER_Y)
-        return;
+    if (_isReturnHouse == false && _isFear == false) {
+        if (abs(_xPixel % SCALE_PIXEL - GHOST_CENTER_X) > 1 ||
+            abs(_yPixel % SCALE_PIXEL - GHOST_CENTER_Y) > 1)
+            return;
+    } else if (_isReturnHouse == true && _isFear == false) {
+        if (abs(_xPixel % SCALE_PIXEL - GHOST_CENTER_X) > 1 ||
+            abs(_yPixel % SCALE_PIXEL - GHOST_CENTER_Y) > 1)
+            return;
+    } else if (_isReturnHouse == false && _isFear == true) {
+        if (_xPixel % SCALE_PIXEL != GHOST_CENTER_X ||
+            _yPixel % SCALE_PIXEL != GHOST_CENTER_Y)
+            return;
+    }
 
     if (_isReturnHouse == true) {
 
@@ -203,7 +261,7 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
         }
 
         // update direction with shortest path
-        updateWithShortestPath(vecBoard, GHOST_INIT_X, GHOST_INIT_Y);
+        updateDirWithShortestPath(vecBoard, GHOST_INIT_X, GHOST_INIT_Y);
         return;
     }
 
@@ -245,7 +303,8 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
         _xPixel = GHOST_CENTER_X;
     }
 
-    // if ghost enters in the teleportation hall, go to the teleportation hall
+    // if ghost enters in the teleportation hall, go to the teleportation
+    // hall
     if (_xBoard <= 4 && _yBoard == 13 && _lastDir == LEFT) {
         _xBoard--;
         return;
@@ -317,6 +376,12 @@ void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
         exit(EXIT_FAILURE);
     }
 
+    // if ghost is at a distance less than 4 go on pacman
+    if (abs(_xBoard - xPac) + abs(_yBoard - yPac) < 4) {
+        updateDirWithShortestPath(vecBoard, xPac, yPac);
+        return;
+    }
+
     int dist = 0;
     while (dist < 4) {
 
@@ -373,7 +438,7 @@ void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
 
     // update direction with the shortest path to the 4th square in front of
     // pacman
-    updateWithShortestPath(vecBoard, xPac4, yPac4);
+    updateDirWithShortestPath(vecBoard, xPac4, yPac4);
 }
 
 void ghost::updateDirBlue(std::vector<std::vector<square *>> vecBoard, int xPac,

@@ -17,28 +17,16 @@ dir pacman::getLastDir() { return _lastDir; }
 void pacman::updatePos() {
     switch (_lastDir) {
     case LEFT:
-        if (_xPixel > 0)
-            _xPixel--;
-        else
-            _lastDir = NONE;
+        _xPixel -= 2;
         break;
     case RIGHT:
-        if (_xPixel < 20 * SCALE_PIXEL)
-            _xPixel++;
-        else
-            _lastDir = NONE;
+        _xPixel += 2;
         break;
     case UP:
-        if (_yPixel > 0)
-            _yPixel--;
-        else
-            _lastDir = NONE;
+        _yPixel -= 2;
         break;
     case DOWN:
-        if (_yPixel < 26 * SCALE_PIXEL)
-            _yPixel++;
-        else
-            _lastDir = NONE;
+        _yPixel += 2;
         break;
     case NONE:
         break;
@@ -58,8 +46,8 @@ void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
     }
 
     // wait until pacman reaches the middle of the next square
-    if ((_xPixel % SCALE_PIXEL) != PACMAN_CENTER_X ||
-        (_yPixel % SCALE_PIXEL) != PACMAN_CENTER_Y)
+    if (abs(_xPixel % SCALE_PIXEL - PACMAN_CENTER_X) > 1 ||
+        abs(_yPixel % SCALE_PIXEL - PACMAN_CENTER_Y) > 1)
         return;
 
     switch (currentDir) {
@@ -148,7 +136,7 @@ void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
 dir pacman::getDir() { return _lastDir; }
 
 void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard,
-                          fruit *Fruit) {
+                          std::vector<ghost *> vecGhost, fruit *Fruit) {
 
     if (_xBoard < 0 || _xBoard > 20 || _yBoard <= 0 || _yBoard >= 26) {
         std::cerr << "Pacman out of the board in updateSquare" << std::endl;
@@ -197,6 +185,10 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard,
         vecBoard[_xBoard][_yBoard]->setScore(0);
 
         _powerup = true;
+        for (auto Ghost : vecGhost) {
+            if (Ghost->isInHouse() == false)
+                Ghost->setFrightened(true);
+        }
         timePoint1 = std::chrono::steady_clock::now();
 
     } else if (_xBoard == FRUIT_X && _yBoard == FRUIT_Y &&
@@ -221,8 +213,13 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard,
     if (_powerup) {
         time_t timePoint2 = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsedTime = timePoint2 - timePoint1;
-        if (elapsedTime.count() > POWERUP_MODE)
+        if (elapsedTime.count() > POWERUP_MODE) {
             _powerup = false;
+            for (auto Ghost : vecGhost) {
+                if (Ghost->isInHouse() == false)
+                    Ghost->setFrightened(false);
+            }
+        }
     }
 }
 
@@ -236,9 +233,13 @@ bool pacman::ghostCollision(std::vector<ghost *> vecGhost) {
 
     if (_powerup == false) {
         for (auto Ghost : vecGhost) {
-            if (abs(_xPixel - Ghost->getPos().first) < GHOST_PACMAN_CONTACT &&
-                abs(_yPixel - Ghost->getPos().second) < GHOST_PACMAN_CONTACT)
-                return true;
+            if (Ghost->isReturnHouse() == false) {
+                if (abs(_xPixel - Ghost->getPos().first) <
+                        GHOST_PACMAN_CONTACT &&
+                    abs(_yPixel - Ghost->getPos().second) <
+                        GHOST_PACMAN_CONTACT)
+                    return true;
+            }
         }
     } else {
         for (auto Ghost : vecGhost) {

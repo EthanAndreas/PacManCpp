@@ -66,7 +66,7 @@ class pacman {
      * @param vecBoard
      */
     void updateSquare(std::vector<std::vector<square *>> vecBoard,
-                      fruit *Fruit);
+                      std::vector<ghost *> vecGhost, fruit *Fruit);
     /**
      * @brief Set the powerup of pacman.
      *

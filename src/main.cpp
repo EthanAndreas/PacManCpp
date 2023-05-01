@@ -23,6 +23,7 @@ int main() {
     bool restart = true;
     while (restart) {
         // initialize board, pacman, ghost and item
+        int count = 0;
         board Board;
         Board.load();
         Board.transpose();
@@ -39,8 +40,8 @@ int main() {
         fruit Fruit;
 
         // display initial board
-        draw(&windowSurf, &spriteBoard, Pacman, vecGhost, vecDot, vecPowerup,
-             _NONE, 0);
+        count = draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost, vecDot,
+                     vecPowerup, _NONE, 0);
         SDL_UpdateWindowSurface(Window);
 
         bool start = false, quit = false;
@@ -111,7 +112,7 @@ int main() {
                 // pacman movement management
                 Pacman.updateDir(Board.getBoard(), currentDir);
                 Pacman.updatePos();
-                Pacman.updateSquare(Board.getBoard(), &Fruit);
+                Pacman.updateSquare(Board.getBoard(), vecGhost, &Fruit);
 
                 // pacman eat fruit management
 
@@ -123,7 +124,7 @@ int main() {
                 // ghost movement management
                 for (auto Ghost : vecGhost) {
 
-                    if (!Ghost->isGhostInHouse()) {
+                    if (!Ghost->isInHouse()) {
                         Ghost->updatePos();
                         Ghost->updateDir(Board.getBoard(), Pacman.getPos(),
                                          Pacman.getDir());
@@ -154,8 +155,9 @@ int main() {
                 }
 
                 // display updated board
-                draw(&windowSurf, &spriteBoard, Pacman, vecGhost, vecDot,
-                     vecPowerup, Fruit.getFruit(), Pacman.getScore());
+                count = draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost,
+                             vecDot, vecPowerup, Fruit.getFruit(),
+                             Pacman.getScore());
                 SDL_UpdateWindowSurface(Window);
             }
 
@@ -164,7 +166,7 @@ int main() {
                             (float)SDL_GetPerformanceFrequency() * 1000.0f;
 
             // 120 fps
-            SDL_Delay(floor(8.888f - elapsed));
+            SDL_Delay(floor(16.667f - elapsed));
         }
     }
 
