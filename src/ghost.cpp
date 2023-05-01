@@ -109,11 +109,19 @@ void ghost::leaveGhostHouse() {
 }
 
 void ghost::houseReturn() {
+
     _isReturnHouse = true;
     _isFear = false;
 }
 
-void ghost::setFrightened(bool isFear) { _isFear = isFear; }
+void ghost::setFrightened(bool isFear) {
+    // swap speed 2 for 1
+    if (isFear == true) {
+        _xPixel = _xPixel - (_xPixel % 2);
+        _yPixel = _yPixel - (_yPixel % 2);
+    }
+    _isFear = isFear;
+}
 
 bool ghost::isFrightened() { return _isFear; }
 
@@ -121,8 +129,8 @@ dir ghost::getLastDir() { return _lastDir; }
 
 void ghost::updatePos() {
 
-    if (_isReturnHouse == false && _isFear == false) {
-
+    if (_isFear == false) {
+        // normal speed
         switch (_lastDir) {
         case LEFT:
             _xPixel -= 2;
@@ -139,26 +147,8 @@ void ghost::updatePos() {
         case NONE:
             break;
         }
-    } else if (_isReturnHouse == true && _isFear == false) {
-
-        switch (_lastDir) {
-        case LEFT:
-            _xPixel -= 2;
-            break;
-        case RIGHT:
-            _xPixel += 2;
-            break;
-        case UP:
-            _yPixel -= 2;
-            break;
-        case DOWN:
-            _yPixel += 2;
-            break;
-        case NONE:
-            break;
-        }
-    } else if (_isReturnHouse == false && _isFear == true) {
-        // slow down the ghost by moving him each even value
+    } else if (_isFear == true) {
+        // slow down the ghost
         switch (_lastDir) {
         case LEFT:
             _xPixel--;
@@ -189,15 +179,11 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
     }
 
     // wait until ghost reaches the middle of the next square
-    if (_isReturnHouse == false && _isFear == false) {
+    if (_isFear == false) {
         if (abs(_xPixel % SCALE_PIXEL - GHOST_CENTER_X) > 1 ||
             abs(_yPixel % SCALE_PIXEL - GHOST_CENTER_Y) > 1)
             return;
-    } else if (_isReturnHouse == true && _isFear == false) {
-        if (abs(_xPixel % SCALE_PIXEL - GHOST_CENTER_X) > 1 ||
-            abs(_yPixel % SCALE_PIXEL - GHOST_CENTER_Y) > 1)
-            return;
-    } else if (_isReturnHouse == false && _isFear == true) {
+    } else if (_isFear == true) {
         if (_xPixel % SCALE_PIXEL != GHOST_CENTER_X ||
             _yPixel % SCALE_PIXEL != GHOST_CENTER_Y)
             return;
@@ -370,8 +356,7 @@ void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
     int xPac4 = xPac;
     int yPac4 = yPac;
 
-    if ((xPac <= 0 && yPac != 13) || (xPac >= 20 && yPac != 13) || yPac <= 0 ||
-        yPac >= 26) {
+    if (xPac < 0 || xPac > 20 || yPac <= 0 || yPac >= 26) {
         std::cerr << "Pacman out of the board in updateDirPink" << std::endl;
         exit(EXIT_FAILURE);
     }
@@ -387,7 +372,7 @@ void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
 
         switch (dirPac) {
         case LEFT:
-            if (xPac4 <= 0 && yPac4 != 13)
+            if (xPac4 <= 0)
                 break;
 
             if (vecBoard[xPac4 - 1][yPac4]->getState() == WALL) {
@@ -398,7 +383,7 @@ void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
             break;
 
         case RIGHT:
-            if (xPac4 >= 20 && yPac4 != 13)
+            if (xPac4 >= 20)
                 break;
 
             if (vecBoard[xPac4 + 1][yPac4]->getState() == WALL) {

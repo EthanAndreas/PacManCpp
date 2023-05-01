@@ -246,7 +246,7 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
             ghost_in2.x += 17;
 
         // fear mode
-        if (Pacman.isPowerup() == true && Ghost->isInHouse() == false &&
+        if (Ghost->isFrightened() == true && Ghost->isInHouse() == false &&
             Ghost->isReturnHouse() == false) {
 
             time_t timePoint2 = std::chrono::steady_clock::now();

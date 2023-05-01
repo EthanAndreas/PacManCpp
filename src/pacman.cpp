@@ -189,6 +189,7 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard,
             if (Ghost->isInHouse() == false)
                 Ghost->setFrightened(true);
         }
+
         timePoint1 = std::chrono::steady_clock::now();
 
     } else if (_xBoard == FRUIT_X && _yBoard == FRUIT_Y &&
@@ -231,25 +232,17 @@ int pacman::getScore() { return _score; }
 
 bool pacman::ghostCollision(std::vector<ghost *> vecGhost) {
 
-    if (_powerup == false) {
-        for (auto Ghost : vecGhost) {
-            if (Ghost->isReturnHouse() == false) {
-                if (abs(_xPixel - Ghost->getPos().first) <
-                        GHOST_PACMAN_CONTACT &&
-                    abs(_yPixel - Ghost->getPos().second) <
-                        GHOST_PACMAN_CONTACT)
-                    return true;
-            }
-        }
-    } else {
-        for (auto Ghost : vecGhost) {
-            if (abs(_xPixel - Ghost->getPos().first) < GHOST_PACMAN_CONTACT &&
-                abs(_yPixel - Ghost->getPos().second) < GHOST_PACMAN_CONTACT) {
-                if (Ghost->isReturnHouse() == false) {
-                    Ghost->houseReturn();
-                    _score = _score + GHOST_SCORE;
-                }
-            }
+    for (auto Ghost : vecGhost) {
+        if (abs(_xPixel - Ghost->getPos().first) < GHOST_PACMAN_CONTACT &&
+            abs(_yPixel - Ghost->getPos().second) < GHOST_PACMAN_CONTACT) {
+            if (Ghost->isReturnHouse() == false &&
+                Ghost->isFrightened() == true) {
+                Ghost->houseReturn();
+                _score = _score + GHOST_SCORE;
+                return false;
+            } else if (Ghost->isReturnHouse() == false &&
+                       Ghost->isFrightened() == false)
+                return true;
         }
     }
 
