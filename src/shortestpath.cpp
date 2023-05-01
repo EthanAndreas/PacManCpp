@@ -93,8 +93,15 @@ findShortestPath(std::vector<std::vector<square *>> vecBoard, size_t xStart,
 
 dir findDir(Node *A, Node *B) {
 
-    if (B->parent != A)
+    if (A == nullptr || B == nullptr) {
+        std::cerr << "Empty node in findDir" << std::endl;
         exit(EXIT_FAILURE);
+    }
+
+    if (B->parent != A) {
+        std::cerr << "Nodes are not parent in findDir" << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
     if (A->x > B->x)
         return LEFT;
@@ -109,5 +116,5 @@ dir findDir(Node *A, Node *B) {
         return DOWN;
 
     else
-        exit(EXIT_FAILURE);
+        return NONE;
 }

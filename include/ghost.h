@@ -52,14 +52,16 @@ class ghost {
      * @return false
      */
     bool isGhostInHouse();
-    /**
-     * @brief Update the direction of the ghost in the ghost house.
-     */
-    void updateDirInHouse();
+    bool isReturnHouse();
     /**
      * @brief Set the ghost in the ghost house
      */
     void leaveGhostHouse();
+    /**
+     * @brief Ghost go back to the house.
+     *
+     */
+    void houseReturn();
     /**
      * @brief Get the last direction of the ghost.
      *
@@ -108,23 +110,13 @@ class ghost {
                        int yPac, dir dirPac);
     void updateDirOrange(std::vector<std::vector<square *>> vecBoard, int xPac,
                          int yPac, dir dirPac);
-    /**
-     * @brief Get the last direction of the ghost.
-     *
-     * @return dir
-     */
-    dir getDir();
-    /**
-     * @brief Ghost go back to the house.
-     *
-     */
-    void houseReturn();
 
   private:
     color _color;
     int _xBoard, _yBoard, _xPixel, _yPixel;
     dir _lastDir;
     bool _isInHouse;
+    bool _isReturnHouse;
     time_t timePoint1;
 };
 

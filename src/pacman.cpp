@@ -52,8 +52,10 @@ std::pair<int, int> pacman::getPos() {
 void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
                        dir currentDir) {
 
-    if (_xBoard < 0 || _xBoard > 20 || _yBoard <= 0 || _yBoard >= 26)
+    if (_xBoard < 0 || _xBoard > 20 || _yBoard <= 0 || _yBoard >= 26) {
+        std::cerr << "Pacman out of the board in updateDir" << std::endl;
         exit(EXIT_FAILURE);
+    }
 
     // wait until pacman reaches the middle of the next square
     if ((_xPixel % SCALE_PIXEL) != PACMAN_CENTER_X ||
@@ -148,8 +150,10 @@ dir pacman::getDir() { return _lastDir; }
 void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard,
                           fruit *Fruit) {
 
-    if (_xBoard < 0 || _xBoard > 20 || _yBoard <= 0 || _yBoard >= 26)
+    if (_xBoard < 0 || _xBoard > 20 || _yBoard <= 0 || _yBoard >= 26) {
+        std::cerr << "Pacman out of the board in updateSquare" << std::endl;
         exit(EXIT_FAILURE);
+    }
 
     // update item
     if (vecBoard[_xBoard][_yBoard]->getItem() == _DOT) {
