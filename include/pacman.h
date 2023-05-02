@@ -11,9 +11,12 @@
 #define PACMAN_CENTER_X 0
 #define PACMAN_CENTER_Y 4
 
+#define PACMAN_SPEED 2
+#define PACMAN_RANGE_CENTER PACMAN_SPEED - 1
+
 #define DOT_PACMAN_CONTACT 20
 #define POWERUP_PACMAN_CONTACT 10
-#define GHOST_PACMAN_CONTACT 5
+#define GHOST_PACMAN_CONTACT 15
 #define FRUIT_PACMAN_CONTACT 10
 
 #define DOT_SCORE 10
@@ -28,11 +31,11 @@ class pacman {
     pacman();
     ~pacman();
     /**
-     * @brief Get the last direction of pacman.
+     * @brief Get the sprite position of pacman.
      *
-     * @return dir
+     * @return std::pair<int, int>
      */
-    dir getLastDir();
+    std::pair<int, int> getPos();
     /**
      * @brief Update the sprite position of pacman.
      *
@@ -40,14 +43,17 @@ class pacman {
      */
     void updatePos();
     /**
-     * @brief Get the sprite position of pacman.
+     * @brief Wait for pacman to be in the center of a square in function of
+     * his direction and his sprite position.
      *
-     * @return std::pair<int, int>
+     * @return true
+     * @return false
      */
-    std::pair<int, int> getPos();
+    bool waitSquareCenter();
     /**
-     * @brief Update the direction of pacman with the direction pressed by the
-     * user if the direction is valid and update the board position of pacman.
+     * @brief Update the direction of pacman with the direction pressed by
+     * the user if the direction is valid and update the board position of
+     * pacman.
      *
      * @param vecBoard
      * @param currentDir
@@ -58,7 +64,7 @@ class pacman {
      *
      * @return dir
      */
-    dir getDir();
+    dir getLastDir();
     /**
      * @brief Fill the new square with pacman and empty the previous square.
      * Update the square and the score if pacman eats a dot or a powerup.
@@ -70,22 +76,32 @@ class pacman {
     /**
      * @brief Set the powerup of pacman.
      *
+     * @param powerup
+     */
+    time_t getTimePoint1();
+    /**
+     * @brief Set the powerup of pacman.
+     *
      * @return true
      * @return false
      */
     bool isPowerup();
-    /**
-     * @brief Set the powerup of pacman.
-     *
-     * @param powerup
-     */
-    time_t getTimePoint1();
     /**
      * @brief Get the score of pacman.
      *
      * @return int
      */
     int getScore();
+    /**
+     * @brief Check if pacman is in collision with a ghost.
+     * If pacman is in collision with a ghost, the ghost is eaten if
+     * pacman is in powerup mode, else pacman is eaten.
+     *
+     * @param vecGhost
+     * @return true
+     * @return false
+     */
+    bool ghostCollision(std::vector<ghost *> vecGhost);
     /**
      * @brief Get the number of dots eaten by pacman.
      *
@@ -98,10 +114,10 @@ class pacman {
      */
     void resetDotCounter();
 
-    bool ghostCollision(std::vector<ghost *> vecGhost);
-
   private:
-    int _xBoard, _yBoard, _xPixel, _yPixel;
+    // board coordinates corresponding to coordinates of the board vector
+    // pixel coordinates corresponding to the sprite position
+    size_t _xBoard, _yBoard, _xPixel, _yPixel;
     dir _lastDir;
     int _score;
     int _dotCounter;

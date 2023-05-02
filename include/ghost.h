@@ -22,6 +22,15 @@
 #define GHOST_CENTER_X 0
 #define GHOST_CENTER_Y 4
 
+#define GHOST_HOUSE_SPEED 1
+#define GHOST_HOUSE_RANGE_CENTER GHOST_HOUSE_SPEED - 1
+#define GHOST_FEAR_SPEED 1
+#define GHOST_FEAR_RANGE_CENTER GHOST_FEAR_SPEED - 1
+#define GHOST_SPEED 2
+#define GHOST_RANGE_CENTER GHOST_SPEED - 1
+#define GHOST_RETURN_SPEED 3
+#define GHOST_RETURN_RANGE_CENTER GHOST_RETURN_SPEED - 1
+
 enum color { RED, PINK, BLUE, ORANGE };
 
 // macro for wait time in function of difficulty
@@ -63,6 +72,15 @@ class ghost {
      */
     bool isInHouse();
     /**
+     * @brief Update the position of the ghost in the ghost house.
+     */
+    void updateInGhostHouse(std::vector<std::vector<square *>> vecBoard);
+    /**
+     * @brief Ghost go back to the house.
+     *
+     */
+    void setReturnHouse();
+    /**
      * @brief Check if the ghost is returning in the ghost house.
      *
      * @return true
@@ -70,14 +88,11 @@ class ghost {
      */
     bool isReturnHouse();
     /**
-     * @brief Set the ghost in the ghost house
-     */
-    void leaveGhostHouse();
-    /**
-     * @brief Ghost go back to the house.
+     * @brief Make the ghost go to the ghost house.
      *
+     * @param vecBoard
      */
-    void houseReturn();
+    void returnHouse(std::vector<std::vector<square *>> vecBoard);
     /**
      * @brief Set the frightened object.
      *
@@ -92,11 +107,11 @@ class ghost {
      */
     bool isFrightened();
     /**
-     * @brief Get the last direction of the ghost.
+     * @brief Get the sprite position of the ghost.
      *
-     * @return dir*
+     * @return std::pair<int, int>
      */
-    dir getLastDir();
+    std::pair<int, int> getPos();
     /**
      * @brief Update the sprite position of the ghost.
      *
@@ -105,14 +120,22 @@ class ghost {
      */
     void updatePos();
     /**
-     * @brief Get the sprite position of the ghost.
+     * @brief Wait the ghost to be in the center of a square in function of the
+     * ghost speed, of the direction and of the sprite position.
      *
-     * @return std::pair<int, int>
+     * @return true
+     * @return false
      */
-    std::pair<int, int> getPos();
+    bool waitSquareCenter();
     /**
-     * @brief Update the direction of the ghost with a  valid random direction
-     * and update the board position of the ghost.
+     * @brief Get the last direction of the ghost.
+     *
+     * @return dir*
+     */
+    dir getLastDir();
+    /**
+     * @brief Update the direction of the ghost with a  valid random
+     * direction and update the board position of the ghost.
      *
      * @param vecBoard
      */
@@ -149,7 +172,9 @@ class ghost {
 
   private:
     color _color;
-    int _xBoard, _yBoard, _xPixel, _yPixel;
+    // board coordinates corresponding to coordinates of the board vector
+    // pixel coordinates corresponding to the sprite position
+    size_t _xBoard, _yBoard, _xPixel, _yPixel;
     dir _lastDir;
     bool _isInHouse;
     bool _isReturnHouse;

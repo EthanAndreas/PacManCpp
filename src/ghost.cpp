@@ -55,14 +55,13 @@ color ghost::getGhost() { return _color; }
 
 bool ghost::isInHouse() { return _isInHouse; }
 
-bool ghost::isReturnHouse() { return _isReturnHouse; }
-
-void ghost::leaveGhostHouse() {
+void ghost::updateInGhostHouse(std::vector<std::vector<square *>> vecBoard) {
 
     time_t timePoint2 = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsedTime = timePoint2 - timePoint1;
     bool isTime = false;
 
+    // wait in ghost house
     switch (_color) {
     case RED:
         if (elapsedTime.count() >= RED_GHOST_WAIT_TIME)
@@ -84,6 +83,7 @@ void ghost::leaveGhostHouse() {
         break;
     }
 
+    // move in ghost house
     if (isTime == false) {
 
         if (_xPixel % SCALE_PIXEL != GHOST_CENTER_X ||
@@ -97,22 +97,117 @@ void ghost::leaveGhostHouse() {
             _lastDir = DOWN;
             _yBoard++;
         }
-    } else {
+    }
+    // move out ghost house
+    else {
+        // wait that ghost arrive at square center
 
+        // if the ghost has left the house
+        if (_xBoard == GHOST_INIT_X && _yBoard == GHOST_INIT_Y)
+            _isInHouse = false;
+
+        // next condition are set only for the 12th line
         if (_yBoard == 13) {
-            _yBoard--;
+            _yBoard -= GHOST_HOUSE_SPEED;
             _lastDir = UP;
-            _isInHouse = false;
-        } else if (_yBoard == 12)
-            _isInHouse = false;
+            return;
+        }
+
+        // in the door
+        if (vecBoard[_xBoard][_yBoard]->getState() == DOOR) {
+            _yBoard -= GHOST_HOUSE_SPEED;
+            _lastDir = UP;
+            return;
+        }
+        // at the bottom of the door
+        else if (vecBoard[_xBoard][_yBoard - 1]->getState() == DOOR) {
+            _yBoard -= GHOST_HOUSE_SPEED;
+            _lastDir = UP;
+            return;
+        }
+        // at the bottom left of the door
+        else if (vecBoard[_xBoard + 1][_yBoard - 1]->getState() == DOOR) {
+            _xBoard += GHOST_HOUSE_SPEED;
+            _lastDir = RIGHT;
+            return;
+        }
+        // at the bottom right of the door
+        else if (vecBoard[_xBoard - 1][_yBoard - 1]->getState() == DOOR) {
+            _xBoard -= GHOST_HOUSE_SPEED;
+            _lastDir = LEFT;
+            return;
+        }
     }
 }
 
-void ghost::houseReturn() {
+void ghost::setReturnHouse() {
 
     _isReturnHouse = true;
     _isFear = false;
 }
+
+void ghost::returnHouse(std::vector<std::vector<square *>> vecBoard) {
+
+    // arrive at the house
+    if ((_color == RED && _xBoard == RED_GHOST_INIT_X &&
+         _yBoard == RED_GHOST_INIT_Y) ||
+        (_color == PINK && _xBoard == PINK_GHOST_INIT_X &&
+         _yBoard == PINK_GHOST_INIT_Y) ||
+        (_color == BLUE && _xBoard == BLUE_GHOST_INIT_X &&
+         _yBoard == BLUE_GHOST_INIT_Y) ||
+        (_color == ORANGE && _xBoard == ORANGE_GHOST_INIT_X &&
+         _yBoard == ORANGE_GHOST_INIT_Y)) {
+
+        _isReturnHouse = false;
+        _lastDir = NONE;
+        setGhost(_color);
+        timePoint1 = std::chrono::steady_clock::now();
+        return;
+    }
+
+    // go the initial position
+    if (_xBoard == 10 && _yBoard == 10) {
+        _lastDir = DOWN;
+        _yBoard++;
+        return;
+    } else if (_xBoard == 10 && _yBoard == 11) {
+        _lastDir = DOWN;
+        _yBoard++;
+        return;
+    }
+
+    switch (_color) {
+    case RED:
+        break;
+    case PINK:
+
+        if (_xBoard == 10 && _yBoard == 12) {
+            _lastDir = LEFT;
+            _xBoard--;
+            return;
+        }
+        break;
+    case BLUE:
+        if (_xBoard == 10 && _yBoard == 12) {
+            _lastDir = DOWN;
+            _yBoard++;
+            return;
+        }
+        break;
+    case ORANGE:
+        if (_xBoard == 10 && _yBoard == 12) {
+            _lastDir = RIGHT;
+            _xBoard++;
+            return;
+        }
+        break;
+    }
+
+    // update direction with shortest path
+    updateDirWithShortestPath(vecBoard, GHOST_INIT_X, GHOST_INIT_Y);
+}
+
+bool ghost::isReturnHouse() { return _isReturnHouse; }
 
 void ghost::setFrightened(bool isFear) {
     // swap speed 2 for 1
@@ -125,42 +220,62 @@ void ghost::setFrightened(bool isFear) {
 
 bool ghost::isFrightened() { return _isFear; }
 
-dir ghost::getLastDir() { return _lastDir; }
+std::pair<int, int> ghost::getPos() { return std::make_pair(_xPixel, _yPixel); }
 
 void ghost::updatePos() {
 
-    if (_isFear == false) {
-        // normal speed
+    // normal speed
+    if (_isFear == false && _isReturnHouse == false) {
         switch (_lastDir) {
         case LEFT:
-            _xPixel -= 2;
+            _xPixel -= GHOST_SPEED;
             break;
         case RIGHT:
-            _xPixel += 2;
+            _xPixel += GHOST_SPEED;
             break;
         case UP:
-            _yPixel -= 2;
+            _yPixel -= GHOST_SPEED;
             break;
         case DOWN:
-            _yPixel += 2;
+            _yPixel += GHOST_SPEED;
             break;
         case NONE:
             break;
         }
-    } else if (_isFear == true) {
-        // slow down the ghost
+    }
+    // speed up the ghost
+    else if (_isFear == false && _isReturnHouse == true) {
         switch (_lastDir) {
         case LEFT:
-            _xPixel--;
+            _xPixel -= GHOST_RETURN_SPEED;
             break;
         case RIGHT:
-            _xPixel++;
+            _xPixel += GHOST_RETURN_SPEED;
             break;
         case UP:
-            _yPixel--;
+            _yPixel -= GHOST_RETURN_SPEED;
             break;
         case DOWN:
-            _yPixel++;
+            _yPixel += GHOST_RETURN_SPEED;
+            break;
+        case NONE:
+            break;
+        }
+    }
+    // slow down the ghost
+    else if (_isFear == true && _isReturnHouse == false) {
+        switch (_lastDir) {
+        case LEFT:
+            _xPixel -= GHOST_FEAR_SPEED;
+            break;
+        case RIGHT:
+            _xPixel += GHOST_FEAR_SPEED;
+            break;
+        case UP:
+            _yPixel -= GHOST_FEAR_SPEED;
+            break;
+        case DOWN:
+            _yPixel += GHOST_FEAR_SPEED;
             break;
         case NONE:
             break;
@@ -168,116 +283,71 @@ void ghost::updatePos() {
     }
 }
 
-std::pair<int, int> ghost::getPos() { return std::make_pair(_xPixel, _yPixel); }
+bool ghost::waitSquareCenter() {
+
+    size_t xCenter = _xBoard * SCALE_PIXEL + GHOST_CENTER_X;
+    size_t yCenter = _yBoard * SCALE_PIXEL + GHOST_CENTER_Y;
+
+    // normal speed
+    size_t speed = GHOST_SPEED, range = GHOST_RANGE_CENTER;
+
+    // return house speed
+    if (_isFear == false && _isReturnHouse == true && _isInHouse == false) {
+
+        speed = GHOST_RETURN_SPEED;
+        range = GHOST_RETURN_RANGE_CENTER;
+    }
+    // fear speed
+    else if (_isFear == true && _isReturnHouse == false &&
+             _isInHouse == false) {
+
+        speed = GHOST_FEAR_SPEED;
+        range = GHOST_FEAR_RANGE_CENTER;
+    }
+    // house speed
+    else if (_isFear == false && _isReturnHouse == false &&
+             _isInHouse == true) {
+
+        speed = GHOST_HOUSE_SPEED;
+        range = GHOST_HOUSE_RANGE_CENTER;
+    }
+
+    if (_lastDir == LEFT && _xPixel - speed <= xCenter + range) {
+        _xPixel = _xBoard * SCALE_PIXEL + GHOST_CENTER_X;
+        return true;
+    } else if (_lastDir == RIGHT && _xPixel + speed >= xCenter - range) {
+        _xPixel = _xBoard * SCALE_PIXEL + GHOST_CENTER_X;
+        return true;
+    } else if (_lastDir == UP && _yPixel + speed <= yCenter + range) {
+        _yPixel = _yBoard * SCALE_PIXEL + GHOST_CENTER_Y;
+        return true;
+    } else if (_lastDir == DOWN && _yPixel + speed >= yCenter - range) {
+        _yPixel = _yBoard * SCALE_PIXEL + GHOST_CENTER_Y;
+        return true;
+    } else if (_lastDir == NONE)
+        return true;
+
+    return false;
+}
+
+dir ghost::getLastDir() { return _lastDir; }
 
 void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
                       std::pair<int, int> pacPos, dir dirPac) {
 
-    if (_xBoard < 0 || _xBoard > 20 || _yBoard <= 0 || _yBoard >= 26) {
+    if (_xBoard > 20 || _yBoard == 0 || _yBoard >= 26) {
         std::cerr << "Ghost out of the board in updateDir" << std::endl;
         exit(EXIT_FAILURE);
     }
 
-    // wait until ghost reaches the middle of the next square
-    if (_isFear == false) {
-        if (abs(_xPixel % SCALE_PIXEL - GHOST_CENTER_X) > 1 ||
-            abs(_yPixel % SCALE_PIXEL - GHOST_CENTER_Y) > 1)
-            return;
-    } else if (_isFear == true) {
-        if (_xPixel % SCALE_PIXEL != GHOST_CENTER_X ||
-            _yPixel % SCALE_PIXEL != GHOST_CENTER_Y)
-            return;
-    }
-
-    if (_isReturnHouse == true) {
-
-        // arrive at the house
-        if ((_color == RED && _xBoard == RED_GHOST_INIT_X &&
-             _yBoard == RED_GHOST_INIT_Y) ||
-            (_color == PINK && _xBoard == PINK_GHOST_INIT_X &&
-             _yBoard == PINK_GHOST_INIT_Y) ||
-            (_color == BLUE && _xBoard == BLUE_GHOST_INIT_X &&
-             _yBoard == BLUE_GHOST_INIT_Y) ||
-            (_color == ORANGE && _xBoard == ORANGE_GHOST_INIT_X &&
-             _yBoard == ORANGE_GHOST_INIT_Y)) {
-
-            _isReturnHouse = false;
-            _lastDir = NONE;
-            setGhost(_color);
-            timePoint1 = std::chrono::steady_clock::now();
-            return;
-        }
-
-        // go the initial position
-        if (_xBoard == 10 && _yBoard == 10) {
-            _lastDir = DOWN;
-            _yBoard++;
-            return;
-        } else if (_xBoard == 10 && _yBoard == 11) {
-            _lastDir = DOWN;
-            _yBoard++;
-            return;
-        }
-
-        switch (_color) {
-        case RED:
-            break;
-        case PINK:
-
-            if (_xBoard == 10 && _yBoard == 12) {
-                _lastDir = LEFT;
-                _xBoard--;
-                return;
-            }
-            break;
-        case BLUE:
-            if (_xBoard == 10 && _yBoard == 12) {
-                _lastDir = DOWN;
-                _yBoard++;
-                return;
-            }
-            break;
-        case ORANGE:
-            if (_xBoard == 10 && _yBoard == 12) {
-                _lastDir = RIGHT;
-                _xBoard++;
-                return;
-            }
-            break;
-        }
-
-        // update direction with shortest path
-        updateDirWithShortestPath(vecBoard, GHOST_INIT_X, GHOST_INIT_Y);
+    if (_isInHouse == true) {
+        updateInGhostHouse(vecBoard);
         return;
     }
 
-    // ghost leaving the house
-    // at the bottom of the door
-    if (_xBoard >= 9 && _xBoard <= 11 && _yBoard >= 11 && _yBoard <= 13) {
-
-        if (vecBoard[_xBoard][_yBoard - 1]->getState() == DOOR) {
-            _yBoard--;
-            _lastDir = UP;
-            return;
-        }
-        // in the door
-        if (vecBoard[_xBoard][_yBoard]->getState() == DOOR) {
-            _yBoard--;
-            _lastDir = UP;
-            return;
-        }
-        // at the bottom left of the door
-        if (vecBoard[_xBoard + 1][_yBoard - 1]->getState() == DOOR) {
-            _xBoard++;
-            _lastDir = RIGHT;
-            return;
-        }
-        // at the bottom right of the door
-        if (vecBoard[_xBoard - 1][_yBoard - 1]->getState() == DOOR) {
-            _xBoard--;
-            _lastDir = LEFT;
-            return;
-        }
+    if (_isReturnHouse == true) {
+        returnHouse(vecBoard);
+        return;
     }
 
     // if ghost is on the teleportation, take it

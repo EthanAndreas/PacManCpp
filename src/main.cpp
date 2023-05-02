@@ -110,7 +110,8 @@ int main() {
             // press any key to start the game
             if (start) {
                 // pacman movement management
-                Pacman.updateDir(Board.getBoard(), currentDir);
+                if (Pacman.waitSquareCenter() == true)
+                    Pacman.updateDir(Board.getBoard(), currentDir);
                 Pacman.updatePos();
                 Pacman.updateSquare(Board.getBoard(), vecGhost, &Fruit);
 
@@ -125,11 +126,13 @@ int main() {
                 for (auto Ghost : vecGhost) {
 
                     if (!Ghost->isInHouse()) {
+                        if (Ghost->waitSquareCenter() == true)
+                            Ghost->updateDir(Board.getBoard(), Pacman.getPos(),
+                                             Pacman.getLastDir());
                         Ghost->updatePos();
-                        Ghost->updateDir(Board.getBoard(), Pacman.getPos(),
-                                         Pacman.getDir());
                     } else {
-                        Ghost->leaveGhostHouse();
+                        if (Ghost->waitSquareCenter() == true)
+                            Ghost->updateInGhostHouse(Board.getBoard());
                         Ghost->updatePos();
                     }
                 }

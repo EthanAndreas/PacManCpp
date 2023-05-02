@@ -12,49 +12,73 @@ pacman::pacman() {
 }
 pacman::~pacman() {}
 
-dir pacman::getLastDir() { return _lastDir; }
+std::pair<int, int> pacman::getPos() {
+    return std::make_pair(_xPixel, _yPixel);
+}
 
 void pacman::updatePos() {
+    // normal speed
     switch (_lastDir) {
     case LEFT:
-        _xPixel -= 2;
+        _xPixel -= PACMAN_SPEED;
         break;
     case RIGHT:
-        _xPixel += 2;
+        _xPixel += PACMAN_SPEED;
         break;
     case UP:
-        _yPixel -= 2;
+        _yPixel -= PACMAN_SPEED;
         break;
     case DOWN:
-        _yPixel += 2;
+        _yPixel += PACMAN_SPEED;
         break;
     case NONE:
         break;
     }
 }
 
-std::pair<int, int> pacman::getPos() {
-    return std::make_pair(_xPixel, _yPixel);
+bool pacman::waitSquareCenter() {
+
+    size_t xCenter = _xBoard * SCALE_PIXEL + PACMAN_CENTER_X,
+           yCenter = _yBoard * SCALE_PIXEL + PACMAN_CENTER_Y;
+
+    // speed of 2 pixels per frame
+    if (_lastDir == LEFT &&
+        _xPixel - PACMAN_SPEED <= xCenter + PACMAN_RANGE_CENTER) {
+        _xPixel = _xBoard * SCALE_PIXEL + PACMAN_CENTER_X;
+        return true;
+    } else if (_lastDir == RIGHT &&
+               _xPixel + PACMAN_SPEED >= xCenter - PACMAN_RANGE_CENTER) {
+        _xPixel = _xBoard * SCALE_PIXEL + PACMAN_CENTER_X;
+        return true;
+    } else if (_lastDir == UP &&
+               _yPixel + PACMAN_SPEED <= yCenter + PACMAN_RANGE_CENTER) {
+        _yPixel = _yBoard * SCALE_PIXEL + PACMAN_CENTER_Y;
+        return true;
+    } else if (_lastDir == DOWN &&
+               _yPixel + PACMAN_SPEED >= yCenter - PACMAN_RANGE_CENTER) {
+        _yPixel = _yBoard * SCALE_PIXEL + PACMAN_CENTER_Y;
+        return true;
+    } else if (_lastDir == NONE)
+        return true;
+
+    return false;
 }
+
+dir pacman::getLastDir() { return _lastDir; }
 
 void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
                        dir currentDir) {
 
-    if (_xBoard < 0 || _xBoard > 20 || _yBoard <= 0 || _yBoard >= 26) {
+    if (_xBoard > 20 || _yBoard == 0 || _yBoard >= 26) {
         std::cerr << "Pacman out of the board in updateDir" << std::endl;
         exit(EXIT_FAILURE);
     }
-
-    // wait until pacman reaches the middle of the next square
-    if (abs(_xPixel % SCALE_PIXEL - PACMAN_CENTER_X) > 1 ||
-        abs(_yPixel % SCALE_PIXEL - PACMAN_CENTER_Y) > 1)
-        return;
 
     switch (currentDir) {
 
     case LEFT:
         // out of the board
-        if (_xBoard <= 0 && _yBoard != 13) {
+        if (_xBoard == 0 && _yBoard != 13) {
             _lastDir = NONE;
             break;
         }
@@ -96,7 +120,7 @@ void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
 
     case UP:
         // out of the board
-        if (_yBoard >= 26) {
+        if (_yBoard == 0) {
             _lastDir = NONE;
             break;
         }
@@ -113,7 +137,7 @@ void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
 
     case DOWN:
         // out of the board
-        if (_yBoard <= 0) {
+        if (_yBoard >= 26) {
             _lastDir = NONE;
             break;
         }
@@ -133,12 +157,10 @@ void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
     }
 }
 
-dir pacman::getDir() { return _lastDir; }
-
 void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard,
                           std::vector<ghost *> vecGhost, fruit *Fruit) {
 
-    if (_xBoard < 0 || _xBoard > 20 || _yBoard <= 0 || _yBoard >= 26) {
+    if (_xBoard > 20 || _yBoard >= 26) {
         std::cerr << "Pacman out of the board in updateSquare" << std::endl;
         exit(EXIT_FAILURE);
     }
@@ -224,9 +246,9 @@ void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard,
     }
 }
 
-bool pacman::isPowerup() { return _powerup; }
-
 time_t pacman::getTimePoint1() { return timePoint1; }
+
+bool pacman::isPowerup() { return _powerup; }
 
 int pacman::getScore() { return _score; }
 
@@ -237,7 +259,7 @@ bool pacman::ghostCollision(std::vector<ghost *> vecGhost) {
             abs(_yPixel - Ghost->getPos().second) < GHOST_PACMAN_CONTACT) {
             if (Ghost->isReturnHouse() == false &&
                 Ghost->isFrightened() == true) {
-                Ghost->houseReturn();
+                Ghost->setReturnHouse();
                 _score = _score + GHOST_SCORE;
                 return false;
             } else if (Ghost->isReturnHouse() == false &&
