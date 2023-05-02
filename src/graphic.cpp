@@ -18,9 +18,9 @@ SDL_Rect _pacman = {PACMAN_INIT_X * SCALE_PIXEL + PACMAN_CENTER_X,
 std::vector<SDL_Rect> eatenPacman{
     {3, 110, 17, 10}, {22, 112, 18, 8}, {41, 113, 18, 7},
     {79, 112, 18, 8}, {98, 111, 16, 9}, {115, 111, 12, 9},
-    {128, 111, 8, 9}, {137, 111, 4, 9}, {142, 108, 12, 12}}
-
-;
+    {128, 111, 8, 9}, {137, 111, 4, 9}, {142, 108, 12, 12}};
+// life
+SDL_Rect _life = {168, 75, 12, 14};
 
 // Ghost
 std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
@@ -202,6 +202,15 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
     // print the score string
     drawString(windowSurf, spriteBoard, 4, 874, scoreString);
 
+    // print the remaining life
+    SDL_Rect lifeArea = {610, 874, 54, 16};
+    // Erase the area
+    SDL_FillRect(*windowSurf, &lifeArea, 0);
+    for (auto i = 0; i < Pacman.getRemainingLife(); i++) {
+        SDL_Rect life = {610 + i * 18, 874, 16, 16};
+        SDL_BlitScaled(*spriteBoard, &_life, *windowSurf, &life);
+    }
+
     // dot display
     for (auto &coord : vecDot) {
         SDL_Rect dot = {coord.x * SCALE_PIXEL + 11, coord.y * SCALE_PIXEL + 15,
@@ -224,7 +233,7 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
                        &fruitSdl);
     }
 
-    if (death == -1) { // dont draw ghost if pacman is deadgit
+    if (death == -1) { // dont draw ghost if pacman is dead
         for (auto &Ghost : vecGhost) {
             // _ghost look animation
             SDL_Rect *ghost_in = nullptr;

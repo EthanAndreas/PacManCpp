@@ -21,6 +21,8 @@
 #define GHOST_SCORE 200
 #define FRUIT_SCORE 1000
 
+#define DEFAULT_LIVES 3
+
 #define POWERUP_MODE 10 // 10s
 
 class pacman {
@@ -99,6 +101,21 @@ class pacman {
     void resetDotCounter();
 
     bool ghostCollision(std::vector<ghost *> vecGhost);
+    /**
+     * @brief Get the remaining live of pacman.
+     *
+     */
+    short getRemainingLife();
+    /**
+     * @brief Decrement the remaining live of pacman.
+     *
+     */
+    void looseLife();
+    /**
+     * @brief Reset the position of pacman.
+     *
+     */
+    void resetPos();
 
   private:
     int _xBoard, _yBoard, _xPixel, _yPixel;
@@ -107,6 +124,7 @@ class pacman {
     int _dotCounter;
     bool _powerup;
     time_t timePoint1;
+    short _remainingLife;
 };
 
 #endif

@@ -20,6 +20,8 @@ int main() {
     dir currentDir = NONE;
     init(&Window, &windowSurf, &spriteBoard);
 
+    pacman Pacman;
+
     bool restart = true;
     while (restart) {
         // initialize board, pacman, ghost and item
@@ -28,7 +30,7 @@ int main() {
         Board.load();
         Board.transpose();
         Board.setItem();
-        pacman Pacman;
+        Pacman.resetPos();
         std::vector<ghost *> vecGhost;
         for (int i = 0; i < 4; i++) {
             ghost *Ghost = new ghost();
@@ -148,7 +150,6 @@ int main() {
 
                 // loose statement
                 if (Pacman.ghostCollision(vecGhost)) {
-                    std::cout << "You loose!" << std::endl;
                     // death animation
                     for (int i = 0; i < 10; i++) {
                         count = draw(&windowSurf, &spriteBoard, count, Pacman,
@@ -162,6 +163,19 @@ int main() {
 
                         // Slown the animation
                         SDL_Delay(int(66.668f - elapsed));
+                    }
+                    // loose a life
+                    Pacman.looseLife();
+
+                    std::cout << "Remaining " << Pacman.getRemainingLife()
+                              << " life(s)" << std::endl;
+
+                    // quit the game if no more life
+                    if (Pacman.getRemainingLife() == 0) {
+                        std::cout << "You loose with a score of : "
+                                  << Pacman.getScore() << std::endl;
+                        restart = false;
+                        break;
                     }
 
                     // restart level
