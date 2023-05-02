@@ -39,6 +39,10 @@ enum color { RED, PINK, BLUE, ORANGE };
 #define BLUE_GHOST_WAIT_TIME (18 / DIFFICULTY)   // 18s for easy
 #define ORANGE_GHOST_WAIT_TIME (24 / DIFFICULTY) // 24s for easy
 
+// swap for the blue ghost between chase mode of red and pink ghost
+#define BLUE_GHOST_RED_TIME 20  // 20s
+#define BLUE_GHOST_PINK_TIME 12 // 12s
+
 #define updateDirWithShortestPath(vecBoard, xPac, yPac) \
     updateDirRed(vecBoard, xPac, yPac)
 #define updateDirRandom(vecBoard) updateDirOrange(vecBoard)
@@ -176,10 +180,16 @@ class ghost {
     // pixel coordinates corresponding to the sprite position
     size_t _xBoard, _yBoard, _xPixel, _yPixel;
     dir _lastDir;
-    bool _isInHouse;
-    bool _isReturnHouse;
-    bool _isFear;
+    // mode of the ghost
+    bool _chaseMode, _scatterMode, _frightenedMode;
+    // state of the ghost
+    bool _isInHouse, _isReturnHouse, _isFear;
+    // blue ghost is following the red ghost during 20s and the pink ghost
+    // during 12s
+    bool _blueRed, _bluePink;
+    // timer
     time_t timePoint1;
+    // random number generator
     std::mt19937 _rng;
 };
 

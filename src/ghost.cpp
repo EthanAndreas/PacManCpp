@@ -6,8 +6,13 @@ ghost::ghost() {
     _xPixel = 0;
     _yPixel = 0;
     _lastDir = NONE;
+    _chaseMode = false;
+    _scatterMode = false;
+    _frightenedMode = false;
     _isReturnHouse = false;
     _isFear = false;
+    _blueRed = false;
+    _bluePink = false;
 }
 ghost::~ghost() {}
 
@@ -100,8 +105,6 @@ void ghost::updateInGhostHouse(std::vector<std::vector<square *>> vecBoard) {
     }
     // move out ghost house
     else {
-        // wait that ghost arrive at square center
-
         // if the ghost has left the house
         if (_xBoard == GHOST_INIT_X && _yBoard == GHOST_INIT_Y)
             _isInHouse = false;
@@ -499,10 +502,55 @@ void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
 void ghost::updateDirBlue(std::vector<std::vector<square *>> vecBoard, int xPac,
                           int yPac, dir dirPac) {
 
-    updateDirOrange(vecBoard);
-    (void)xPac;
-    (void)yPac;
-    (void)dirPac;
+    // take red chase mode when leaving the house
+    if (_blueRed == false && _bluePink == false) {
+        _blueRed = true;
+        updateDirRed(vecBoard, xPac, yPac);
+        timePoint1 = std::chrono::steady_clock::now();
+        return;
+    }
+    // red chase mode
+    else if (_blueRed == true && _bluePink == false) {
+        std::cout << "red" << std::endl;
+        // check if 20 seconds are spent
+        time_t timePoint2 = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsedTime = timePoint2 - timePoint1;
+
+        // if 20 seconds are spent, take pink chase mode
+        if (elapsedTime.count() >= BLUE_GHOST_RED_TIME) {
+            _blueRed = false;
+            _bluePink = true;
+            updateDirPink(vecBoard, xPac, yPac, dirPac);
+            timePoint1 = std::chrono::steady_clock::now();
+            return;
+        }
+
+        // if not, continue red chase mode
+        updateDirRed(vecBoard, xPac, yPac);
+        return;
+    }
+    // pink chase mode
+    else if (_blueRed == false && _bluePink == true) {
+        std::cout << "pink" << std::endl;
+        // check if 12 seconds are spent
+        time_t timePoint2 = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsedTime = timePoint2 - timePoint1;
+
+        // if 10 seconds are spent, take random mode
+        if (elapsedTime.count() >= BLUE_GHOST_PINK_TIME) {
+            _bluePink = false;
+            _blueRed = true;
+            updateDirRed(vecBoard, xPac, yPac);
+            return;
+        }
+
+        // if not, continue pink chase mode
+        updateDirPink(vecBoard, xPac, yPac, dirPac);
+        return;
+    }
+    // if there is an error, take a random direction
+    else
+        updateDirRandom(vecBoard);
 }
 
 void ghost::updateDirOrange(std::vector<std::vector<square *>> vecBoard) {
