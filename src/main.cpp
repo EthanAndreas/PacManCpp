@@ -41,7 +41,7 @@ int main() {
 
         // display initial board
         count = draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost, vecDot,
-                     vecPowerup, _NONE, 0);
+                     vecPowerup, _NONE, 0, -1);
         SDL_UpdateWindowSurface(Window);
 
         bool start = false, quit = false;
@@ -149,6 +149,21 @@ int main() {
                 // loose statement
                 if (Pacman.ghostCollision(vecGhost)) {
                     std::cout << "You loose!" << std::endl;
+                    // death animation
+                    for (int i = 0; i < 10; i++) {
+                        count = draw(&windowSurf, &spriteBoard, count, Pacman,
+                                     vecGhost, vecDot, vecPowerup,
+                                     Fruit.getFruit(), Pacman.getScore(), i);
+                        SDL_UpdateWindowSurface(Window);
+                        Uint64 fps_end = SDL_GetTicks();
+                        float elapsed = (fps_end - fps_start) /
+                                        (float)SDL_GetPerformanceFrequency() *
+                                        1000.0f;
+
+                        // Slown the animation
+                        SDL_Delay(int(66.668f - elapsed));
+                    }
+
                     // restart level
                     quit = true;
                     break;
@@ -157,7 +172,7 @@ int main() {
                 // display updated board
                 count = draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost,
                              vecDot, vecPowerup, Fruit.getFruit(),
-                             Pacman.getScore());
+                             Pacman.getScore(), -1);
                 SDL_UpdateWindowSurface(Window);
             }
 

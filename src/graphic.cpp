@@ -14,6 +14,13 @@ SDL_Rect pac_u = {75, 89, 16, 16};
 SDL_Rect _pacman = {PACMAN_INIT_X * SCALE_PIXEL + PACMAN_CENTER_X,
                     PACMAN_INIT_Y *SCALE_PIXEL + PACMAN_CENTER_Y, SCALE_PIXEL,
                     SCALE_PIXEL};
+// eaten
+std::vector<SDL_Rect> eatenPacman{
+    {3, 110, 17, 10}, {22, 112, 18, 8}, {41, 113, 18, 7},
+    {79, 112, 18, 8}, {98, 111, 16, 9}, {115, 111, 12, 9},
+    {128, 111, 8, 9}, {137, 111, 4, 9}, {142, 108, 12, 12}}
+
+;
 
 // Ghost
 std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
@@ -182,7 +189,7 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
 int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
          pacman Pacman, std::vector<ghost *> vecGhost,
          std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup,
-         typeFruit fruit, int curScore) {
+         typeFruit fruit, int curScore, short death) {
 
     SDL_SetColorKey(*spriteBoard, false, 0);
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
@@ -217,102 +224,108 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
                        &fruitSdl);
     }
 
-    for (auto &Ghost : vecGhost) {
-        // _ghost look animation
-        SDL_Rect *ghost_in = nullptr;
-        // normal mode
-        switch (Ghost->getLastDir()) {
-        case LEFT:
-            ghost_in = &(vecGhostSprite[Ghost->getGhost()][LEFT]);
-            break;
-        case RIGHT:
-            ghost_in = &(vecGhostSprite[Ghost->getGhost()][RIGHT]);
-            break;
-        case UP:
-            ghost_in = &(vecGhostSprite[Ghost->getGhost()][UP]);
-            break;
-        case DOWN:
-            ghost_in = &(vecGhostSprite[Ghost->getGhost()][DOWN]);
-            break;
-        case NONE:
-            // by default, _ghost looks right
-            ghost_in = &(vecGhostSprite[Ghost->getGhost()][RIGHT]);
-            break;
-        }
-
-        // _ghost wave animation
-        SDL_Rect ghost_in2 = *ghost_in;
-        if ((count / 4) % 2)
-            ghost_in2.x += 17;
-
-        // fear mode
-        if (Ghost->isFrightened() == true && Ghost->isInHouse() == false &&
-            Ghost->isReturnHouse() == false) {
-
-            time_t timePoint2 = std::chrono::steady_clock::now();
-            std::chrono::duration<double> elapsedTime =
-                timePoint2 - Pacman.getTimePoint1();
-            if (elapsedTime.count() < POWERUP_MODE - GHOST_BLINK)
-                ghost_in = &(fearBlueGhostSprite);
-            else
-                ghost_in = &(fearWhiteGhostSprite);
-
-            // _ghost wave animation
-            ghost_in2 = *ghost_in;
-            if ((count / 4) % 2)
-                ghost_in2.x += 17;
-        }
-        // go back to house mode
-        else if (Ghost->isReturnHouse() == true) {
-
+    if (death == -1) { // dont draw ghost if pacman is deadgit
+        for (auto &Ghost : vecGhost) {
+            // _ghost look animation
+            SDL_Rect *ghost_in = nullptr;
+            // normal mode
             switch (Ghost->getLastDir()) {
-            case RIGHT:
-                ghost_in2 = eatenGhostSprite_r;
-                break;
             case LEFT:
-                ghost_in2 = eatenGhostSprite_l;
+                ghost_in = &(vecGhostSprite[Ghost->getGhost()][LEFT]);
+                break;
+            case RIGHT:
+                ghost_in = &(vecGhostSprite[Ghost->getGhost()][RIGHT]);
                 break;
             case UP:
-                ghost_in2 = eatenGhostSprite_u;
+                ghost_in = &(vecGhostSprite[Ghost->getGhost()][UP]);
                 break;
             case DOWN:
-                ghost_in2 = eatenGhostSprite_d;
+                ghost_in = &(vecGhostSprite[Ghost->getGhost()][DOWN]);
                 break;
             case NONE:
-                ghost_in2 = eatenGhostSprite_l;
+                // by default, _ghost looks right
+                ghost_in = &(vecGhostSprite[Ghost->getGhost()][RIGHT]);
                 break;
             }
+
+            // _ghost wave animation
+            SDL_Rect ghost_in2 = *ghost_in;
+            if ((count / 4) % 2)
+                ghost_in2.x += 17;
+
+            // fear mode
+            if (Ghost->isFrightened() == true && Ghost->isInHouse() == false &&
+                Ghost->isReturnHouse() == false) {
+
+                time_t timePoint2 = std::chrono::steady_clock::now();
+                std::chrono::duration<double> elapsedTime =
+                    timePoint2 - Pacman.getTimePoint1();
+                if (elapsedTime.count() < POWERUP_MODE - GHOST_BLINK)
+                    ghost_in = &(fearBlueGhostSprite);
+                else
+                    ghost_in = &(fearWhiteGhostSprite);
+
+                // _ghost wave animation
+                ghost_in2 = *ghost_in;
+                if ((count / 4) % 2)
+                    ghost_in2.x += 17;
+            }
+            // go back to house mode
+            else if (Ghost->isReturnHouse() == true) {
+
+                switch (Ghost->getLastDir()) {
+                case RIGHT:
+                    ghost_in2 = eatenGhostSprite_r;
+                    break;
+                case LEFT:
+                    ghost_in2 = eatenGhostSprite_l;
+                    break;
+                case UP:
+                    ghost_in2 = eatenGhostSprite_u;
+                    break;
+                case DOWN:
+                    ghost_in2 = eatenGhostSprite_d;
+                    break;
+                case NONE:
+                    ghost_in2 = eatenGhostSprite_l;
+                    break;
+                }
+            }
+
+            // ghost updated position
+            vecGhostSprite[Ghost->getGhost()].back().x = Ghost->getPos().first;
+            vecGhostSprite[Ghost->getGhost()].back().y = Ghost->getPos().second;
+
+            SDL_SetColorKey(*spriteBoard, true, 0);
+            SDL_BlitScaled(*spriteBoard, &ghost_in2, *windowSurf,
+                           &vecGhostSprite[Ghost->getGhost()].back());
         }
-
-        // ghost updated position
-        vecGhostSprite[Ghost->getGhost()].back().x = Ghost->getPos().first;
-        vecGhostSprite[Ghost->getGhost()].back().y = Ghost->getPos().second;
-
-        SDL_SetColorKey(*spriteBoard, true, 0);
-        SDL_BlitScaled(*spriteBoard, &ghost_in2, *windowSurf,
-                       &vecGhostSprite[Ghost->getGhost()].back());
     }
 
     // pacman animation
     SDL_Rect pac_in = pac_blank;
-    if ((count / 4) % 2) {
-        switch (Pacman.getLastDir()) {
-        case LEFT:
-            pac_in = pac_l;
-            break;
-        case RIGHT:
-            pac_in = pac_r;
-            break;
-        case UP:
-            pac_in = pac_u;
-            break;
-        case DOWN:
-            pac_in = pac_d;
-            break;
-        case NONE:
-            pac_in = pac_blank;
-            break;
+    if (death == -1) {
+        if ((count / 4) % 2) {
+            switch (Pacman.getLastDir()) {
+            case LEFT:
+                pac_in = pac_l;
+                break;
+            case RIGHT:
+                pac_in = pac_r;
+                break;
+            case UP:
+                pac_in = pac_u;
+                break;
+            case DOWN:
+                pac_in = pac_d;
+                break;
+            case NONE:
+                pac_in = pac_blank;
+                break;
+            }
         }
+    } else {
+        pac_in = eatenPacman[death];
     }
 
     // pacman updated position
