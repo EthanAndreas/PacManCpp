@@ -43,9 +43,14 @@ enum color { RED, PINK, BLUE, ORANGE };
 #define BLUE_GHOST_RED_TIME 20  // 20s
 #define BLUE_GHOST_PINK_TIME 12 // 12s
 
+#define CHASE_MODE 20  // 20s
+#define SCATTER_MODE 7 // 7s
+
 #define updateDirWithShortestPath(vecBoard, xPac, yPac) \
     updateDirRed(vecBoard, xPac, yPac)
 #define updateDirRandom(vecBoard) updateDirOrange(vecBoard)
+
+enum mode { ANY, CHASE, SCATTER, FRIGHTENED };
 
 class ghost {
   public:
@@ -113,9 +118,9 @@ class ghost {
     /**
      * @brief Get the sprite position of the ghost.
      *
-     * @return std::pair<int, int>
+     * @return std::pair<size_t, size_t>
      */
-    std::pair<int, int> getPos();
+    std::pair<size_t, size_t> getPos();
     /**
      * @brief Update the sprite position of the ghost.
      *
@@ -144,7 +149,7 @@ class ghost {
      * @param vecBoard
      */
     void updateDir(std::vector<std::vector<square *>> vecBoard,
-                   std::pair<int, int> pacPos, dir dirPac);
+                   std::pair<size_t, size_t> pacPos, dir dirPac);
     /**
      * @brief Update direction of red ghost. Red ghost is following the pacman.
      *
@@ -152,8 +157,8 @@ class ghost {
      * @param xPac
      * @param yPac
      */
-    void updateDirRed(std::vector<std::vector<square *>> vecBoard, int xPac,
-                      int yPac);
+    void updateDirRed(std::vector<std::vector<square *>> vecBoard, size_t xPac,
+                      size_t yPac);
     /**
      * @brief Update direction of pink ghost. Pink ghost is anticipating the
      * pacman, it is going to the position of the pacman + 4.
@@ -163,16 +168,39 @@ class ghost {
      * @param yPac
      * @param dirPac
      */
-    void updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
-                       int yPac, dir dirPac);
-    void updateDirBlue(std::vector<std::vector<square *>> vecBoard, int xPac,
-                       int yPac, dir dirPac);
+    void updateDirPink(std::vector<std::vector<square *>> vecBoard, size_t xPac,
+                       size_t yPac, dir dirPac);
+    /**
+     * @brief Update direction of blue ghost. Swap between the chase mode of red
+     * and pink ghost.
+     *
+     * @param vecBoard
+     * @param xPac
+     * @param yPac
+     * @param dirPac
+     */
+    void updateDirBlue(std::vector<std::vector<square *>> vecBoard, size_t xPac,
+                       size_t yPac, dir dirPac);
     /**
      * @brief Update of the orange ghost. Orange ghost takes a random direction.
      *
      * @param vecBoard
      */
     void updateDirOrange(std::vector<std::vector<square *>> vecBoard);
+    /**
+     * @brief Update the direction of the ghost in scatter mode.
+     *
+     * @param vecBoard
+     * @param x
+     * @param y
+     */
+    void updateScatterDir(std::vector<std::vector<square *>> vecBoard, size_t x,
+                          size_t y);
+    /**
+     * @brief Swap between chase and scatter mode.
+     *
+     */
+    void swapMode();
 
   private:
     color _color;
@@ -180,6 +208,7 @@ class ghost {
     // pixel coordinates corresponding to the sprite position
     size_t _xBoard, _yBoard, _xPixel, _yPixel;
     dir _lastDir;
+    mode _mode;
     // mode of the ghost
     bool _chaseMode, _scatterMode, _frightenedMode;
     // state of the ghost
@@ -187,8 +216,12 @@ class ghost {
     // blue ghost is following the red ghost during 20s and the pink ghost
     // during 12s
     bool _blueRed, _bluePink;
-    // timer
-    time_t timePoint1;
+    // timer for house waiting
+    time_t houseWaitTimer1;
+    // timer for switching mode
+    time_t modeTimer1;
+    // timer orange ghost
+    time_t blueTimer1;
     // random number generator
     std::mt19937 _rng;
 };

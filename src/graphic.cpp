@@ -182,7 +182,7 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
 int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
          pacman Pacman, std::vector<ghost *> vecGhost,
          std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup,
-         typeFruit fruit, int curScore) {
+         typeFruit fruit, size_t curScore) {
 
     SDL_SetColorKey(*spriteBoard, false, 0);
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
@@ -338,8 +338,8 @@ void drawString(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int x,
 
     // Print the text
     SDL_Rect textRect = {x, y, 16, 16};
-    for (int i = 0; i < len; i++) {
-        SDL_BlitScaled(*spriteBoard, &sdlChar[str[i]], *windowSurf, &textRect);
+    for (auto s : str) {
+        SDL_BlitScaled(*spriteBoard, &sdlChar[s], *windowSurf, &textRect);
         textRect.x += 16;
     }
 }

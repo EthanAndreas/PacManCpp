@@ -28,7 +28,7 @@ findShortestPath(std::vector<std::vector<square *>> vecBoard, size_t xStart,
     int count = 0;
 
     // A* algorithm
-    while (!openSet.empty() && count < 300) {
+    while (!openSet.empty() && count < 500) {
 
         // get the node with the lowest f_score from the open set
         auto current = *openSet.begin();

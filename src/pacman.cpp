@@ -12,7 +12,7 @@ pacman::pacman() {
 }
 pacman::~pacman() {}
 
-std::pair<int, int> pacman::getPos() {
+std::pair<size_t, size_t> pacman::getPos() {
     return std::make_pair(_xPixel, _yPixel);
 }
 
@@ -250,7 +250,7 @@ time_t pacman::getTimePoint1() { return timePoint1; }
 
 bool pacman::isPowerup() { return _powerup; }
 
-int pacman::getScore() { return _score; }
+size_t pacman::getScore() { return _score; }
 
 bool pacman::ghostCollision(std::vector<ghost *> vecGhost) {
 
@@ -271,6 +271,6 @@ bool pacman::ghostCollision(std::vector<ghost *> vecGhost) {
     return false;
 }
 
-int pacman::getDotCounter() { return _dotCounter; }
+size_t pacman::getDotCounter() { return _dotCounter; }
 
 void pacman::resetDotCounter() { _dotCounter = 0; }

@@ -33,9 +33,9 @@ class pacman {
     /**
      * @brief Get the sprite position of pacman.
      *
-     * @return std::pair<int, int>
+     * @return std::pair<size_t, size_t>
      */
-    std::pair<int, int> getPos();
+    std::pair<size_t, size_t> getPos();
     /**
      * @brief Update the sprite position of pacman.
      *
@@ -89,9 +89,9 @@ class pacman {
     /**
      * @brief Get the score of pacman.
      *
-     * @return int
+     * @return size_t
      */
-    int getScore();
+    size_t getScore();
     /**
      * @brief Check if pacman is in collision with a ghost.
      * If pacman is in collision with a ghost, the ghost is eaten if
@@ -105,9 +105,9 @@ class pacman {
     /**
      * @brief Get the number of dots eaten by pacman.
      *
-     * @return int
+     * @return size_t
      */
-    int getDotCounter();
+    size_t getDotCounter();
     /**
      * @brief Reset the dot counter.
      *
@@ -119,8 +119,8 @@ class pacman {
     // pixel coordinates corresponding to the sprite position
     size_t _xBoard, _yBoard, _xPixel, _yPixel;
     dir _lastDir;
-    int _score;
-    int _dotCounter;
+    size_t _score;
+    size_t _dotCounter;
     bool _powerup;
     time_t timePoint1;
 };

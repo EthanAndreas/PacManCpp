@@ -6,6 +6,7 @@ ghost::ghost() {
     _xPixel = 0;
     _yPixel = 0;
     _lastDir = NONE;
+    _mode = ANY;
     _chaseMode = false;
     _scatterMode = false;
     _frightenedMode = false;
@@ -17,7 +18,7 @@ ghost::ghost() {
 ghost::~ghost() {}
 
 void ghost::setTimer() {
-    timePoint1 = std::chrono::steady_clock::now();
+    houseWaitTimer1 = std::chrono::steady_clock::now();
     std::mt19937 _rng(
         std::chrono::steady_clock::now().time_since_epoch().count());
 }
@@ -62,8 +63,9 @@ bool ghost::isInHouse() { return _isInHouse; }
 
 void ghost::updateInGhostHouse(std::vector<std::vector<square *>> vecBoard) {
 
-    time_t timePoint2 = std::chrono::steady_clock::now();
-    std::chrono::duration<double> elapsedTime = timePoint2 - timePoint1;
+    time_t houseWaitTimer2 = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsedTime =
+        houseWaitTimer2 - houseWaitTimer1;
     bool isTime = false;
 
     // wait in ghost house
@@ -164,7 +166,7 @@ void ghost::returnHouse(std::vector<std::vector<square *>> vecBoard) {
         _isReturnHouse = false;
         _lastDir = NONE;
         setGhost(_color);
-        timePoint1 = std::chrono::steady_clock::now();
+        houseWaitTimer1 = std::chrono::steady_clock::now();
         return;
     }
 
@@ -213,17 +215,22 @@ void ghost::returnHouse(std::vector<std::vector<square *>> vecBoard) {
 bool ghost::isReturnHouse() { return _isReturnHouse; }
 
 void ghost::setFrightened(bool isFear) {
-    // swap speed 2 for 1
-    if (isFear == true) {
-        _xPixel = _xPixel - (_xPixel % 2);
-        _yPixel = _yPixel - (_yPixel % 2);
+
+    if (_isFear == true && isFear == false) {
+        _mode = SCATTER;
+        modeTimer1 = std::chrono::steady_clock::now();
+        _isFear = isFear;
+    } else if (_isFear == false && isFear == true) {
+        _mode = FRIGHTENED;
+        _isFear = isFear;
     }
-    _isFear = isFear;
 }
 
 bool ghost::isFrightened() { return _isFear; }
 
-std::pair<int, int> ghost::getPos() { return std::make_pair(_xPixel, _yPixel); }
+std::pair<size_t, size_t> ghost::getPos() {
+    return std::make_pair(_xPixel, _yPixel);
+}
 
 void ghost::updatePos() {
 
@@ -336,7 +343,7 @@ bool ghost::waitSquareCenter() {
 dir ghost::getLastDir() { return _lastDir; }
 
 void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
-                      std::pair<int, int> pacPos, dir dirPac) {
+                      std::pair<size_t, size_t> pacPos, dir dirPac) {
 
     if (_xBoard > 20 || _yBoard == 0 || _yBoard >= 26) {
         std::cerr << "Ghost out of the board in updateDir" << std::endl;
@@ -372,45 +379,105 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
         return;
     }
 
-    switch (_color) {
-    case RED:
-        updateDirRed(vecBoard, pacPos.first / SCALE_PIXEL,
-                     pacPos.second / SCALE_PIXEL);
-        break;
-    case PINK:
-        updateDirPink(vecBoard, pacPos.first / SCALE_PIXEL,
-                      pacPos.second / SCALE_PIXEL, dirPac);
-        break;
-    case BLUE:
-        updateDirBlue(vecBoard, pacPos.first / SCALE_PIXEL,
-                      pacPos.second / SCALE_PIXEL, dirPac);
-        break;
-    case ORANGE:
-        updateDirOrange(vecBoard);
-        break;
+    // switching mode
+    swapMode();
+
+    // chase mode
+    if (_mode == CHASE) {
+        switch (_color) {
+        case RED:
+            std::cout << "Chase mode" << std::endl;
+            updateDirRed(vecBoard, pacPos.first / SCALE_PIXEL,
+                         pacPos.second / SCALE_PIXEL);
+            break;
+        case PINK:
+            updateDirPink(vecBoard, pacPos.first / SCALE_PIXEL,
+                          pacPos.second / SCALE_PIXEL, dirPac);
+            break;
+        case BLUE:
+            updateDirBlue(vecBoard, pacPos.first / SCALE_PIXEL,
+                          pacPos.second / SCALE_PIXEL, dirPac);
+            break;
+        case ORANGE:
+            updateDirOrange(vecBoard);
+            break;
+        }
+    }
+    // scatter mode
+    else if (_mode == SCATTER) {
+        switch (_color) {
+        case RED:
+            std::cout << "Scatter mode" << std::endl;
+            updateScatterDir(vecBoard, 1, 1);
+            break;
+        case PINK:
+            updateScatterDir(vecBoard, 19, 1);
+            break;
+        case BLUE:
+            updateScatterDir(vecBoard, 1, 25);
+            break;
+        case ORANGE:
+            updateScatterDir(vecBoard, 19, 25);
+            break;
+        }
+    }
+    // frightened mode
+    else if (_mode == FRIGHTENED) {
+        if (_color == RED)
+            std::cout << "Frightened mode" << std::endl;
+        updateDirRandom(vecBoard);
+    }
+    // if an error occurs
+    else {
+        std::cerr << "Error in updateDir" << std::endl;
+        exit(EXIT_FAILURE);
     }
 }
 
-void ghost::updateDirRed(std::vector<std::vector<square *>> vecBoard, int xPac,
-                         int yPac) {
+void ghost::updateDirRed(std::vector<std::vector<square *>> vecBoard,
+                         size_t xPac, size_t yPac) {
 
     // get the shortest path to pacman
     std::vector<Node *> path =
         findShortestPath(vecBoard, _xBoard, _yBoard, xPac, yPac);
     // if a shortest path is found, assign the new direction
     if (path.size() >= 2) {
-        _lastDir = findDir(path[0], path[1]);
-        switch (_lastDir) {
+        dir newDir = findDir(path[0], path[1]);
+        switch (newDir) {
         case LEFT:
+            // avoid going back
+            if (_lastDir == RIGHT) {
+                updateDirRandom(vecBoard);
+                break;
+            }
+            _lastDir = newDir;
             _xBoard--;
             break;
         case RIGHT:
+            // avoid going back
+            if (_lastDir == LEFT) {
+                updateDirRandom(vecBoard);
+                break;
+            }
+            _lastDir = newDir;
             _xBoard++;
             break;
         case UP:
+            // avoid going back
+            if (_lastDir == DOWN) {
+                updateDirRandom(vecBoard);
+                break;
+            }
+            _lastDir = newDir;
             _yBoard--;
             break;
         case DOWN:
+            // avoid going back
+            if (_lastDir == UP) {
+                updateDirRandom(vecBoard);
+                break;
+            }
+            _lastDir = newDir;
             _yBoard++;
             break;
         case NONE:
@@ -422,14 +489,14 @@ void ghost::updateDirRed(std::vector<std::vector<square *>> vecBoard, int xPac,
         updateDirRandom(vecBoard);
 }
 
-void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
-                          int yPac, dir dirPac) {
+void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard,
+                          size_t xPac, size_t yPac, dir dirPac) {
 
     // get the 4th square in front of pacman
-    int xPac4 = xPac;
-    int yPac4 = yPac;
+    size_t xPac4 = xPac;
+    size_t yPac4 = yPac;
 
-    if (xPac < 0 || xPac > 20 || yPac <= 0 || yPac >= 26) {
+    if (xPac > 20 || yPac == 0 || yPac >= 26) {
         std::cerr << "Pacman out of the board in updateDirPink" << std::endl;
         exit(EXIT_FAILURE);
     }
@@ -440,7 +507,7 @@ void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
         return;
     }
 
-    int dist = 0;
+    size_t dist = 0;
     while (dist < 4) {
 
         switch (dirPac) {
@@ -494,34 +561,33 @@ void ghost::updateDirPink(std::vector<std::vector<square *>> vecBoard, int xPac,
         dist++;
     }
 
-    // update direction with the shortest path to the 4th square in front of
-    // pacman
+    // update direction with the shortest path to the 4th square in
+    // front of pacman
     updateDirWithShortestPath(vecBoard, xPac4, yPac4);
 }
 
-void ghost::updateDirBlue(std::vector<std::vector<square *>> vecBoard, int xPac,
-                          int yPac, dir dirPac) {
+void ghost::updateDirBlue(std::vector<std::vector<square *>> vecBoard,
+                          size_t xPac, size_t yPac, dir dirPac) {
 
     // take red chase mode when leaving the house
     if (_blueRed == false && _bluePink == false) {
         _blueRed = true;
         updateDirRed(vecBoard, xPac, yPac);
-        timePoint1 = std::chrono::steady_clock::now();
+        blueTimer1 = std::chrono::steady_clock::now();
         return;
     }
     // red chase mode
     else if (_blueRed == true && _bluePink == false) {
-        std::cout << "red" << std::endl;
         // check if 20 seconds are spent
-        time_t timePoint2 = std::chrono::steady_clock::now();
-        std::chrono::duration<double> elapsedTime = timePoint2 - timePoint1;
+        time_t blueTimer2 = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsedTime = blueTimer2 - blueTimer1;
 
         // if 20 seconds are spent, take pink chase mode
         if (elapsedTime.count() >= BLUE_GHOST_RED_TIME) {
             _blueRed = false;
             _bluePink = true;
             updateDirPink(vecBoard, xPac, yPac, dirPac);
-            timePoint1 = std::chrono::steady_clock::now();
+            houseWaitTimer1 = std::chrono::steady_clock::now();
             return;
         }
 
@@ -531,10 +597,9 @@ void ghost::updateDirBlue(std::vector<std::vector<square *>> vecBoard, int xPac,
     }
     // pink chase mode
     else if (_blueRed == false && _bluePink == true) {
-        std::cout << "pink" << std::endl;
         // check if 12 seconds are spent
-        time_t timePoint2 = std::chrono::steady_clock::now();
-        std::chrono::duration<double> elapsedTime = timePoint2 - timePoint1;
+        time_t blueTimer2 = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsedTime = blueTimer2 - blueTimer1;
 
         // if 10 seconds are spent, take random mode
         if (elapsedTime.count() >= BLUE_GHOST_PINK_TIME) {
@@ -559,7 +624,7 @@ void ghost::updateDirOrange(std::vector<std::vector<square *>> vecBoard) {
     bool findPos = false;
     while (findPos == false) {
 
-        int randDir = std::uniform_int_distribution<int>(0, 3)(_rng);
+        size_t randDir = std::uniform_int_distribution<size_t>(0, 3)(_rng);
 
         switch (randDir) {
 
@@ -641,6 +706,40 @@ void ghost::updateDirOrange(std::vector<std::vector<square *>> vecBoard) {
 
         case NONE:
             break;
+        }
+    }
+}
+
+void ghost::updateScatterDir(std::vector<std::vector<square *>> vecBoard,
+                             size_t x, size_t y) {
+
+    // when arrive in the house, go back in chase mode
+    if (_xBoard == x && _yBoard == y) {
+        _mode = CHASE;
+        modeTimer1 = std::chrono::steady_clock::now();
+        return;
+    }
+
+    updateDirWithShortestPath(vecBoard, x, y);
+}
+
+void ghost::swapMode() {
+
+    time_t modeTimer2 = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsedTime = modeTimer2 - modeTimer1;
+
+    if (_mode == ANY) {
+        _mode = SCATTER;
+        modeTimer1 = std::chrono::steady_clock::now();
+    } else if (_mode == CHASE) {
+        if (elapsedTime.count() >= CHASE_MODE) {
+            _mode = SCATTER;
+            modeTimer1 = std::chrono::steady_clock::now();
+        }
+    } else if (_mode == SCATTER) {
+        if (elapsedTime.count() >= SCATTER_MODE) {
+            _mode = CHASE;
+            modeTimer1 = std::chrono::steady_clock::now();
         }
     }
 }
