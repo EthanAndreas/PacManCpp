@@ -43,7 +43,7 @@ int main() {
 
         // display initial board
         count = draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost, vecDot,
-                     vecPowerup, _NONE, 0, -1);
+                     vecPowerup, _NONE, 0, -1, false);
         SDL_UpdateWindowSurface(Window);
 
         bool start = false, quit = false;
@@ -147,9 +147,10 @@ int main() {
                 if (Pacman.ghostCollision(vecGhost)) {
                     // death animation
                     for (int i = 0; i < 10; i++) {
-                        count = draw(&windowSurf, &spriteBoard, count, Pacman,
-                                     vecGhost, vecDot, vecPowerup,
-                                     Fruit.getFruit(), Pacman.getScore(), i);
+                        count =
+                            draw(&windowSurf, &spriteBoard, count, Pacman,
+                                 vecGhost, vecDot, vecPowerup, Fruit.getFruit(),
+                                 Pacman.getScore(), i, start);
                         SDL_UpdateWindowSurface(Window);
                         Uint64 fps_end = SDL_GetTicks();
                         float elapsed = (fps_end - fps_start) /
@@ -181,7 +182,7 @@ int main() {
                 // display updated board
                 count = draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost,
                              vecDot, vecPowerup, Fruit.getFruit(),
-                             Pacman.getScore(), -1);
+                             Pacman.getScore(), -1, start);
                 SDL_UpdateWindowSurface(Window);
             }
 

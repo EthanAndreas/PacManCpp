@@ -71,9 +71,10 @@ void board::setItem() {
                 // pacman spawn
                 else if (i == 10 && j == 20)
                     Square->setItem(_EMPTY);
-                else
+                else {
                     Square->setItem(_DOT);
-                Square->setScore(DOT_POINT);
+                    Square->setScore(DOT_POINT);
+                }
             }
         }
     }

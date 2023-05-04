@@ -178,7 +178,7 @@ std::map<char, SDL_Rect> sdlChar = {
     {'y', letter_y}, {'z', letter_z}, {'.', letter_point}, {' ', letter_blank},
     {'1', letter_1}, {'2', letter_2}, {'3', letter_3},     {'4', letter_4},
     {'5', letter_5}, {'6', letter_6}, {'7', letter_7},     {'8', letter_8},
-    {'9', letter_9}, {'0', letter_0}, {' ', letter_blank}};
+    {'9', letter_9}, {'0', letter_0}};
 
 void init(SDL_Window **Window, SDL_Surface **windowSurf,
           SDL_Surface **spriteBoard) {
@@ -193,12 +193,16 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
 int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
          pacman Pacman, std::vector<std::shared_ptr<ghost>> vecGhost,
          std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup,
-         typeFruit fruit, int curScore, short death) {
+         typeFruit fruit, int curScore, short death, bool start) {
 
     SDL_SetColorKey(*spriteBoard, false, 0);
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
 
     count = (count + 1) % (512);
+
+    // print ready before the game starts
+    if (!start)
+        drawString(windowSurf, spriteBoard, 298, 492, "ready");
 
     // combine the score string and the score number into one string
     std::string scoreString = "score " + std::to_string(curScore);
