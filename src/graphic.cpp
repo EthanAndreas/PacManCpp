@@ -122,6 +122,10 @@ SDL_Rect score400 = {155, 185, 14, 7};
 SDL_Rect score800 = {155, 194, 14, 7};
 SDL_Rect score1600 = {154, 203, 15, 7};
 SDL_Rect pts = {177, 204, 16, 7};
+std::map<int, SDL_Rect> scoreSprite = {
+    {100, score100},   {300, score300},   {500, score500},   {700, score700},
+    {1000, score1000}, {2000, score2000}, {3000, score3000}, {5000, score5000},
+    {200, score200},   {400, score400},   {800, score800},   {1600, score1600}};
 
 // Letters and numbers for SDL
 SDL_Rect letter_a = {12, 61, 8, 8};

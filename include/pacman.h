@@ -7,7 +7,7 @@
 #include "square.h"
 
 #define PACMAN_INIT_X 10
-#define PACMAN_INIT_Y 15
+#define PACMAN_INIT_Y 20
 #define PACMAN_CENTER_X 0
 #define PACMAN_CENTER_Y 4
 

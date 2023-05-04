@@ -68,6 +68,9 @@ void board::setItem() {
                 // middle of the map
                 else if (i >= 6 && i <= 14 && j >= 9 && j <= 17)
                     Square->setItem(_EMPTY);
+                // pacman spawn
+                else if (i == 10 && j == 20)
+                    Square->setItem(_EMPTY);
                 else
                     Square->setItem(_DOT);
                 Square->setScore(DOT_POINT);
