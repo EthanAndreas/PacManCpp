@@ -9,6 +9,7 @@ pacman::pacman() {
     _score = 0;
     _powerup = false;
     _dotCounter = 0;
+    _remainingLife = DEFAULT_LIVES;
 }
 pacman::~pacman() {}
 
@@ -276,3 +277,16 @@ bool pacman::ghostCollision(std::vector<std::shared_ptr<ghost>> vecGhost) {
 size_t pacman::getDotCounter() { return _dotCounter; }
 
 void pacman::resetDotCounter() { _dotCounter = 0; }
+
+short pacman::getRemainingLife() { return _remainingLife; }
+
+void pacman::looseLife() { _remainingLife--; }
+
+void pacman::resetPos() {
+    _xBoard = PACMAN_INIT_X;
+    _yBoard = PACMAN_INIT_Y;
+    _xPixel = PACMAN_INIT_X * SCALE_PIXEL + PACMAN_CENTER_X;
+    _yPixel = PACMAN_INIT_Y * SCALE_PIXEL + PACMAN_CENTER_Y;
+    _lastDir = NONE;
+    _powerup = false;
+}

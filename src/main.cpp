@@ -20,6 +20,8 @@ int main() {
     dir currentDir = NONE;
     init(&Window, &windowSurf, &spriteBoard);
 
+    pacman Pacman;
+
     bool restart = true;
     while (restart) {
         // initialize board, pacman, ghost and item
@@ -28,7 +30,7 @@ int main() {
         Board.load();
         Board.transpose();
         Board.setItem();
-        pacman Pacman;
+        Pacman.resetPos();
         std::vector<std::shared_ptr<ghost>> vecGhost;
         for (int i = 0; i < 4; i++) {
             std::shared_ptr<ghost> Ghost = std::make_shared<ghost>();
@@ -41,7 +43,7 @@ int main() {
 
         // display initial board
         count = draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost, vecDot,
-                     vecPowerup, _NONE, 0);
+                     vecPowerup, _NONE, 0, -1);
         SDL_UpdateWindowSurface(Window);
 
         bool start = false, quit = false;
@@ -143,7 +145,34 @@ int main() {
 
                 // loose statement
                 if (Pacman.ghostCollision(vecGhost)) {
-                    std::cout << "You loose!" << std::endl;
+                    // death animation
+                    for (int i = 0; i < 10; i++) {
+                        count = draw(&windowSurf, &spriteBoard, count, Pacman,
+                                     vecGhost, vecDot, vecPowerup,
+                                     Fruit.getFruit(), Pacman.getScore(), i);
+                        SDL_UpdateWindowSurface(Window);
+                        Uint64 fps_end = SDL_GetTicks();
+                        float elapsed = (fps_end - fps_start) /
+                                        (float)SDL_GetPerformanceFrequency() *
+                                        1000.0f;
+
+                        // Slown the animation
+                        SDL_Delay(int(66.668f - elapsed));
+                    }
+                    // loose a life
+                    Pacman.looseLife();
+
+                    std::cout << "Remaining " << Pacman.getRemainingLife()
+                              << " life(s)" << std::endl;
+
+                    // quit the game if no more life
+                    if (Pacman.getRemainingLife() == 0) {
+                        std::cout << "You loose with a score of : "
+                                  << Pacman.getScore() << std::endl;
+                        restart = false;
+                        break;
+                    }
+
                     // restart level
                     quit = true;
                     break;
@@ -152,7 +181,7 @@ int main() {
                 // display updated board
                 count = draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost,
                              vecDot, vecPowerup, Fruit.getFruit(),
-                             Pacman.getScore());
+                             Pacman.getScore(), -1);
                 SDL_UpdateWindowSurface(Window);
             }
 
