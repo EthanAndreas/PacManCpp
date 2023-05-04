@@ -21,15 +21,15 @@ int main() {
     init(&Window, &windowSurf, &spriteBoard);
 
     pacman Pacman;
+    board Board;
+    Board.load();
+    Board.transpose();
+    Board.setItem();
 
     bool restart = true;
     while (restart) {
         // initialize board, pacman, ghost and item
         int count = 0;
-        board Board;
-        Board.load();
-        Board.transpose();
-        Board.setItem();
         Pacman.resetPos();
         std::vector<std::shared_ptr<ghost>> vecGhost;
         for (int i = 0; i < 4; i++) {
