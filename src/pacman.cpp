@@ -6,6 +6,7 @@ pacman::pacman() {
     _xPixel = PACMAN_INIT_X * SCALE_PIXEL + PACMAN_CENTER_X;
     _yPixel = PACMAN_INIT_Y * SCALE_PIXEL + PACMAN_CENTER_Y;
     _lastDir = NONE;
+    _oldDir = NONE;
     _score = 0;
     _powerup = false;
     _dotCounter = 0;
@@ -21,15 +22,19 @@ void pacman::updatePos() {
     // normal speed
     switch (_lastDir) {
     case LEFT:
+        _oldDir = LEFT;
         _xPixel -= PACMAN_SPEED;
         break;
     case RIGHT:
+        _oldDir = RIGHT;
         _xPixel += PACMAN_SPEED;
         break;
     case UP:
+        _oldDir = UP;
         _yPixel -= PACMAN_SPEED;
         break;
     case DOWN:
+        _oldDir = DOWN;
         _yPixel += PACMAN_SPEED;
         break;
     case NONE:
@@ -97,6 +102,7 @@ void pacman::updateDir(
             _lastDir = NONE;
         }
 
+        _oldDir = LEFT;
         break;
 
     case RIGHT:
@@ -118,6 +124,7 @@ void pacman::updateDir(
             _lastDir = NONE;
         }
 
+        _oldDir = RIGHT;
         break;
 
     case UP:
@@ -135,6 +142,7 @@ void pacman::updateDir(
             _lastDir = NONE;
         }
 
+        _oldDir = UP;
         break;
 
     case DOWN:
@@ -152,6 +160,7 @@ void pacman::updateDir(
             _lastDir = NONE;
         }
 
+        _oldDir = DOWN;
         break;
 
     case NONE:
@@ -290,3 +299,5 @@ void pacman::resetPos() {
     _lastDir = NONE;
     _powerup = false;
 }
+
+dir pacman::getOldDir() { return _oldDir; }

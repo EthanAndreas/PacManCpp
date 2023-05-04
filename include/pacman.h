@@ -133,12 +133,18 @@ class pacman {
      *
      */
     void resetPos();
+    /**
+     * @brief Get previous direction of pacman.
+     *
+     */
+    dir getOldDir();
 
   private:
     // board coordinates corresponding to coordinates of the board vector
     // pixel coordinates corresponding to the sprite position
     size_t _xBoard, _yBoard, _xPixel, _yPixel;
     dir _lastDir;
+    dir _oldDir;
     size_t _score;
     size_t _dotCounter;
     bool _powerup;
