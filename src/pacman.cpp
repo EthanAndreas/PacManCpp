@@ -264,6 +264,8 @@ bool pacman::isPowerup() { return _powerup; }
 
 size_t pacman::getScore() { return _score; }
 
+void pacman::resetScore() { _score = 0; }
+
 bool pacman::ghostCollision(std::vector<std::shared_ptr<ghost>> vecGhost) {
 
     for (auto Ghost : vecGhost) {

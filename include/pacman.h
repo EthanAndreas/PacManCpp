@@ -97,6 +97,11 @@ class pacman {
      */
     size_t getScore();
     /**
+     * @brief Reset the score of pacman.
+     *
+     */
+    void resetScore();
+    /**
      * @brief Check if pacman is in collision with a ghost.
      * If pacman is in collision with a ghost, the ghost is eaten if
      * pacman is in powerup mode, else pacman is eaten.
@@ -143,8 +148,7 @@ class pacman {
     // board coordinates corresponding to coordinates of the board vector
     // pixel coordinates corresponding to the sprite position
     size_t _xBoard, _yBoard, _xPixel, _yPixel;
-    dir _lastDir;
-    dir _oldDir;
+    dir _lastDir, _oldDir;
     size_t _score;
     size_t _dotCounter;
     bool _powerup;
