@@ -48,7 +48,6 @@ enum color { RED, PINK, BLUE, ORANGE };
 
 #define updateDirWithShortestPath(vecBoard, xPac, yPac) \
     updateDirRed(vecBoard, xPac, yPac)
-#define updateDirRandom(vecBoard) updateDirOrange(vecBoard)
 
 enum mode { ANY, CHASE, SCATTER, FRIGHTENED };
 
@@ -182,11 +181,24 @@ class ghost {
     void updateDirBlue(std::vector<std::vector<square *>> vecBoard, size_t xPac,
                        size_t yPac, dir dirPac);
     /**
-     * @brief Update of the orange ghost. Orange ghost takes a random direction.
+     * @brief Update direction of orange ghost. Orange ghost is following the
+     * pacman if the distance between the pacman and the ghost is greater than
+     * 8, else it is going to the ghost house.
+     *
+     * @param vecBoard
+     * @param xPac
+     * @param yPac
+     * @param dirPac
+     */
+    void updateDirOrange(std::vector<std::vector<square *>> vecBoard,
+                         size_t xPac, size_t yPac);
+    /**
+     * @brief Update of the orange ghost. Orange ghost takes a random
+     * direction.
      *
      * @param vecBoard
      */
-    void updateDirOrange(std::vector<std::vector<square *>> vecBoard);
+    void updateDirRandom(std::vector<std::vector<square *>> vecBoard);
     /**
      * @brief Update the direction of the ghost in scatter mode.
      *
@@ -196,6 +208,17 @@ class ghost {
      */
     void updateScatterDir(std::vector<std::vector<square *>> vecBoard, size_t x,
                           size_t y);
+    /**
+     * @brief Update the direction in run away mode. Ghost is going to the
+     * opposite direction of the pacman.
+     *
+     * @param vecBoard
+     * @param xPac
+     * @param yPac
+     * @param dirPac
+     */
+    void updateRunAwayDir(std::vector<std::vector<square *>> vecBoard,
+                          size_t xPac, size_t yPac, dir dirPac);
     /**
      * @brief Swap between chase and scatter mode.
      *

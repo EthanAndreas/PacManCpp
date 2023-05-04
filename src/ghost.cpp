@@ -153,6 +153,8 @@ void ghost::setReturnHouse() {
 
 void ghost::returnHouse(std::vector<std::vector<square *>> vecBoard) {
 
+    _lastDir = NONE;
+
     // arrive at the house
     if ((_color == RED && _xBoard == RED_GHOST_INIT_X &&
          _yBoard == RED_GHOST_INIT_Y) ||
@@ -386,7 +388,6 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
     if (_mode == CHASE) {
         switch (_color) {
         case RED:
-            std::cout << "Chase mode" << std::endl;
             updateDirRed(vecBoard, pacPos.first / SCALE_PIXEL,
                          pacPos.second / SCALE_PIXEL);
             break;
@@ -399,7 +400,8 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
                           pacPos.second / SCALE_PIXEL, dirPac);
             break;
         case ORANGE:
-            updateDirOrange(vecBoard);
+            updateDirOrange(vecBoard, pacPos.first / SCALE_PIXEL,
+                            pacPos.second / SCALE_PIXEL);
             break;
         }
     }
@@ -407,7 +409,6 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
     else if (_mode == SCATTER) {
         switch (_color) {
         case RED:
-            std::cout << "Scatter mode" << std::endl;
             updateScatterDir(vecBoard, 1, 1);
             break;
         case PINK:
@@ -422,16 +423,12 @@ void ghost::updateDir(std::vector<std::vector<square *>> vecBoard,
         }
     }
     // frightened mode
-    else if (_mode == FRIGHTENED) {
-        if (_color == RED)
-            std::cout << "Frightened mode" << std::endl;
-        updateDirRandom(vecBoard);
-    }
+    else if (_mode == FRIGHTENED)
+        updateRunAwayDir(vecBoard, pacPos.first / SCALE_PIXEL,
+                         pacPos.second / SCALE_PIXEL, dirPac);
     // if an error occurs
-    else {
-        std::cerr << "Error in updateDir" << std::endl;
+    else
         exit(EXIT_FAILURE);
-    }
 }
 
 void ghost::updateDirRed(std::vector<std::vector<square *>> vecBoard,
@@ -618,7 +615,25 @@ void ghost::updateDirBlue(std::vector<std::vector<square *>> vecBoard,
         updateDirRandom(vecBoard);
 }
 
-void ghost::updateDirOrange(std::vector<std::vector<square *>> vecBoard) {
+void ghost::updateDirOrange(std::vector<std::vector<square *>> vecBoard,
+                            size_t xPac, size_t yPac) {
+
+    // if ghost is at a distance greater than 8 go on pacman
+    if (abs(_xBoard - xPac) + abs(_yBoard - yPac) > 8) {
+        updateDirWithShortestPath(vecBoard, xPac, yPac);
+        return;
+    }
+
+    // if ghost is at a distance less than 8 go in scatter mode
+    else {
+        _mode = SCATTER;
+        modeTimer1 = std::chrono::steady_clock::now();
+        updateScatterDir(vecBoard, 19, 25);
+        return;
+    }
+}
+
+void ghost::updateDirRandom(std::vector<std::vector<square *>> vecBoard) {
 
     // random movement
     bool findPos = false;
@@ -721,6 +736,175 @@ void ghost::updateScatterDir(std::vector<std::vector<square *>> vecBoard,
     }
 
     updateDirWithShortestPath(vecBoard, x, y);
+}
+
+void ghost::updateRunAwayDir(std::vector<std::vector<square *>> vecBoard,
+                             size_t xPac, size_t yPac, dir dirPac) {
+
+    std::vector<Node *> path =
+        findShortestPath(vecBoard, _xBoard, _yBoard, xPac, yPac);
+    // if a shortest path is found, assign the new direction
+    if (path.size() >= 2) {
+        dir shortestDirToPacman = findDir(path[0], path[1]);
+
+        size_t count = 0;
+        bool findPos = false;
+        while (findPos == false && count < 100) {
+            auto rand = std::uniform_int_distribution<size_t>(0, 3)(_rng);
+
+            switch (rand) {
+            case LEFT:
+                // avoid ghost to take the teleport
+                if (_xBoard == 4 && _yBoard == 13)
+                    break;
+
+                // avoid going back
+                if (_lastDir == RIGHT)
+                    break;
+
+                if (shortestDirToPacman != LEFT) {
+                    if (vecBoard[_xBoard - 1][_yBoard]->getState() == HALL) {
+                        _xBoard--;
+                        _lastDir = LEFT;
+                        findPos = true;
+                    }
+                }
+                break;
+            case RIGHT:
+                // avoid ghost to take the teleport
+                if (_xBoard == 15 && _yBoard == 13)
+                    break;
+
+                // avoid going back
+                if (_lastDir == LEFT)
+                    break;
+
+                if (shortestDirToPacman != RIGHT) {
+                    if (vecBoard[_xBoard + 1][_yBoard]->getState() == HALL) {
+                        _xBoard++;
+                        _lastDir = RIGHT;
+                        findPos = true;
+                    }
+                }
+                break;
+            case UP:
+                // avoid going back
+                if (_lastDir == DOWN)
+                    break;
+
+                if (shortestDirToPacman != UP) {
+                    if (vecBoard[_xBoard][_yBoard - 1]->getState() == HALL) {
+                        _yBoard--;
+                        _lastDir = UP;
+                        findPos = true;
+                    }
+                }
+                break;
+            case DOWN:
+                // avoid going back
+                if (_lastDir == UP)
+                    break;
+
+                if (shortestDirToPacman != DOWN) {
+                    if (vecBoard[_xBoard][_yBoard + 1]->getState() == HALL) {
+                        _yBoard++;
+                        _lastDir = DOWN;
+                        findPos = true;
+                    }
+                }
+                break;
+            case NONE:
+                break;
+            }
+
+            count++;
+        }
+
+        // if the ghost found a new position
+        if (findPos == true)
+            return;
+    }
+
+    // if the ghost cannot find a new position, take a random position other
+    // than the one of the pacman and the one he is coming from
+    bool findPos = false;
+    while (findPos == false) {
+
+        auto rand = std::uniform_int_distribution<size_t>(0, 3)(_rng);
+
+        switch (rand) {
+        case LEFT:
+            // avoid going on pacman
+            if (dirPac == RIGHT)
+                break;
+
+            // avoid taking the teleport
+            if (_xBoard == 4 && _yBoard == 13)
+                break;
+
+            // avoid going back
+            if (_lastDir == RIGHT)
+                break;
+
+            if (vecBoard[_xBoard - 1][_yBoard]->getState() == HALL) {
+                _xBoard--;
+                _lastDir = LEFT;
+                findPos = true;
+            }
+            break;
+        case RIGHT:
+            // avoid going on pacman
+            if (dirPac == LEFT)
+                break;
+
+            // avoid taking the teleport
+            if (_xBoard == 15 && _yBoard == 13)
+                break;
+
+            // avoid going back
+            if (_lastDir == LEFT)
+                break;
+
+            if (vecBoard[_xBoard + 1][_yBoard]->getState() == HALL) {
+                _xBoard++;
+                _lastDir = RIGHT;
+                findPos = true;
+            }
+            break;
+        case UP:
+            // avoid going on pacman
+            if (dirPac == DOWN)
+                break;
+
+            // avoid going back
+            if (_lastDir == DOWN)
+                break;
+
+            if (vecBoard[_xBoard][_yBoard - 1]->getState() == HALL) {
+                _yBoard--;
+                _lastDir = UP;
+                findPos = true;
+            }
+            break;
+        case DOWN:
+            // avoid going on pacman
+            if (dirPac == UP)
+                break;
+
+            // avoid going back
+            if (_lastDir == UP)
+                break;
+
+            if (vecBoard[_xBoard][_yBoard + 1]->getState() == HALL) {
+                _yBoard++;
+                _lastDir = DOWN;
+                findPos = true;
+            }
+            break;
+        case NONE:
+            break;
+        }
+    }
 }
 
 void ghost::swapMode() {
