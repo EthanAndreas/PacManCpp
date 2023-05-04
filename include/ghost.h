@@ -82,7 +82,8 @@ class ghost {
     /**
      * @brief Update the position of the ghost in the ghost house.
      */
-    void updateInGhostHouse(std::vector<std::vector<square *>> vecBoard);
+    void updateInGhostHouse(
+        std::vector<std::vector<std::shared_ptr<square>>> vecBoard);
     /**
      * @brief Ghost go back to the house.
      *
@@ -100,7 +101,8 @@ class ghost {
      *
      * @param vecBoard
      */
-    void returnHouse(std::vector<std::vector<square *>> vecBoard);
+    void
+    returnHouse(std::vector<std::vector<std::shared_ptr<square>>> vecBoard);
     /**
      * @brief Set the frightened object.
      *
@@ -147,7 +149,7 @@ class ghost {
      *
      * @param vecBoard
      */
-    void updateDir(std::vector<std::vector<square *>> vecBoard,
+    void updateDir(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
                    std::pair<size_t, size_t> pacPos, dir dirPac);
     /**
      * @brief Update direction of red ghost. Red ghost is following the pacman.
@@ -156,8 +158,9 @@ class ghost {
      * @param xPac
      * @param yPac
      */
-    void updateDirRed(std::vector<std::vector<square *>> vecBoard, size_t xPac,
-                      size_t yPac);
+    void
+    updateDirRed(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
+                 size_t xPac, size_t yPac);
     /**
      * @brief Update direction of pink ghost. Pink ghost is anticipating the
      * pacman, it is going to the position of the pacman + 4.
@@ -167,8 +170,9 @@ class ghost {
      * @param yPac
      * @param dirPac
      */
-    void updateDirPink(std::vector<std::vector<square *>> vecBoard, size_t xPac,
-                       size_t yPac, dir dirPac);
+    void
+    updateDirPink(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
+                  size_t xPac, size_t yPac, dir dirPac);
     /**
      * @brief Update direction of blue ghost. Swap between the chase mode of red
      * and pink ghost.
@@ -178,8 +182,9 @@ class ghost {
      * @param yPac
      * @param dirPac
      */
-    void updateDirBlue(std::vector<std::vector<square *>> vecBoard, size_t xPac,
-                       size_t yPac, dir dirPac);
+    void
+    updateDirBlue(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
+                  size_t xPac, size_t yPac, dir dirPac);
     /**
      * @brief Update direction of orange ghost. Orange ghost is following the
      * pacman if the distance between the pacman and the ghost is greater than
@@ -190,15 +195,17 @@ class ghost {
      * @param yPac
      * @param dirPac
      */
-    void updateDirOrange(std::vector<std::vector<square *>> vecBoard,
-                         size_t xPac, size_t yPac);
+    void
+    updateDirOrange(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
+                    size_t xPac, size_t yPac);
     /**
      * @brief Update of the orange ghost. Orange ghost takes a random
      * direction.
      *
      * @param vecBoard
      */
-    void updateDirRandom(std::vector<std::vector<square *>> vecBoard);
+    void
+    updateDirRandom(std::vector<std::vector<std::shared_ptr<square>>> vecBoard);
     /**
      * @brief Update the direction of the ghost in scatter mode.
      *
@@ -206,8 +213,9 @@ class ghost {
      * @param x
      * @param y
      */
-    void updateScatterDir(std::vector<std::vector<square *>> vecBoard, size_t x,
-                          size_t y);
+    void updateDirScatterMode(
+        std::vector<std::vector<std::shared_ptr<square>>> vecBoard, size_t x,
+        size_t y);
     /**
      * @brief Update the direction in run away mode. Ghost is going to the
      * opposite direction of the pacman.
@@ -217,8 +225,9 @@ class ghost {
      * @param yPac
      * @param dirPac
      */
-    void updateRunAwayDir(std::vector<std::vector<square *>> vecBoard,
-                          size_t xPac, size_t yPac, dir dirPac);
+    void updateDirRunAwayMode(
+        std::vector<std::vector<std::shared_ptr<square>>> vecBoard, size_t xPac,
+        size_t yPac);
     /**
      * @brief Swap between chase and scatter mode.
      *

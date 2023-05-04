@@ -66,8 +66,9 @@ bool pacman::waitSquareCenter() {
 
 dir pacman::getLastDir() { return _lastDir; }
 
-void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
-                       dir currentDir) {
+void pacman::updateDir(
+    std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
+    dir currentDir) {
 
     if (_xBoard > 20 || _yBoard == 0 || _yBoard >= 26) {
         std::cerr << "Pacman out of the board in updateDir" << std::endl;
@@ -157,8 +158,9 @@ void pacman::updateDir(std::vector<std::vector<square *>> vecBoard,
     }
 }
 
-void pacman::updateSquare(std::vector<std::vector<square *>> vecBoard,
-                          std::vector<ghost *> vecGhost, fruit *Fruit) {
+void pacman::updateSquare(
+    std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
+    std::vector<std::shared_ptr<ghost>> vecGhost, fruit *Fruit) {
 
     if (_xBoard > 20 || _yBoard >= 26) {
         std::cerr << "Pacman out of the board in updateSquare" << std::endl;
@@ -252,7 +254,7 @@ bool pacman::isPowerup() { return _powerup; }
 
 size_t pacman::getScore() { return _score; }
 
-bool pacman::ghostCollision(std::vector<ghost *> vecGhost) {
+bool pacman::ghostCollision(std::vector<std::shared_ptr<ghost>> vecGhost) {
 
     for (auto Ghost : vecGhost) {
         if (abs(_xPixel - Ghost->getPos().first) < GHOST_PACMAN_CONTACT &&

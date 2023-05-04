@@ -58,7 +58,8 @@ class pacman {
      * @param vecBoard
      * @param currentDir
      */
-    void updateDir(std::vector<std::vector<square *>> vecBoard, dir currentDir);
+    void updateDir(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
+                   dir currentDir);
     /**
      * @brief Get the last direction of pacman.
      *
@@ -71,8 +72,9 @@ class pacman {
      *
      * @param vecBoard
      */
-    void updateSquare(std::vector<std::vector<square *>> vecBoard,
-                      std::vector<ghost *> vecGhost, fruit *Fruit);
+    void
+    updateSquare(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
+                 std::vector<std::shared_ptr<ghost>> vecGhost, fruit *Fruit);
     /**
      * @brief Set the powerup of pacman.
      *
@@ -101,7 +103,7 @@ class pacman {
      * @return true
      * @return false
      */
-    bool ghostCollision(std::vector<ghost *> vecGhost);
+    bool ghostCollision(std::vector<std::shared_ptr<ghost>> vecGhost);
     /**
      * @brief Get the number of dots eaten by pacman.
      *

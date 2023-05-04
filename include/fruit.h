@@ -52,14 +52,14 @@ class fruit {
      * @param vecBoard
      * @param _dotCounter
      */
-    int updateFruit(std::vector<std::vector<square *>> vecBoard,
+    int updateFruit(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
                     int dotCounter);
     /**
      * @brief Eat the fruit.
      *
      * @param vecBoard
      */
-    void eatFruit(std::vector<std::vector<square *>> vecBoard);
+    void eatFruit(std::vector<std::vector<std::shared_ptr<square>>> vecBoard);
 
   private:
     typeFruit _fruit;

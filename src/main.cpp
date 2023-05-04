@@ -29,9 +29,9 @@ int main() {
         Board.transpose();
         Board.setItem();
         pacman Pacman;
-        std::vector<ghost *> vecGhost;
+        std::vector<std::shared_ptr<ghost>> vecGhost;
         for (int i = 0; i < 4; i++) {
-            ghost *Ghost = new ghost();
+            std::shared_ptr<ghost> Ghost = std::make_shared<ghost>();
             Ghost->setGhost(color(i));
             vecGhost.push_back(Ghost);
         }
@@ -114,9 +114,7 @@ int main() {
                     Pacman.updateDir(Board.getBoard(), currentDir);
                 Pacman.updatePos();
                 Pacman.updateSquare(Board.getBoard(), vecGhost, &Fruit);
-
                 // pacman eat fruit management
-
                 if (Fruit.updateFruit(Board.getBoard(),
                                       Pacman.getDotCounter()) == EXCEED) {
                     Pacman.resetDotCounter();
@@ -125,16 +123,10 @@ int main() {
                 // ghost movement management
                 for (auto Ghost : vecGhost) {
 
-                    if (!Ghost->isInHouse()) {
-                        if (Ghost->waitSquareCenter() == true)
-                            Ghost->updateDir(Board.getBoard(), Pacman.getPos(),
-                                             Pacman.getLastDir());
-                        Ghost->updatePos();
-                    } else {
-                        if (Ghost->waitSquareCenter() == true)
-                            Ghost->updateInGhostHouse(Board.getBoard());
-                        Ghost->updatePos();
-                    }
+                    if (Ghost->waitSquareCenter() == true)
+                        Ghost->updateDir(Board.getBoard(), Pacman.getPos(),
+                                         Pacman.getLastDir());
+                    Ghost->updatePos();
                 }
 
                 // update item on the board
@@ -168,8 +160,8 @@ int main() {
             float elapsed = (fps_end - fps_start) /
                             (float)SDL_GetPerformanceFrequency() * 1000.0f;
 
-            // 120 fps
-            SDL_Delay(floor(16.667f - elapsed));
+            // fps
+            SDL_Delay(floor(10.000f - elapsed));
         }
     }
 

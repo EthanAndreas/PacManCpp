@@ -21,8 +21,9 @@ fruit::~fruit() {}
 
 typeFruit fruit::getFruit() { return _fruit; }
 
-int fruit::updateFruit(std::vector<std::vector<square *>> vecBoard,
-                       int dotCounter) {
+int fruit::updateFruit(
+    std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
+    int dotCounter) {
     if (dotCounter >= MIN_DOT_FRUIT) {
         if (dotCounter == MIN_DOT_FRUIT && _fruit == _NONE) {
             _lastFruit = (_lastFruit + 1) % 8;
@@ -48,7 +49,8 @@ int fruit::updateFruit(std::vector<std::vector<square *>> vecBoard,
     return NO_UPDATE;
 }
 
-void fruit::eatFruit(std::vector<std::vector<square *>> vecBoard) {
+void fruit::eatFruit(
+    std::vector<std::vector<std::shared_ptr<square>>> vecBoard) {
     _fruit = _NONE;
     vecBoard[FRUIT_X][FRUIT_Y]->setItem(_EMPTY);
     vecBoard[FRUIT_X][FRUIT_Y]->setScore(0);

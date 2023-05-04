@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "fruit.h"
 #include "ghost.h"
+#include "lib.h"
 #include "pacman.h"
 #include "square.h"
 
@@ -20,7 +21,7 @@ class board {
      *
      * @return std::vector<std::vector<square>>
      */
-    std::vector<std::vector<square *>> getBoard();
+    std::vector<std::vector<std::shared_ptr<square>>> getBoard();
     /**
      * @brief Set the state of each square with the map defined
      * in "assets/pacman_board.txt".
@@ -54,7 +55,7 @@ class board {
     std::vector<Coordinate> getPowerupList();
 
   private:
-    std::vector<std::vector<square *>> _board;
+    std::vector<std::vector<std::shared_ptr<square>>> _board;
 };
 
 #endif
