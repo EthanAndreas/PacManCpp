@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <set>
 
-#define CONVERGENCE 300
+#define CONVERGENCE 50
 
 struct Node {
     size_t x;

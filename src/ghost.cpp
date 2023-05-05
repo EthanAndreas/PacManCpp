@@ -458,13 +458,19 @@ void ghost::updateDirRed(
     std::vector<std::vector<std::shared_ptr<square>>> vecBoard, size_t xPac,
     size_t yPac) {
 
-    // new vedBoard without go back possibility
-    std::vector<std::vector<std::shared_ptr<square>>> vecBoardWithoutGoBack =
-        removeAboutTurn(vecBoard, _lastDir, _xBoard, _yBoard);
+    std::vector<std::shared_ptr<Node>> path;
 
-    // get the shortest path to pacman
-    std::vector<std::shared_ptr<Node>> path =
-        findShortestPath(vecBoardWithoutGoBack, _xBoard, _yBoard, xPac, yPac);
+    if (_lastDir != NONE) {
+
+        // new vecBoard without go back possibility
+        std::vector<std::vector<std::shared_ptr<square>>>
+            vecBoardWithoutGoBack =
+                removeAboutTurn(vecBoard, _lastDir, _xBoard, _yBoard);
+        // get the shortest path to pacman
+        path = findShortestPath(vecBoardWithoutGoBack, _xBoard, _yBoard, xPac,
+                                yPac);
+    } else
+        path = findShortestPath(vecBoard, _xBoard, _yBoard, xPac, yPac);
 
     // if a shortest path is found, assign the new direction
     if (path.size() >= 2) {
@@ -495,118 +501,8 @@ void ghost::updateDirRed(
     // if an error occurs on A* algorithm, take the direction that minimizes the
     // euclidian distance between the ghost and pacman
     else {
-        size_t xTarget = 0, yTarget = 0;
-
-        // if ghost is in chase mode, targets pacman
-        if (_mode == CHASE) {
-            xTarget = xPac;
-            yTarget = yPac;
-        }
-        // if ghost is in scatter mode, targets the corner of the board
-        else {
-            switch (_color) {
-            case RED:
-                xTarget = 1;
-                yTarget = 1;
-                break;
-            case PINK:
-                xTarget = 19;
-                yTarget = 1;
-                break;
-            case BLUE:
-                xTarget = 1;
-                yTarget = 25;
-                break;
-            case ORANGE:
-                xTarget = 19;
-                yTarget = 25;
-                break;
-            }
-        }
-
-        auto vecPossibleDir =
-            findPossibleDir(vecBoard, _lastDir, NONE, _xBoard, _yBoard);
-
-        int distMin = 1000;
-        dir dirMin = NONE;
-
-        if (vecPossibleDir.size() > 0) {
-
-            for (auto tempDir : vecPossibleDir) {
-
-                // use of "<=" to priotize vertical moves such as, when A*
-                // do not find shortest path, it means that pacman is far,
-                // and often it is the vertical distance that it is the
-                // biggest
-                switch (tempDir) {
-                case LEFT:
-                    if (abs(_xBoard - 1 - xTarget) + abs(_yBoard - yTarget) <=
-                        distMin) {
-                        distMin =
-                            abs(_xBoard - 1 - xTarget) + abs(_yBoard - yTarget);
-                        dirMin = LEFT;
-                    }
-                    break;
-
-                case RIGHT:
-                    if (abs(_xBoard + 1 - xTarget) + abs(_yBoard - yTarget) <=
-                        distMin) {
-                        distMin =
-                            abs(_xBoard + 1 - xTarget) + abs(_yBoard - yTarget);
-                        dirMin = RIGHT;
-                    }
-                    break;
-
-                case UP:
-                    if (abs(_xBoard - xTarget) + abs(_yBoard - 1 - yTarget) <=
-                        distMin) {
-                        distMin =
-                            abs(_xBoard - xTarget) + abs(_yBoard - 1 - yTarget);
-                        dirMin = UP;
-                    }
-                    break;
-
-                case DOWN:
-                    if (abs(_xBoard - xTarget) + abs(_yBoard + 1 - yTarget) <=
-                        distMin) {
-                        distMin =
-                            abs(_xBoard - xTarget) + abs(_yBoard + 1 - yTarget);
-                        dirMin = DOWN;
-                    }
-                    break;
-
-                case NONE:
-                    break;
-                }
-            }
-
-            switch (dirMin) {
-            case LEFT:
-                _lastDir = dirMin;
-                _xBoard--;
-                break;
-            case RIGHT:
-                _lastDir = dirMin;
-                _xBoard++;
-                break;
-            case UP:
-                _lastDir = dirMin;
-                _yBoard--;
-                break;
-            case DOWN:
-                _lastDir = dirMin;
-                _yBoard++;
-                break;
-            case NONE:
-                break;
-            }
-        }
-
-        // if no possible direction
-        else {
-            std::cerr << "No possible direction in updateDirRed" << std::endl;
-            exit(EXIT_FAILURE);
-        }
+        std::cerr << "No possible direction in updateDirRed" << std::endl;
+        exit(EXIT_FAILURE);
     }
 }
 

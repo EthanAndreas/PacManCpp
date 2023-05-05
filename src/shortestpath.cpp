@@ -1,5 +1,15 @@
 #include "shortestpath.h"
 
+int findNode(std::set<std::shared_ptr<Node>> set, std::shared_ptr<Node> node) {
+    size_t i = 0;
+    for (auto it = set.begin(); it != set.end(); it++) {
+        if ((*it)->x == node->x && (*it)->y == node->y)
+            return i;
+        i++;
+    }
+    return -1;
+}
+
 std::vector<std::shared_ptr<Node>>
 findShortestPath(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
                  size_t xStart, size_t yStart, size_t xEnd, size_t yEnd) {
@@ -8,6 +18,9 @@ findShortestPath(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
         return {};
 
     if (vecBoard[xEnd][yEnd]->getState() == WALL)
+        return {};
+
+    if (xStart == xEnd && yStart == yEnd)
         return {};
 
     // define a lambda function for calculating the heuristic (Manhattan
@@ -27,10 +40,13 @@ findShortestPath(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
     openSet.insert(start);
 
     // avoid infinite loop
-    int count = 0;
+    int maxDist = 0;
+
+    // teleport use
+    bool teleportUse = false;
 
     // A* algorithm
-    while (!openSet.empty() && count < CONVERGENCE) {
+    while (!openSet.empty()) {
 
         // get the node with the lowest f_score from the open set
         auto current = *openSet.begin();
@@ -40,8 +56,10 @@ findShortestPath(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
                 current = node;
         }
 
-        // fi the current node is the end node, it is the final path
-        if (current->x == end->x && current->y == end->y) {
+        // if the current node is the end node, it is the final path or if the
+        // algorithm is stuck (bounded by CONVERGENCE)
+        if ((current->x == end->x && current->y == end->y) ||
+            maxDist > CONVERGENCE) {
             std::vector<std::shared_ptr<Node>> path;
             // pull up all the parents of the current node
             while (current) {
@@ -60,39 +78,72 @@ findShortestPath(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
         // check the neighbors of the current node
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                // Skip the current node and diagonals
-                if ((i == 0 && j == 0) || (i != 0 && j != 0))
-                    continue;
 
-                size_t x = current->x + i;
-                size_t y = current->y + j;
+                std::shared_ptr<Node> neighbor;
 
-                if (x >= 20 || y >= 26)
-                    continue;
-                if (vecBoard[x][y]->getState() == WALL)
-                    continue;
+                // teleportation case
+                bool teleport = false;
+                if (teleportUse == false) {
+                    if (current->x == 0 && current->y == 13) {
+                        // the only one possible neighbor is the next position
+                        // of teleport
+                        neighbor = std::make_shared<Node>(
+                            Node{20, 13, current->distance + 1, current});
+                        teleport = true;
+                    } else if (current->x == 20 && current->y == 13) {
+                        // the only one possible neighbor is the next position
+                        // of teleport
+                        neighbor = std::make_shared<Node>(
+                            Node{0, 13, current->distance + 1, current});
+                        teleport = true;
+                    }
 
-                // create a new node and add it to the open set if it hasn't
-                // already been visited
-                std::shared_ptr<Node> neighbor = std::make_shared<Node>(
-                    Node{x, y, current->distance + 1, current});
-                if (closedSet.find(neighbor) == closedSet.end()) {
-                    auto it = openSet.find(neighbor);
-                    if (it != openSet.end()) {
-                        // update the neighbor's distance if a shorter path was
-                        // found
+                    if (teleport)
+                        teleportUse = true;
+                }
+
+                if (!teleport) {
+
+                    // skip the current node and diagonals
+                    if ((i == 0 && j == 0) || (i != 0 && j != 0))
+                        continue;
+
+                    // check all the neighbors
+                    size_t x = current->x + i;
+                    size_t y = current->y + j;
+
+                    if (x >= 20 || y >= 26)
+                        continue;
+                    if (vecBoard[x][y]->getState() == WALL)
+                        continue;
+
+                    // create the neighbor node
+                    neighbor = std::make_shared<Node>(
+                        Node{x, y, current->distance + 1, current});
+                }
+
+                // if the neighbor is already in the closed set, skip it
+                int index = findNode(closedSet, neighbor);
+                if (index == -1) {
+                    index = findNode(openSet, neighbor);
+                    if (index != -1) {
+                        // update the neighbor's distance if a shorter path
+                        // was found
+                        auto it = openSet.begin();
+                        std::advance(it, index);
+                        auto element = *it;
                         if ((*it)->distance > neighbor->distance) {
                             openSet.erase(it);
                             openSet.insert(neighbor);
+                            maxDist = neighbor->distance;
                         }
                     } else {
                         openSet.insert(neighbor);
+                        maxDist = neighbor->distance;
                     }
                 }
             }
         }
-
-        count++;
     }
 
     // no path was found
