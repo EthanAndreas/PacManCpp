@@ -370,28 +370,29 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
                 break;
             }
         }
-    } else {
-        pac_in = eatenPacman[death];
-    }
-    // avoid animation when pacman is not moving
-    if (Pacman.getLastDir() == NONE) {
-        switch (Pacman.getOldDir()) {
-        case LEFT:
-            pac_in = pac_l;
-            break;
-        case RIGHT:
-            pac_in = pac_r;
-            break;
-        case UP:
-            pac_in = pac_u;
-            break;
-        case DOWN:
-            pac_in = pac_d;
-            break;
-        case NONE:
-            pac_in = pac_blank;
-            break;
+        // avoid animation when pacman is not moving
+        if (Pacman.getLastDir() == NONE) {
+            switch (Pacman.getOldDir()) {
+            case LEFT:
+                pac_in = pac_l;
+                break;
+            case RIGHT:
+                pac_in = pac_r;
+                break;
+            case UP:
+                pac_in = pac_u;
+                break;
+            case DOWN:
+                pac_in = pac_d;
+                break;
+            case NONE:
+                pac_in = pac_blank;
+                break;
+            }
         }
+    } else {
+        std::cout << "death: " << death << std::endl;
+        pac_in = eatenPacman[death];
     }
 
     // pacman updated position
