@@ -202,7 +202,11 @@ void intro(SDL_Surface **windowSurf, SDL_Surface **spriteBoard) {
     SDL_BlitScaled(*spriteBoard, &pacmanLogo, *windowSurf, &logoArea);
 
     // Print text
-    drawString(windowSurf, spriteBoard, 193, 600, "press enter to start");
+    drawString(windowSurf, spriteBoard, 190, 600, "press enter to start");
+
+    // print credits
+    drawString(windowSurf, spriteBoard, 8, 878,
+               "developped by ethan huret and thomas dumond");
 }
 
 int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,

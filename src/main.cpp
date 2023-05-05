@@ -54,6 +54,12 @@ int main() {
                 keys = SDL_GetKeyboardState(&nbk);
                 if (keys[SDL_SCANCODE_RETURN])
                     menu = false;
+                else if (keys[SDL_SCANCODE_ESCAPE]) {
+                    game = false;
+                    menu = false;
+                    SDL_Quit();
+                    return EXIT_SUCCESS;
+                }
                 break;
             }
         }
