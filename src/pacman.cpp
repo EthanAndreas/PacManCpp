@@ -299,6 +299,7 @@ void pacman::resetPos() {
     _xPixel = PACMAN_INIT_X * SCALE_PIXEL + PACMAN_CENTER_X;
     _yPixel = PACMAN_INIT_Y * SCALE_PIXEL + PACMAN_CENTER_Y;
     _lastDir = NONE;
+    _oldDir = NONE;
     _powerup = false;
 }
 

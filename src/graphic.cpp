@@ -3,6 +3,9 @@
 SDL_Rect src_bg = {370, 3, 168, 216};
 SDL_Rect bg = {4, 4, 672, 864};
 
+// Pacman logo
+SDL_Rect pacmanLogo = {3, 3, 182, 49};
+
 // PacMan
 // animation
 SDL_Rect pac_blank = {3, 89, 16, 16};
@@ -190,11 +193,26 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
     *spriteBoard = SDL_LoadBMP("assets/pacman_sprites.bmp");
 }
 
+void intro(SDL_Surface **windowSurf, SDL_Surface **spriteBoard) {
+    SDL_SetColorKey(*spriteBoard, false, 0);
+
+    // Area for pacman logo
+    SDL_Rect logoArea = {166, 80, 364, 98};
+    SDL_FillRect(*windowSurf, &logoArea, 0);
+    SDL_BlitScaled(*spriteBoard, &pacmanLogo, *windowSurf, &logoArea);
+
+    // Print text
+    drawString(windowSurf, spriteBoard, 190, 600, "press enter to start");
+
+    // print credits
+    drawString(windowSurf, spriteBoard, 8, 878,
+               "developped by ethan huret and thomas dumond");
+}
+
 int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
          pacman Pacman, std::vector<std::shared_ptr<ghost>> vecGhost,
          std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup,
          typeFruit fruit, int curScore, short death, bool start) {
-
     SDL_SetColorKey(*spriteBoard, false, 0);
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
 

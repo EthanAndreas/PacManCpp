@@ -20,6 +20,11 @@ int main() {
     dir currentDir = NONE;
     init(&Window, &windowSurf, &spriteBoard);
 
+    // Keyboard
+    SDL_Event event;
+    const Uint8 *keys;
+    int nbk;
+
     // initialize game
     pacman Pacman;
     board Board;
@@ -30,7 +35,34 @@ int main() {
     // Game
     bool game = true;
     bool next_level = true;
+    bool menu = true;
     while (game) {
+
+        // Intro
+        while (menu) {
+            intro(&windowSurf, &spriteBoard);
+            SDL_UpdateWindowSurface(Window);
+            SDL_PollEvent(&event);
+            switch (event.type) {
+            case SDL_QUIT:
+                game = false;
+                menu = false;
+                SDL_Quit();
+                return EXIT_SUCCESS;
+                break;
+            case SDL_KEYDOWN:
+                keys = SDL_GetKeyboardState(&nbk);
+                if (keys[SDL_SCANCODE_RETURN])
+                    menu = false;
+                else if (keys[SDL_SCANCODE_ESCAPE]) {
+                    game = false;
+                    menu = false;
+                    SDL_Quit();
+                    return EXIT_SUCCESS;
+                }
+                break;
+            }
+        }
 
         // Level
         bool level = true;
@@ -64,9 +96,6 @@ int main() {
             SDL_UpdateWindowSurface(Window);
 
             bool life = true, start = false;
-            int nbk;
-            const Uint8 *keys;
-            SDL_Event event;
             // Life
             while (life) {
 
