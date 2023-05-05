@@ -33,4 +33,6 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
 void drawString(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int x,
                 int y, std::string str);
 
+void intro(SDL_Surface **windowSurf, SDL_Surface **spriteBoard);
+
 #endif
