@@ -183,6 +183,8 @@ std::map<char, SDL_Rect> sdlChar = {
     {'5', letter_5}, {'6', letter_6}, {'7', letter_7},     {'8', letter_8},
     {'9', letter_9}, {'0', letter_0}};
 
+int frame = 0;
+
 void init(SDL_Window **Window, SDL_Surface **windowSurf,
           SDL_Surface **spriteBoard) {
 
@@ -195,6 +197,10 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
 
 void intro(SDL_Surface **windowSurf, SDL_Surface **spriteBoard) {
     SDL_SetColorKey(*spriteBoard, false, 0);
+
+    // Area for window
+    SDL_Rect windowArea = {0, 0, 700, 900};
+    SDL_FillRect(*windowSurf, &windowArea, 0);
 
     // Area for pacman logo
     SDL_Rect logoArea = {166, 80, 364, 98};
@@ -217,6 +223,10 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
 
     count = (count + 1) % (512);
+
+    // area for score and life
+    SDL_Rect scoreArea = {0, 864, 700, 36};
+    SDL_FillRect(*windowSurf, &scoreArea, 0);
 
     // print ready before the game starts
     if (!start)
@@ -245,10 +255,12 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
     }
 
     // powerup display
-    for (auto &coord : vecPowerup) {
-        SDL_Rect powerup = {coord.x * SCALE_PIXEL + 6,
-                            coord.y * SCALE_PIXEL + 10, 20, 20};
-        SDL_BlitScaled(*spriteBoard, &powerup_in, *windowSurf, &powerup);
+    if ((frame / 8) % 2 == 0) {
+        for (auto &coord : vecPowerup) {
+            SDL_Rect powerup = {coord.x * SCALE_PIXEL + 6,
+                                coord.y * SCALE_PIXEL + 10, 20, 20};
+            SDL_BlitScaled(*spriteBoard, &powerup_in, *windowSurf, &powerup);
+        }
     }
 
     // Fruit display
@@ -389,6 +401,8 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
     SDL_SetColorKey(*spriteBoard, true, 0);
     SDL_BlitScaled(*spriteBoard, &pac_in, *windowSurf, &_pacman);
 
+    frame++;
+
     return count;
 }
 
@@ -398,7 +412,7 @@ void drawString(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int x,
     int len = str.length();
 
     // Create a rectangle for the text
-    SDL_Rect area = {x, y, 16 * (len + 5), 16};
+    SDL_Rect area = {x, y, 16 * (len + 2), 16};
 
     // Erase the area
     SDL_FillRect(*windowSurf, &area, 0);

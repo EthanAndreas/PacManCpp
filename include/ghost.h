@@ -82,8 +82,8 @@ class ghost {
     /**
      * @brief Update the position of the ghost in the ghost house.
      */
-    void updateInGhostHouse(
-        std::vector<std::vector<std::shared_ptr<square>>> vecBoard);
+    void
+    updateInHouse(std::vector<std::vector<std::shared_ptr<square>>> vecBoard);
     /**
      * @brief Ghost go back to the house.
      *

@@ -61,7 +61,7 @@ color ghost::getGhost() { return _color; }
 
 bool ghost::isInHouse() { return _isInHouse; }
 
-void ghost::updateInGhostHouse(
+void ghost::updateInHouse(
     std::vector<std::vector<std::shared_ptr<square>>> vecBoard) {
 
     time_t houseWaitTimer2 = std::chrono::steady_clock::now();
@@ -100,10 +100,10 @@ void ghost::updateInGhostHouse(
 
         if (_yBoard == 13) {
             _lastDir = UP;
-            _yBoard--;
+            _yBoard -= GHOST_HOUSE_SPEED;
         } else if (_yBoard == 12) {
             _lastDir = DOWN;
-            _yBoard++;
+            _yBoard += GHOST_HOUSE_SPEED;
         }
     }
     // move out ghost house
@@ -364,7 +364,7 @@ void ghost::updateDir(
     }
 
     if (_isInHouse == true) {
-        updateInGhostHouse(vecBoard);
+        updateInHouse(vecBoard);
         return;
     }
 

@@ -37,28 +37,29 @@ int main() {
     bool next_level = true;
     bool menu = true;
     while (game) {
-        std::cout << "Game" << std::endl;
 
         // Intro
         while (menu) {
-            // std::cout << "Menu" << std::endl;
             // display intro
             intro(&windowSurf, &spriteBoard);
             SDL_UpdateWindowSurface(Window);
 
+            // keyboard management
             SDL_PollEvent(&event);
-
-            keys = SDL_GetKeyboardState(&nbk);
+            // return touch
             if (event.type == SDL_KEYDOWN &&
                 event.key.keysym.sym == SDLK_RETURN)
                 menu = false;
+            // esc touch
             else if (event.type == SDL_KEYDOWN &&
                      event.key.keysym.sym == SDLK_ESCAPE) {
                 game = false;
                 menu = false;
                 SDL_Quit();
                 return EXIT_SUCCESS;
-            } else if (event.type == SDL_QUIT) {
+            }
+            // close window
+            else if (event.type == SDL_QUIT) {
                 game = false;
                 menu = false;
                 SDL_Quit();
@@ -93,8 +94,9 @@ int main() {
 
             // display initial board
             int count = 0;
-            count = draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost,
-                         vecDot, vecPowerup, _NONE, 0, -1, false);
+            count =
+                draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost, vecDot,
+                     vecPowerup, _NONE, Pacman.getScore(), -1, false);
             SDL_UpdateWindowSurface(Window);
 
             bool life = true, start = false;
@@ -121,6 +123,8 @@ int main() {
                         life = false;
                         level = false;
                         game = false;
+                        SDL_Quit();
+                        exit(EXIT_SUCCESS);
                         break;
                     default:
                         break;
@@ -129,32 +133,43 @@ int main() {
 
                 // keyboard management
                 keys = SDL_GetKeyboardState(&nbk);
+                // esc touch
                 if (keys[SDL_SCANCODE_ESCAPE]) {
                     life = true;
                     level = true;
                     game = true;
-                } else if (keys[SDL_SCANCODE_LEFT]) {
+                    SDL_Quit();
+                    exit(EXIT_SUCCESS);
+                }
+                // left arrow touch
+                else if (keys[SDL_SCANCODE_LEFT]) {
                     if (start == false) {
                         for (auto Ghost : vecGhost)
                             Ghost->setTimer();
                     }
                     start = true;
                     currentDir = LEFT;
-                } else if (keys[SDL_SCANCODE_RIGHT]) {
+                }
+                // right arrow touch
+                else if (keys[SDL_SCANCODE_RIGHT]) {
                     if (start == false) {
                         for (auto Ghost : vecGhost)
                             Ghost->setTimer();
                     }
                     start = true;
                     currentDir = RIGHT;
-                } else if (keys[SDL_SCANCODE_UP]) {
+                }
+                // up arrow touch
+                else if (keys[SDL_SCANCODE_UP]) {
                     if (start == false) {
                         for (auto Ghost : vecGhost)
                             Ghost->setTimer();
                     }
                     start = true;
                     currentDir = UP;
-                } else if (keys[SDL_SCANCODE_DOWN]) {
+                }
+                // down arrow touch
+                else if (keys[SDL_SCANCODE_DOWN]) {
                     if (start == false) {
                         for (auto Ghost : vecGhost)
                             Ghost->setTimer();
@@ -240,6 +255,7 @@ int main() {
                             next_level = true;
                             life = false;
                             level = false;
+                            menu = true;
                             break;
                         }
 
