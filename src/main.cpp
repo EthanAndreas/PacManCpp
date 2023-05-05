@@ -23,7 +23,7 @@ int main() {
     // Keyboard
     SDL_Event event;
     const Uint8 *keys;
-    int nbk;
+    int nbk = 0;
 
     // initialize game
     pacman Pacman;
@@ -37,30 +37,32 @@ int main() {
     bool next_level = true;
     bool menu = true;
     while (game) {
+        std::cout << "Game" << std::endl;
 
         // Intro
         while (menu) {
+            // std::cout << "Menu" << std::endl;
+            // display intro
             intro(&windowSurf, &spriteBoard);
             SDL_UpdateWindowSurface(Window);
+
             SDL_PollEvent(&event);
-            switch (event.type) {
-            case SDL_QUIT:
+
+            keys = SDL_GetKeyboardState(&nbk);
+            if (event.type == SDL_KEYDOWN &&
+                event.key.keysym.sym == SDLK_RETURN)
+                menu = false;
+            else if (event.type == SDL_KEYDOWN &&
+                     event.key.keysym.sym == SDLK_ESCAPE) {
                 game = false;
                 menu = false;
                 SDL_Quit();
                 return EXIT_SUCCESS;
-                break;
-            case SDL_KEYDOWN:
-                keys = SDL_GetKeyboardState(&nbk);
-                if (keys[SDL_SCANCODE_RETURN])
-                    menu = false;
-                else if (keys[SDL_SCANCODE_ESCAPE]) {
-                    game = false;
-                    menu = false;
-                    SDL_Quit();
-                    return EXIT_SUCCESS;
-                }
-                break;
+            } else if (event.type == SDL_QUIT) {
+                game = false;
+                menu = false;
+                SDL_Quit();
+                return EXIT_SUCCESS;
             }
         }
 
@@ -127,9 +129,11 @@ int main() {
 
                 // keyboard management
                 keys = SDL_GetKeyboardState(&nbk);
-                if (keys[SDL_SCANCODE_ESCAPE])
+                if (keys[SDL_SCANCODE_ESCAPE]) {
                     life = true;
-                else if (keys[SDL_SCANCODE_LEFT]) {
+                    level = true;
+                    game = true;
+                } else if (keys[SDL_SCANCODE_LEFT]) {
                     if (start == false) {
                         for (auto Ghost : vecGhost)
                             Ghost->setTimer();
