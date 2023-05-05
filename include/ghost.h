@@ -123,6 +123,12 @@ class ghost {
      */
     std::pair<size_t, size_t> getPos();
     /**
+     * @brief Get the last eaten position of the ghost.
+     *
+     * @return std::pair<size_t, size_t>
+     */
+    std::pair<size_t, size_t> getEatenPosition();
+    /**
      * @brief Update the sprite position of the ghost.
      *
      * @param count - frame number
@@ -238,7 +244,7 @@ class ghost {
     color _color;
     // board coordinates corresponding to coordinates of the board vector
     // pixel coordinates corresponding to the sprite position
-    size_t _xBoard, _yBoard, _xPixel, _yPixel;
+    size_t _xBoard, _yBoard, _xPixel, _yPixel, _xPixelEaten, _yPixelEaten;
     dir _lastDir;
     mode _mode;
     // mode of the ghost

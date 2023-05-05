@@ -300,6 +300,9 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
             if ((count / 4) % 2)
                 ghost_in2.x += 17;
 
+            // Create an area to write score of the ghost when it is eaten
+            SDL_Rect pointArea;
+
             // fear mode
             if (Ghost->isFrightened() == true && Ghost->isInHouse() == false &&
                 Ghost->isReturnHouse() == false) {
@@ -319,6 +322,17 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
             }
             // go back to house mode
             else if (Ghost->isReturnHouse() == true) {
+
+                // Place the area to write the score
+                pointArea = {int(Ghost->getEatenPosition().first) +
+                                 (GHOST_CENTER_X / 2),
+                             int(Ghost->getEatenPosition().second +
+                                 (GHOST_CENTER_Y / 2)),
+                             34, 20};
+
+                // print the score
+                SDL_BlitScaled(*spriteBoard, &scoreSprite[200], *windowSurf,
+                               &pointArea);
 
                 switch (Ghost->getLastDir()) {
                 case RIGHT:

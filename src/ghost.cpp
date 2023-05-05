@@ -5,6 +5,8 @@ ghost::ghost() {
     _yBoard = 0;
     _xPixel = 0;
     _yPixel = 0;
+    _xPixelEaten = 0;
+    _yPixelEaten = 0;
     _lastDir = NONE;
     _mode = ANY;
     _chaseMode = false;
@@ -154,6 +156,10 @@ void ghost::setReturnHouse() {
     _lastDir = NONE;
     _isReturnHouse = true;
     _isFear = false;
+
+    // update eaten position
+    _xPixelEaten = _xPixel;
+    _yPixelEaten = _yPixel;
 }
 
 void ghost::returnHouse(
@@ -242,6 +248,10 @@ bool ghost::isFrightened() { return _isFear; }
 
 std::pair<size_t, size_t> ghost::getPos() {
     return std::make_pair(_xPixel, _yPixel);
+}
+
+std::pair<size_t, size_t> ghost::getEatenPosition() {
+    return std::make_pair(_xPixelEaten, _yPixelEaten);
 }
 
 void ghost::updatePos() {
