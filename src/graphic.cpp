@@ -391,7 +391,6 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
             }
         }
     } else {
-        std::cout << "death: " << death << std::endl;
         pac_in = eatenPacman[death];
     }
 
