@@ -315,6 +315,26 @@ void ghost::updatePos() {
     }
 }
 
+void ghost::updateCoord() {
+
+    switch (_lastDir) {
+    case LEFT:
+        _xBoard--;
+        break;
+    case RIGHT:
+        _xBoard++;
+        break;
+    case UP:
+        _yBoard--;
+        break;
+    case DOWN:
+        _yBoard++;
+        break;
+    case NONE:
+        break;
+    }
+}
+
 bool ghost::waitSquareCenter() {
 
     size_t xCenter = _xBoard * SCALE_PIXEL + GHOST_CENTER_X;
@@ -482,28 +502,8 @@ void ghost::updateDirRed(
     // if a shortest path is found, assign the new direction
     if (path.size() >= 2) {
 
-        dir newDir = findDir(path[0], path[1]);
-
-        switch (newDir) {
-        case LEFT:
-            _lastDir = newDir;
-            _xBoard--;
-            break;
-        case RIGHT:
-            _lastDir = newDir;
-            _xBoard++;
-            break;
-        case UP:
-            _lastDir = newDir;
-            _yBoard--;
-            break;
-        case DOWN:
-            _lastDir = newDir;
-            _yBoard++;
-            break;
-        case NONE:
-            break;
-        }
+        _lastDir = findDir(path[0], path[1]);
+        updateCoord();
     }
     // if an error occurs on A* algorithm, take the direction that minimizes the
     // euclidian distance between the ghost and pacman
@@ -528,6 +528,7 @@ void ghost::updateDirPink(
         return;
     }
 
+    // find the 4th square in front of pacman
     size_t dist = 0;
     while (dist < 4) {
 
@@ -582,7 +583,7 @@ void ghost::updateDirPink(
         dist++;
     }
 
-    // new vedBoard without go back possibility
+    // new vecBoard without go back possibility
     std::vector<std::vector<std::shared_ptr<square>>> newVecBoard =
         removeAboutTurn(vecBoard, _lastDir, _xBoard, _yBoard);
 
@@ -640,8 +641,10 @@ void ghost::updateDirBlue(
         return;
     }
     // if there is an error, take a random direction
-    else
-        updateDirRandom(vecBoard);
+    else {
+        std::cerr << "Error in updateDirBlue for ghost " << _color << std::endl;
+        exit(EXIT_FAILURE);
+    }
 }
 
 void ghost::updateDirOrange(
@@ -660,94 +663,6 @@ void ghost::updateDirOrange(
         modeTimer1 = std::chrono::steady_clock::now();
         updateDirScatterMode(vecBoard, 19, 25);
         return;
-    }
-}
-
-void ghost::updateDirRandom(
-    std::vector<std::vector<std::shared_ptr<square>>> vecBoard) {
-
-    // random movement
-    size_t count = 0;
-    bool findPos = false;
-    std::set<dir> vecDir;
-    while (findPos == false) {
-
-        std::cout << "count: " << count << std::endl;
-
-        size_t randDir = std::uniform_int_distribution<size_t>(0, 3)(_rng);
-
-        switch (randDir) {
-
-        case LEFT:
-            vecDir.insert(LEFT);
-            // avoid going back
-            if (_lastDir == RIGHT)
-                break;
-
-            if (vecBoard[_xBoard - 1][_yBoard]->getState() == HALL) {
-                _xBoard--;
-                _lastDir = LEFT;
-                findPos = true;
-            }
-
-            break;
-
-        case RIGHT:
-            vecDir.insert(RIGHT);
-            // avoid going back
-            if (_lastDir == LEFT)
-                break;
-
-            if (vecBoard[_xBoard + 1][_yBoard]->getState() == HALL) {
-                _xBoard++;
-                _lastDir = RIGHT;
-                findPos = true;
-            }
-
-            break;
-
-        case UP:
-            vecDir.insert(UP);
-            // avoid going back
-            if (_lastDir == DOWN)
-                break;
-
-            if (vecBoard[_xBoard][_yBoard - 1]->getState() == HALL) {
-                _yBoard--;
-                _lastDir = UP;
-                findPos = true;
-            }
-
-            break;
-
-        case DOWN:
-            vecDir.insert(DOWN);
-            // avoid going back
-            if (_lastDir == UP)
-                break;
-
-            if (vecBoard[_xBoard][_yBoard + 1]->getState() == HALL) {
-                _yBoard++;
-                _lastDir = DOWN;
-                findPos = true;
-            }
-
-            break;
-
-        case NONE:
-            break;
-        }
-
-        count++;
-    }
-
-    if (findPos == true)
-        return;
-
-    else {
-        std::cerr << "Error: no direction found in updateRandomDir"
-                  << std::endl;
-        exit(EXIT_FAILURE);
     }
 }
 
@@ -776,42 +691,68 @@ void ghost::updateDirRunAwayMode(
         // retrieve the shortest direction to pacman
         dir shortestDirToPacman = findDir(path[0], path[1]);
 
-        // find all the possible directions with avoiding the one he is
-        // coming from and the one of the pacman
+        // find all the possible directions with avoiding last direction
+        // of ghost and pacman
         std::vector<dir> vecPossibleDir = findPossibleDir(
             vecBoard, _lastDir, shortestDirToPacman, _xBoard, _yBoard);
 
-        // a direction is possible corresponding to the previous conditions
+        // if a direction is possible corresponding to the previous conditions
         if (vecPossibleDir.size() > 0) {
 
-            // take a random direction among the possible ones
-            size_t randDir = std::uniform_int_distribution<size_t>(
-                0, vecPossibleDir.size() - 1)(_rng);
+            // take the direction that maximizes the euclidian distance
+            // between the ghost and pacman
+            dir maxDir = NONE;
+            int maxDist = -1;
 
-            switch (vecPossibleDir[randDir]) {
-            case LEFT:
-                _xBoard--;
-                _lastDir = LEFT;
-                break;
+            // lambda function to compute the euclidian distance
+            auto euclidianDistance = [](int x1, int y1, int x2, int y2) {
+                return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
+            };
 
-            case RIGHT:
-                _xBoard++;
-                _lastDir = RIGHT;
-                break;
+            for (auto dir : vecPossibleDir) {
 
-            case UP:
-                _yBoard--;
-                _lastDir = UP;
-                break;
-
-            case DOWN:
-                _yBoard++;
-                _lastDir = DOWN;
-                break;
-
-            case NONE:
-                break;
+                switch (dir) {
+                case LEFT:
+                    if (euclidianDistance(_xBoard - 1, _yBoard, xPac, yPac) >
+                        maxDist) {
+                        maxDist =
+                            euclidianDistance(_xBoard - 1, _yBoard, xPac, yPac);
+                        maxDir = LEFT;
+                    }
+                    break;
+                case RIGHT:
+                    if (euclidianDistance(_xBoard + 1, _yBoard, xPac, yPac) >
+                        maxDist) {
+                        maxDist =
+                            euclidianDistance(_xBoard + 1, _yBoard, xPac, yPac);
+                        maxDir = RIGHT;
+                    }
+                    break;
+                case UP:
+                    if (euclidianDistance(_xBoard, _yBoard - 1, xPac, yPac) >
+                        maxDist) {
+                        maxDist =
+                            euclidianDistance(_xBoard, _yBoard - 1, xPac, yPac);
+                        maxDir = UP;
+                    }
+                    break;
+                case DOWN:
+                    if (euclidianDistance(_xBoard, _yBoard + 1, xPac, yPac) >
+                        maxDist) {
+                        maxDist =
+                            euclidianDistance(_xBoard, _yBoard + 1, xPac, yPac);
+                        maxDir = DOWN;
+                    }
+                    break;
+                case NONE:
+                    break;
+                }
             }
+
+            // take the direction that maximizes the euclidian distance
+            // between the ghost and pacman
+            _lastDir = maxDir;
+            updateCoord();
         }
         // if no direction is possible, take a random direction in possible
         // direction
@@ -823,113 +764,17 @@ void ghost::updateDirRunAwayMode(
             if (vecPossibleDir2.size() > 0) {
 
                 // take a random direction among the possible ones
-                size_t randDir = std::uniform_int_distribution<size_t>(
-                    0, vecPossibleDir2.size() - 1)(_rng);
-
-                switch (vecPossibleDir2[randDir]) {
-                case LEFT:
-                    _xBoard--;
-                    _lastDir = LEFT;
-                    break;
-
-                case RIGHT:
-                    _xBoard++;
-                    _lastDir = RIGHT;
-                    break;
-
-                case UP:
-                    _yBoard--;
-                    _lastDir = UP;
-                    break;
-
-                case DOWN:
-                    _yBoard++;
-                    _lastDir = DOWN;
-                    break;
-
-                case NONE:
-                    break;
-                }
+                _lastDir =
+                    vecPossibleDir2[std::uniform_int_distribution<size_t>(
+                        0, vecPossibleDir2.size() - 1)(_rng)];
+                updateCoord();
             }
         }
-    }
-    // if an error occurs on A *algorithm, take the direction that maximizes
-    // the euclidian distance between the ghost and pacman
-    else {
-        auto vecPossibleDir =
-            findPossibleDir(vecBoard, _lastDir, NONE, _xBoard, _yBoard);
 
-        int distMax = -1;
-        dir dirMax = NONE;
-
-        if (vecPossibleDir.size() > 0) {
-
-            for (auto tempDir : vecPossibleDir) {
-
-                switch (tempDir) {
-                case LEFT:
-                    if (abs(_xBoard - 1 - xPac) + abs(_yBoard - yPac) >=
-                        distMax) {
-                        distMax = abs(_xBoard - 1 - xPac) + abs(_yBoard - yPac);
-                        dirMax = LEFT;
-                    }
-                    break;
-
-                case RIGHT:
-                    if (abs(_xBoard + 1 - xPac) + abs(_yBoard - yPac) >=
-                        distMax) {
-                        distMax = abs(_xBoard + 1 - xPac) + abs(_yBoard - yPac);
-                        dirMax = RIGHT;
-                    }
-                    break;
-
-                case UP:
-                    if (abs(_xBoard - xPac) + abs(_yBoard - 1 - yPac) >=
-                        distMax) {
-                        distMax = abs(_xBoard - xPac) + abs(_yBoard - 1 - yPac);
-                        dirMax = UP;
-                    }
-                    break;
-
-                case DOWN:
-                    if (abs(_xBoard - xPac) + abs(_yBoard + 1 - yPac) >=
-                        distMax) {
-                        distMax = abs(_xBoard - xPac) + abs(_yBoard + 1 - yPac);
-                        dirMax = DOWN;
-                    }
-                    break;
-
-                case NONE:
-                    break;
-                }
-            }
-
-            switch (dirMax) {
-            case LEFT:
-                _lastDir = dirMax;
-                _xBoard--;
-                break;
-            case RIGHT:
-                _lastDir = dirMax;
-                _xBoard++;
-                break;
-            case UP:
-                _lastDir = dirMax;
-                _yBoard--;
-                break;
-            case DOWN:
-                _lastDir = dirMax;
-                _yBoard++;
-                break;
-            case NONE:
-                break;
-            }
-        }
-        // if no possible direction
-        else {
-            std::cerr << "No possible direction in updateDirRed" << std::endl;
-            exit(EXIT_FAILURE);
-        }
+    } else {
+        std::cerr << "No possible direction in updateDirRunAwayMode"
+                  << std::endl;
+        exit(EXIT_FAILURE);
     }
 }
 

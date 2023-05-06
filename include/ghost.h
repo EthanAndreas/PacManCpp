@@ -136,8 +136,13 @@ class ghost {
      */
     void updatePos();
     /**
-     * @brief Wait the ghost to be in the center of a square in function of the
-     * ghost speed, of the direction and of the sprite position.
+     * @brief Update the board position of the ghost.
+     *
+     */
+    void updateCoord();
+    /**
+     * @brief Wait the ghost to be in the center of a square in function of
+     * the ghost speed, of the direction and of the sprite position.
      *
      * @return true
      * @return false
@@ -204,14 +209,6 @@ class ghost {
     void
     updateDirOrange(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
                     size_t xPac, size_t yPac);
-    /**
-     * @brief Update of the orange ghost. Orange ghost takes a random
-     * direction.
-     *
-     * @param vecBoard
-     */
-    void
-    updateDirRandom(std::vector<std::vector<std::shared_ptr<square>>> vecBoard);
     /**
      * @brief Update the direction of the ghost in scatter mode.
      *
