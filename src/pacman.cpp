@@ -9,6 +9,8 @@ pacman::pacman() {
     _oldDir = NONE;
     _score = 0;
     _powerup = false;
+    _ghostEaten = 0;
+    _ghostEatenScore = 0;
     _dotCounter = 0;
     _remainingLife = DEFAULT_LIVES;
 }
@@ -219,6 +221,8 @@ void pacman::updateSquare(
         vecBoard[_xBoard][_yBoard]->setScore(0);
 
         _powerup = true;
+        _ghostEatenScore = 0;
+
         for (auto Ghost : vecGhost) {
             if (Ghost->isInHouse() == false)
                 Ghost->setFrightened(true);
@@ -274,7 +278,14 @@ bool pacman::ghostCollision(std::vector<std::shared_ptr<ghost>> vecGhost) {
             if (Ghost->isReturnHouse() == false &&
                 Ghost->isFrightened() == true) {
                 Ghost->setReturnHouse();
-                _score = _score + GHOST_SCORE;
+                // multiply the ghost score by 2 each time a ghost is eaten on
+                // the same powerup
+                _ghostEatenScore++;
+                _score += (GHOST_SCORE * _ghostEatenScore);
+                _ghostEaten++;
+                // all ghost eaten for each powerup
+                if (_ghostEaten == 16)
+                    _score += 12000;
                 return false;
             } else if (Ghost->isReturnHouse() == false &&
                        Ghost->isFrightened() == false)

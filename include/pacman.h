@@ -152,6 +152,7 @@ class pacman {
     size_t _score;
     size_t _dotCounter;
     bool _powerup;
+    short _ghostEaten, _ghostEatenScore;
     time_t timePoint1;
     short _remainingLife;
 };
