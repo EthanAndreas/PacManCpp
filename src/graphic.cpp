@@ -271,23 +271,23 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
 
     // score fruit display
     if (Pacman.getFruitEatenScore() != 0) {
+
         time_t fruitEatenTimer2 = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsedTime =
             fruitEatenTimer2 - Pacman.getfruitEatenTimer();
+
         if (elapsedTime.count() < FRUIT_SCORE_DISPLAY_TIME) {
+
             // Place the area to write the score
-            SDL_Rect pointArea = {0, 0, 0, 0};
+            SDL_Rect pointArea = {FRUIT_X * SCALE_PIXEL,
+                                  FRUIT_Y * SCALE_PIXEL + 10, 34, 20};
 
             // print the score
             SDL_BlitScaled(*spriteBoard,
                            &scoreSprite[Pacman.getFruitEatenScore()],
                            *windowSurf, &pointArea);
-
-            drawString(windowSurf, spriteBoard, 298, 492,
-                       std::to_string(Pacman.getFruitEatenScore()));
-        } else {
+        } else
             Pacman.setFruitEatenScore(0);
-        }
     }
 
     // do not draw ghost if pacman is dead

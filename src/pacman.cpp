@@ -261,10 +261,13 @@ void pacman::updateSquare(
     }
 
     if (_powerup) {
+
         time_t powerupTimer2 = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsedTime =
             powerupTimer2 - powerupTimer1;
+
         if (elapsedTime.count() > POWERUP_MODE) {
+
             _powerup = false;
             for (auto Ghost : vecGhost) {
                 if (Ghost->isInHouse() == false)
