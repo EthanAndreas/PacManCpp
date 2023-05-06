@@ -156,7 +156,7 @@ class ghost {
      * @param vecBoard
      */
     void updateDir(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
-                   std::pair<size_t, size_t> pacPos, dir dirPac);
+                   size_t xPac, size_t yPac, dir dirPac);
     /**
      * @brief Update direction of red ghost. Red ghost is following the pacman.
      *

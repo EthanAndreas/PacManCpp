@@ -1,20 +1,29 @@
 #include "pacman.h"
 
 pacman::pacman() {
+    init();
+    reset();
+}
+
+pacman::~pacman() {}
+
+void pacman::init() {
     _xBoard = PACMAN_INIT_X;
     _yBoard = PACMAN_INIT_Y;
     _xPixel = PACMAN_INIT_X * SCALE_PIXEL + PACMAN_CENTER_X;
     _yPixel = PACMAN_INIT_Y * SCALE_PIXEL + PACMAN_CENTER_Y;
     _lastDir = NONE;
     _oldDir = NONE;
-    _score = 0;
     _powerup = false;
     _ghostEaten = 0;
     _ghostEatenScore = 0;
+}
+
+void pacman::reset() {
+    _score = 0;
     _dotCounter = 0;
     _remainingLife = DEFAULT_LIVES;
 }
-pacman::~pacman() {}
 
 std::pair<size_t, size_t> pacman::getPos() {
     return std::make_pair(_xPixel, _yPixel);
@@ -228,7 +237,7 @@ void pacman::updateSquare(
                 Ghost->setFrightened(true);
         }
 
-        timePoint1 = std::chrono::steady_clock::now();
+        powerupTimer1 = std::chrono::steady_clock::now();
 
     } else if (_xBoard == FRUIT_X && _yBoard == FRUIT_Y &&
                vecBoard[_xBoard][_yBoard]->getItem() == _FRUIT) {
@@ -245,13 +254,16 @@ void pacman::updateSquare(
             return;
 
         _score = _score + vecBoard[_xBoard][_yBoard]->getScore();
+        _fruitEatenScore = vecBoard[_xBoard][_yBoard]->getScore();
+        fruitEatenTimer1 = std::chrono::steady_clock::now();
         Fruit->eatFruit(vecBoard);
         _dotCounter = 0;
     }
 
     if (_powerup) {
-        time_t timePoint2 = std::chrono::steady_clock::now();
-        std::chrono::duration<double> elapsedTime = timePoint2 - timePoint1;
+        time_t powerupTimer2 = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsedTime =
+            powerupTimer2 - powerupTimer1;
         if (elapsedTime.count() > POWERUP_MODE) {
             _powerup = false;
             for (auto Ghost : vecGhost) {
@@ -262,31 +274,36 @@ void pacman::updateSquare(
     }
 }
 
-time_t pacman::getTimePoint1() { return timePoint1; }
+time_t pacman::getPowerupTimer() { return powerupTimer1; }
 
 bool pacman::isPowerup() { return _powerup; }
 
 size_t pacman::getScore() { return _score; }
 
-void pacman::resetScore() { _score = 0; }
-
 bool pacman::ghostCollision(std::vector<std::shared_ptr<ghost>> vecGhost) {
 
     for (auto Ghost : vecGhost) {
+
         if (abs(_xPixel - Ghost->getPos().first) < GHOST_PACMAN_CONTACT &&
             abs(_yPixel - Ghost->getPos().second) < GHOST_PACMAN_CONTACT) {
+
             if (Ghost->isReturnHouse() == false &&
                 Ghost->isFrightened() == true) {
+
                 Ghost->setReturnHouse();
+
                 // multiply the ghost score by 2 each time a ghost is eaten on
                 // the same powerup
                 _ghostEatenScore++;
                 _score += (GHOST_SCORE * _ghostEatenScore);
                 _ghostEaten++;
+
                 // all ghost eaten for each powerup
                 if (_ghostEaten == 16)
                     _score += 12000;
+
                 return false;
+
             } else if (Ghost->isReturnHouse() == false &&
                        Ghost->isFrightened() == false)
                 return true;
@@ -296,6 +313,16 @@ bool pacman::ghostCollision(std::vector<std::shared_ptr<ghost>> vecGhost) {
     return false;
 }
 
+size_t pacman::getGhostEatenScore() {
+    return _ghostEatenScore * GHOST_DEFAULT_SCORE;
+}
+
+time_t pacman::getfruitEatenTimer() { return fruitEatenTimer1; }
+
+void pacman::setFruitEatenScore(short score) { _fruitEatenScore = score; }
+
+short pacman::getFruitEatenScore() { return _fruitEatenScore; }
+
 size_t pacman::getDotCounter() { return _dotCounter; }
 
 void pacman::resetDotCounter() { _dotCounter = 0; }
@@ -303,15 +330,5 @@ void pacman::resetDotCounter() { _dotCounter = 0; }
 short pacman::getRemainingLife() { return _remainingLife; }
 
 void pacman::looseLife() { _remainingLife--; }
-
-void pacman::resetPos() {
-    _xBoard = PACMAN_INIT_X;
-    _yBoard = PACMAN_INIT_Y;
-    _xPixel = PACMAN_INIT_X * SCALE_PIXEL + PACMAN_CENTER_X;
-    _yPixel = PACMAN_INIT_Y * SCALE_PIXEL + PACMAN_CENTER_Y;
-    _lastDir = NONE;
-    _oldDir = NONE;
-    _powerup = false;
-}
 
 dir pacman::getOldDir() { return _oldDir; }

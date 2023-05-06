@@ -28,10 +28,22 @@
 
 #define POWERUP_MODE 10 // 10s
 
+#define GHOST_DEFAULT_SCORE 200
+
 class pacman {
   public:
     pacman();
     ~pacman();
+    /**
+     * @brief Init pacman.
+     *
+     */
+    void init();
+    /**
+     * @brief Reset pacman.
+     *
+     */
+    void reset();
     /**
      * @brief Get the sprite position of pacman.
      *
@@ -82,7 +94,7 @@ class pacman {
      *
      * @param powerup
      */
-    time_t getTimePoint1();
+    time_t getPowerupTimer();
     /**
      * @brief Set the powerup of pacman.
      *
@@ -97,11 +109,6 @@ class pacman {
      */
     size_t getScore();
     /**
-     * @brief Reset the score of pacman.
-     *
-     */
-    void resetScore();
-    /**
      * @brief Check if pacman is in collision with a ghost.
      * If pacman is in collision with a ghost, the ghost is eaten if
      * pacman is in powerup mode, else pacman is eaten.
@@ -111,6 +118,30 @@ class pacman {
      * @return false
      */
     bool ghostCollision(std::vector<std::shared_ptr<ghost>> vecGhost);
+    /**
+     * @brief Get the Ghost Eaten Score object.
+     *
+     * @return size_t
+     */
+    size_t getGhostEatenScore();
+    /**
+     * @brief Get the fruit eaten timer object.
+     *
+     * @return time_t
+     */
+    time_t getfruitEatenTimer();
+    /**
+     * @brief Set the fruit eaten score object.
+     *
+     * @param score
+     */
+    void setFruitEatenScore(short score);
+    /**
+     * @brief Get the score of fruit eaten by pacman.
+     *
+     * @param fruitEaten
+     */
+    short getFruitEatenScore();
     /**
      * @brief Get the number of dots eaten by pacman.
      *
@@ -134,11 +165,6 @@ class pacman {
      */
     void looseLife();
     /**
-     * @brief Reset the position of pacman.
-     *
-     */
-    void resetPos();
-    /**
      * @brief Get previous direction of pacman.
      *
      */
@@ -152,8 +178,12 @@ class pacman {
     size_t _score;
     size_t _dotCounter;
     bool _powerup;
+    time_t powerupTimer1;
+    // ghostEaten is the number of ghost eaten in a level
+    // ghostEatenScore is the score of the ghost eaten with one powerup
     short _ghostEaten, _ghostEatenScore;
-    time_t timePoint1;
+    time_t fruitEatenTimer1;
+    short _fruitEatenScore;
     short _remainingLife;
 };
 

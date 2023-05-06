@@ -79,7 +79,7 @@ int main() {
             }
 
             // initialize pacman and ghost
-            Pacman.resetPos();
+            Pacman.init();
             std::vector<std::shared_ptr<ghost>> vecGhost;
             for (int i = 0; i < 4; i++) {
                 std::shared_ptr<ghost> Ghost = std::make_shared<ghost>();
@@ -96,7 +96,7 @@ int main() {
             int count = 0;
             count =
                 draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost, vecDot,
-                     vecPowerup, _NONE, Pacman.getScore(), -1, false);
+                     vecPowerup, _NONE, Pacman.getScore(), PACMAN_LIVE, false);
             SDL_UpdateWindowSurface(Window);
 
             bool life = true, start = false;
@@ -196,8 +196,11 @@ int main() {
                     for (auto Ghost : vecGhost) {
 
                         if (Ghost->waitSquareCenter() == true)
-                            Ghost->updateDir(Board.getBoard(), Pacman.getPos(),
-                                             Pacman.getLastDir());
+                            Ghost->updateDir(
+                                Board.getBoard(),
+                                Pacman.getPos().first / SCALE_PIXEL,
+                                Pacman.getPos().second / SCALE_PIXEL,
+                                Pacman.getLastDir());
                         Ghost->updatePos();
                     }
 
@@ -224,8 +227,8 @@ int main() {
                         for (i = 0; i < 10; i++) {
                             count = draw(&windowSurf, &spriteBoard, count,
                                          Pacman, vecGhost, vecDot, vecPowerup,
-                                         Fruit.getFruit(), Pacman.getScore(), i,
-                                         start);
+                                         Fruit.getFruit(), Pacman.getScore(),
+                                         PACMAN_DEATH * i, start);
                             SDL_UpdateWindowSurface(Window);
                             Uint64 fps_end = SDL_GetTicks();
                             float elapsed =
@@ -251,7 +254,7 @@ int main() {
                             std::cout << "You loose with a score of : "
                                       << Pacman.getScore() << std::endl;
                             // beginning level
-                            Pacman.resetScore();
+                            Pacman.reset();
                             next_level = true;
                             life = false;
                             level = false;
@@ -267,7 +270,7 @@ int main() {
                     // display updated board
                     count = draw(&windowSurf, &spriteBoard, count, Pacman,
                                  vecGhost, vecDot, vecPowerup, Fruit.getFruit(),
-                                 Pacman.getScore(), -1, start);
+                                 Pacman.getScore(), PACMAN_LIVE, start);
                     SDL_UpdateWindowSurface(Window);
                 }
 

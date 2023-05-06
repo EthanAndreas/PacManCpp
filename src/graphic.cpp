@@ -183,8 +183,6 @@ std::map<char, SDL_Rect> sdlChar = {
     {'5', letter_5}, {'6', letter_6}, {'7', letter_7},     {'8', letter_8},
     {'9', letter_9}, {'0', letter_0}};
 
-int frame = 0;
-
 void init(SDL_Window **Window, SDL_Surface **windowSurf,
           SDL_Surface **spriteBoard) {
 
@@ -255,7 +253,7 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
     }
 
     // powerup display
-    if ((frame / 8) % 2 == 0) {
+    if ((count / 8) % 2 == 0) {
         for (auto &coord : vecPowerup) {
             SDL_Rect powerup = {coord.x * SCALE_PIXEL + 6,
                                 coord.y * SCALE_PIXEL + 10, 20, 20};
@@ -263,7 +261,7 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
         }
     }
 
-    // Fruit display
+    // fruit display
     if (fruit != _NONE) {
         SDL_Rect fruitSdl = {FRUIT_X * SCALE_PIXEL, FRUIT_Y * SCALE_PIXEL,
                              SCALE_PIXEL, SCALE_PIXEL};
@@ -271,7 +269,30 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
                        &fruitSdl);
     }
 
-    if (death == -1) { // dont draw ghost if pacman is dead
+    // score fruit display
+    if (Pacman.getFruitEatenScore() != 0) {
+        time_t fruitEatenTimer2 = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsedTime =
+            fruitEatenTimer2 - Pacman.getfruitEatenTimer();
+        if (elapsedTime.count() < FRUIT_SCORE_DISPLAY_TIME) {
+            // Place the area to write the score
+            SDL_Rect pointArea = {0, 0, 0, 0};
+
+            // print the score
+            SDL_BlitScaled(*spriteBoard,
+                           &scoreSprite[Pacman.getFruitEatenScore()],
+                           *windowSurf, &pointArea);
+
+            drawString(windowSurf, spriteBoard, 298, 492,
+                       std::to_string(Pacman.getFruitEatenScore()));
+        } else {
+            Pacman.setFruitEatenScore(0);
+        }
+    }
+
+    // do not draw ghost if pacman is dead
+    if (death == PACMAN_LIVE) {
+
         for (auto &Ghost : vecGhost) {
             // _ghost look animation
             SDL_Rect *ghost_in = nullptr;
@@ -300,20 +321,22 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
             if ((count / 4) % 2)
                 ghost_in2.x += 17;
 
-            // Create an area to write score of the ghost when it is eaten
-            SDL_Rect pointArea;
-
             // fear mode
             if (Ghost->isFrightened() == true && Ghost->isInHouse() == false &&
                 Ghost->isReturnHouse() == false) {
 
-                time_t timePoint2 = std::chrono::steady_clock::now();
+                time_t powerupTimer2 = std::chrono::steady_clock::now();
                 std::chrono::duration<double> elapsedTime =
-                    timePoint2 - Pacman.getTimePoint1();
+                    powerupTimer2 - Pacman.getPowerupTimer();
+
                 if (elapsedTime.count() < POWERUP_MODE - GHOST_BLINK)
                     ghost_in = &(fearBlueGhostSprite);
-                else
-                    ghost_in = &(fearWhiteGhostSprite);
+                else {
+                    if ((count / 8) % 2)
+                        ghost_in = &(fearBlueGhostSprite);
+                    else
+                        ghost_in = &(fearWhiteGhostSprite);
+                }
 
                 // _ghost wave animation
                 ghost_in2 = *ghost_in;
@@ -324,15 +347,16 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
             else if (Ghost->isReturnHouse() == true) {
 
                 // Place the area to write the score
-                pointArea = {int(Ghost->getEatenPosition().first) +
-                                 (GHOST_CENTER_X / 2),
-                             int(Ghost->getEatenPosition().second +
-                                 (GHOST_CENTER_Y / 2)),
-                             34, 20};
+                SDL_Rect pointArea = {int(Ghost->getEatenPosition().first) +
+                                          (GHOST_CENTER_X / 2),
+                                      int(Ghost->getEatenPosition().second +
+                                          (GHOST_CENTER_Y / 2)),
+                                      34, 20};
 
                 // print the score
-                SDL_BlitScaled(*spriteBoard, &scoreSprite[200], *windowSurf,
-                               &pointArea);
+                SDL_BlitScaled(*spriteBoard,
+                               &scoreSprite[Pacman.getGhostEatenScore()],
+                               *windowSurf, &pointArea);
 
                 switch (Ghost->getLastDir()) {
                 case RIGHT:
@@ -365,7 +389,7 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
 
     // pacman animation
     SDL_Rect pac_in = pac_blank;
-    if (death == -1) {
+    if (death == PACMAN_LIVE) {
         if ((count / 4) % 2) {
             switch (Pacman.getLastDir()) {
             case LEFT:
@@ -414,8 +438,6 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
 
     SDL_SetColorKey(*spriteBoard, true, 0);
     SDL_BlitScaled(*spriteBoard, &pac_in, *windowSurf, &_pacman);
-
-    frame++;
 
     return count;
 }

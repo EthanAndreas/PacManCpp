@@ -16,6 +16,9 @@
 
 #define DIFFICULTY 1
 
+#define PACMAN_LIVE 0
+#define PACMAN_DEATH 1
+
 enum dir { LEFT, RIGHT, UP, DOWN, NONE };
 
 #define time_t                          \

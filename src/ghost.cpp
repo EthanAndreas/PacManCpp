@@ -365,8 +365,8 @@ bool ghost::waitSquareCenter() {
 dir ghost::getLastDir() { return _lastDir; }
 
 void ghost::updateDir(
-    std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
-    std::pair<size_t, size_t> pacPos, dir dirPac) {
+    std::vector<std::vector<std::shared_ptr<square>>> vecBoard, size_t xPac,
+    size_t yPac, dir dirPac) {
 
     if (_xBoard > 20 || _yBoard == 0 || _yBoard >= 26) {
         std::cerr << "Ghost out of the board in updateDir" << std::endl;
@@ -387,11 +387,11 @@ void ghost::updateDir(
     if (_xBoard == 0 && _yBoard == 13 && _lastDir == LEFT) {
         _xBoard = 20;
         _xPixel = 20 * SCALE_PIXEL + GHOST_CENTER_X;
-        return;
+        // return;
     } else if (_xBoard == 20 && _yBoard == 13 && _lastDir == RIGHT) {
         _xBoard = 0;
         _xPixel = GHOST_CENTER_X;
-        return;
+        // return;
     }
 
     // if ghost enters in the teleportation hall, go to the teleportation
@@ -404,7 +404,8 @@ void ghost::updateDir(
         return;
     }
 
-    // if ghost takes the teleportation, make him leave the teleportation hall
+    // if ghost takes the teleportation, make him leave the teleportation
+    // hall
     if (_xBoard <= 4 && _yBoard == 13 && _lastDir == RIGHT) {
         _xBoard++;
         return;
@@ -418,22 +419,19 @@ void ghost::updateDir(
 
     // chase mode
     if (_mode == CHASE) {
+
         switch (_color) {
         case RED:
-            updateDirRed(vecBoard, pacPos.first / SCALE_PIXEL,
-                         pacPos.second / SCALE_PIXEL);
+            updateDirRed(vecBoard, xPac, yPac);
             break;
         case PINK:
-            updateDirPink(vecBoard, pacPos.first / SCALE_PIXEL,
-                          pacPos.second / SCALE_PIXEL, dirPac);
+            updateDirPink(vecBoard, xPac, yPac, dirPac);
             break;
         case BLUE:
-            updateDirBlue(vecBoard, pacPos.first / SCALE_PIXEL,
-                          pacPos.second / SCALE_PIXEL, dirPac);
+            updateDirBlue(vecBoard, xPac, yPac, dirPac);
             break;
         case ORANGE:
-            updateDirOrange(vecBoard, pacPos.first / SCALE_PIXEL,
-                            pacPos.second / SCALE_PIXEL);
+            updateDirOrange(vecBoard, xPac, yPac);
             break;
         }
     }
@@ -456,8 +454,7 @@ void ghost::updateDir(
     }
     // frightened mode
     else if (_mode == FRIGHTENED)
-        updateDirRunAwayMode(vecBoard, pacPos.first / SCALE_PIXEL,
-                             pacPos.second / SCALE_PIXEL);
+        updateDirRunAwayMode(vecBoard, xPac, yPac);
 
     // if an error occurs
     else
@@ -511,7 +508,8 @@ void ghost::updateDirRed(
     // if an error occurs on A* algorithm, take the direction that minimizes the
     // euclidian distance between the ghost and pacman
     else {
-        std::cerr << "No possible direction in updateDirRed" << std::endl;
+        std::cerr << "No possible direction in updateDirRed for ghost "
+                  << _color << std::endl;
         exit(EXIT_FAILURE);
     }
 }

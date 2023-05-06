@@ -19,7 +19,7 @@ enum typeFruit {
 #define FRUIT_X 10
 #define FRUIT_Y 15
 
-#define MIN_DOT_FRUIT 170
+#define MIN_DOT_FRUIT 10
 
 #define CHERRY_SCORE 100
 #define STRAWBERRY_SCORE 300

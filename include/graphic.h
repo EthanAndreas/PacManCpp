@@ -8,6 +8,8 @@
 
 #define GHOST_BLINK 3 // 3s
 
+#define FRUIT_SCORE_DISPLAY_TIME 2
+
 /**
  * @brief Initialize SDL and create the window
  * and the surface to draw on
