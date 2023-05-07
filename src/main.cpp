@@ -30,6 +30,23 @@ int main() {
     Board.transpose();
     Board.setItem();
 
+    // read highscore if exist or create it
+    int highScore = 0;
+    std::ifstream file("bin/highscore.txt");
+    if (file.is_open()) {
+        file >> highScore;
+        file.close();
+    } else {
+        std::ofstream file("bin/highscore.txt");
+        if (file.is_open()) {
+            file << highScore;
+            file.close();
+        } else {
+            std::cerr << "Unable to create highscore.txt" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+
     // Game
     bool game = true;
     bool next_level = true;
@@ -39,7 +56,7 @@ int main() {
         // Intro
         while (menu) {
             // display intro
-            intro(&windowSurf, &spriteBoard);
+            intro(&windowSurf, &spriteBoard, highScore);
             SDL_UpdateWindowSurface(Window);
 
             // keyboard management
@@ -93,9 +110,9 @@ int main() {
 
             // display initial board
             int count = 0;
-            count =
-                draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost, vecDot,
-                     vecPowerup, _NONE, Pacman.getScore(), PACMAN_LIVE, false);
+            count = draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost,
+                         vecDot, vecPowerup, _NONE, Pacman.getScore(),
+                         highScore, PACMAN_LIVE, false, curLevel);
             SDL_UpdateWindowSurface(Window);
 
             bool life = true, start = false;
@@ -220,7 +237,8 @@ int main() {
                             count = draw(&windowSurf, &spriteBoard, count,
                                          Pacman, vecGhost, vecDot, vecPowerup,
                                          Fruit.getFruit(), Pacman.getScore(),
-                                         PACMAN_DEATH * i, start);
+                                         highScore, PACMAN_DEATH * i, start,
+                                         curLevel);
                             SDL_UpdateWindowSurface(Window);
                             Uint64 fps_end = SDL_GetTicks();
                             float elapsed =
@@ -245,6 +263,16 @@ int main() {
                             // in the middle of the screen
                             std::cout << "You loose with a score of : "
                                       << Pacman.getScore() << std::endl;
+
+                            // save highscore
+                            if (Pacman.getScore() > size_t(highScore)) {
+                                highScore = Pacman.getScore();
+                                std::ofstream file;
+                                file.open("bin/highscore.txt");
+                                file << highScore;
+                                file.close();
+                            }
+
                             // beginning level
                             Pacman.reset();
                             next_level = true;
@@ -262,7 +290,8 @@ int main() {
                     // display updated board
                     count = draw(&windowSurf, &spriteBoard, count, Pacman,
                                  vecGhost, vecDot, vecPowerup, Fruit.getFruit(),
-                                 Pacman.getScore(), PACMAN_LIVE, start);
+                                 Pacman.getScore(), highScore, PACMAN_LIVE,
+                                 start, curLevel);
                     SDL_UpdateWindowSurface(Window);
                 }
 

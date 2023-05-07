@@ -120,6 +120,12 @@ class pacman {
      * @return size_t
      */
     size_t getGhostEatenScore();
+
+    /**
+     * @brief Get the Fruit Eaten object.
+     *
+     */
+    std::vector<typeFruit> getEatenFruit();
     /**
      * @brief Get the Fruit Eaten object.
      *
@@ -197,10 +203,11 @@ class pacman {
     // ghostEaten is the number of ghost eaten in a level
     // ghostEatenScore is the score of the ghost eaten with one powerup
     short _ghostEaten, _ghostEatenScore;
-    time_t fruitEatenTimer1;
     // fruitEaten is the number of fruit eaten in a level
     // fruitEatenScore is the score of the fruit eaten
+    std::vector<typeFruit> _eatenFruit;
     short _fruitEaten, _fruitEatenScore;
+    time_t fruitEatenTimer1;
     short _remainingLife;
     // timer since the last dot eaten by pacman
     time_t noEatenDotTimer1;

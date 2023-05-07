@@ -264,6 +264,7 @@ void pacman::updateSquare(
         fruitEatenTimer1 = std::chrono::steady_clock::now();
         Fruit->eatFruit(vecBoard);
         _fruitEaten++;
+        _eatenFruit.push_back(Fruit->getFruit());
     }
 
     if (_powerup) {
@@ -330,6 +331,8 @@ size_t pacman::getGhostEatenScore() {
     else
         return _ghostEatenScore * GHOST_SCORE;
 }
+
+std::vector<typeFruit> pacman::getEatenFruit() { return _eatenFruit; }
 
 short pacman::getFruitEaten() { return _fruitEaten; }
 
