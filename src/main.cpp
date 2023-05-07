@@ -189,7 +189,8 @@ int main() {
                                 Pacman.getPos().first / SCALE_PIXEL,
                                 Pacman.getPos().second / SCALE_PIXEL,
                                 Pacman.getLastDir(), curLevel,
-                                Pacman.getDotCounterLevel());
+                                Pacman.getDotCounterLevel(),
+                                Pacman.getRemainingLife());
                         Ghost->updatePos();
                     }
 

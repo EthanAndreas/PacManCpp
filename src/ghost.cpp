@@ -63,7 +63,7 @@ bool ghost::isInHouse() { return _isInHouse; }
 
 void ghost::updateInHouse(
     std::vector<std::vector<std::shared_ptr<square>>> vecBoard, int level,
-    int dotCounter) {
+    int dotCounter, int life) {
 
     bool isTime = false;
 
@@ -74,21 +74,24 @@ void ghost::updateInHouse(
             isTime = true;
         break;
     case PINK:
-        if (dotCounter >= PINK_GHOST_WAIT_DOT)
+        if ((life == DEFAULT_LIVES && dotCounter >= PINK_GHOST_WAIT_DOT) ||
+            (life < DEFAULT_LIVES &&
+             dotCounter >= PINK_GHOST_WAIT_DOT_LESS_LIFE))
             isTime = true;
         break;
     case BLUE:
-        if (level == 1 && dotCounter >= BLUE_GHOST_WAIT_DOT_LVL1)
-            isTime = true;
-        else if (level == 2 && dotCounter >= BLUE_GHOST_WAIT_DOT_LVL2)
+        if ((level == 1 && dotCounter >= BLUE_GHOST_WAIT_DOT_LVL1) ||
+            (level == 2 && dotCounter >= BLUE_GHOST_WAIT_DOT_LVL2) ||
+            (level < DEFAULT_LIVES &&
+             dotCounter >= BLUE_GHOST_WAIT_DOT_LESS_LIFE))
             isTime = true;
         break;
     case ORANGE:
-        if (level == 1 && dotCounter >= ORANGE_GHOST_WAIT_DOT_LVL1)
-            isTime = true;
-        else if (level == 2 && dotCounter >= ORANGE_GHOST_WAIT_DOT_LVL2)
-            isTime = true;
-        else if (level >= 3 && dotCounter >= ORANGE_GHOST_WAIT_DOT_LVL3)
+        if ((level == 1 && dotCounter >= ORANGE_GHOST_WAIT_DOT_LVL1) ||
+            (level == 2 && dotCounter >= ORANGE_GHOST_WAIT_DOT_LVL2) ||
+            (level >= 3 && dotCounter >= ORANGE_GHOST_WAIT_DOT_LVL3) ||
+            (level < DEFAULT_LIVES &&
+             dotCounter >= ORANGE_GHOST_WAIT_DOT_LESS_LIFE))
             isTime = true;
         break;
     default:
@@ -403,7 +406,7 @@ dir ghost::getLastDir() { return _lastDir; }
 
 void ghost::updateDir(
     std::vector<std::vector<std::shared_ptr<square>>> vecBoard, size_t xPac,
-    size_t yPac, dir dirPac, int level, int dotCounter) {
+    size_t yPac, dir dirPac, int level, int dotCounter, int life) {
 
     if (_xBoard > 20 || _yBoard == 0 || _yBoard >= 26) {
         std::cerr << "Ghost out of the board in updateDir" << std::endl;
@@ -411,7 +414,7 @@ void ghost::updateDir(
     }
 
     if (_isInHouse == true) {
-        updateInHouse(vecBoard, level, dotCounter);
+        updateInHouse(vecBoard, level, dotCounter, life);
         return;
     }
 

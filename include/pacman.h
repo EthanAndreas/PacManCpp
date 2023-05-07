@@ -24,8 +24,6 @@
 #define GHOST_SCORE 200
 #define FRUIT_SCORE 1000
 
-#define DEFAULT_LIVES 3
-
 #define POWERUP_MODE 10 // 10s
 
 class pacman {

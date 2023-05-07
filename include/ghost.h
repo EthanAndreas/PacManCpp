@@ -4,6 +4,8 @@
 #include "shortestpath.h"
 #include <random>
 
+enum color { RED, PINK, BLUE, ORANGE };
+
 #define GHOST_INIT_X 10
 #define GHOST_INIT_Y 10
 
@@ -31,8 +33,6 @@
 #define GHOST_RETURN_SPEED 3
 #define GHOST_RETURN_RANGE_CENTER GHOST_RETURN_SPEED - 1
 
-enum color { RED, PINK, BLUE, ORANGE };
-
 // macro for wait time in function of difficulty
 #define RED_GHOST_WAIT_DOT 0
 #define PINK_GHOST_WAIT_DOT 0
@@ -42,6 +42,11 @@ enum color { RED, PINK, BLUE, ORANGE };
 #define ORANGE_GHOST_WAIT_DOT_LVL2 50
 #define ORANGE_GHOST_WAIT_DOT_LVL3 0
 
+#define RED_GHOST_WAIT_DOT_LESS_LIFE 0
+#define PINK_GHOST_WAIT_DOT_LESS_LIFE 7
+#define BLUE_GHOST_WAIT_DOT_LESS_LIFE 17
+#define ORANGE_GHOST_WAIT_DOT_LESS_LIFE 32
+
 // swap for the blue ghost between chase mode of red and pink ghost
 #define BLUE_GHOST_RED_TIME 20  // 20s
 #define BLUE_GHOST_PINK_TIME 12 // 12s
@@ -49,6 +54,8 @@ enum color { RED, PINK, BLUE, ORANGE };
 #define CHASE_MODE 20    // 20s
 #define SCATTER_MODE_1 7 // 7s
 #define SCATTER_MODE_2 5 // 5s
+
+#define DEFAULT_LIVES 3
 
 #define updateDirWithShortestPath(vecBoard, xPac, yPac) \
     updateDirRed(vecBoard, xPac, yPac)
@@ -80,10 +87,15 @@ class ghost {
     bool isInHouse();
     /**
      * @brief Update the position of the ghost in the ghost house.
+     *
+     * @param vecBoard
+     * @param level
+     * @param dotCounter
+     * @param life
      */
     void
     updateInHouse(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
-                  int level, int dotCounter);
+                  int level, int dotCounter, int life);
     /**
      * @brief Ghost go back to the house.
      *
@@ -162,13 +174,17 @@ class ghost {
      */
     void updateDir(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
                    size_t xPac, size_t yPac, dir dirPac, int level,
-                   int dotCounter);
+                   int dotCounter, int life);
     /**
      * @brief Update direction of red ghost. Red ghost is following the pacman.
      *
      * @param vecBoard
      * @param xPac
      * @param yPac
+     * @param dirPac
+     * @param level
+     * @param dotCounter
+     * @param life
      */
     void
     updateDirRed(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
