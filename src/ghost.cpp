@@ -107,19 +107,19 @@ void ghost::updateInHouse(
     if (_isTime == false) {
 
         if (_yBoard == 13) {
-            if (_yPixel + GHOST_HOUSE_SPEED >= _yBoard * SCALE_PIXEL +
-                                                   GHOST_CENTER_X -
-                                                   GHOST_HOUSE_RANGE_CENTER)
+            if (_yPixel + GHOST_SLOW_SPEED >= _yBoard * SCALE_PIXEL +
+                                                  GHOST_CENTER_X -
+                                                  GHOST_SLOW_RANGE_CENTER)
                 _yPixel = _yBoard * SCALE_PIXEL + GHOST_CENTER_X;
             _lastDir = UP;
-            _yBoard -= GHOST_HOUSE_SPEED;
+            _yBoard -= GHOST_SLOW_SPEED;
         } else if (_yBoard == 12) {
-            if (_yPixel + GHOST_HOUSE_SPEED <= _yBoard * SCALE_PIXEL +
-                                                   GHOST_CENTER_X +
-                                                   GHOST_HOUSE_RANGE_CENTER)
+            if (_yPixel + GHOST_SLOW_SPEED <= _yBoard * SCALE_PIXEL +
+                                                  GHOST_CENTER_X +
+                                                  GHOST_SLOW_RANGE_CENTER)
                 _yPixel = _yBoard * SCALE_PIXEL + GHOST_CENTER_X;
             _lastDir = DOWN;
-            _yBoard += GHOST_HOUSE_SPEED;
+            _yBoard += GHOST_SLOW_SPEED;
         }
     }
     // move out ghost house
@@ -137,32 +137,32 @@ void ghost::updateInHouse(
 
         // next condition are set only for the 12th line
         if (_yBoard == 13) {
-            _yBoard -= GHOST_HOUSE_SPEED;
+            _yBoard -= GHOST_SLOW_SPEED;
             _lastDir = UP;
             return;
         }
 
         // in the door
         if (vecBoard[_xBoard][_yBoard]->getState() == DOOR) {
-            _yBoard -= GHOST_HOUSE_SPEED;
+            _yBoard -= GHOST_SLOW_SPEED;
             _lastDir = UP;
             return;
         }
         // at the bottom of the door
         else if (vecBoard[_xBoard][_yBoard - 1]->getState() == DOOR) {
-            _yBoard -= GHOST_HOUSE_SPEED;
+            _yBoard -= GHOST_SLOW_SPEED;
             _lastDir = UP;
             return;
         }
         // at the bottom left of the door
         else if (vecBoard[_xBoard + 1][_yBoard - 1]->getState() == DOOR) {
-            _xBoard += GHOST_HOUSE_SPEED;
+            _xBoard += GHOST_SLOW_SPEED;
             _lastDir = RIGHT;
             return;
         }
         // at the bottom right of the door
         else if (vecBoard[_xBoard - 1][_yBoard - 1]->getState() == DOOR) {
-            _xBoard -= GHOST_HOUSE_SPEED;
+            _xBoard -= GHOST_SLOW_SPEED;
             _lastDir = LEFT;
             return;
         }
@@ -354,16 +354,16 @@ void ghost::updatePos() {
              _isReturnHouse == false) {
         switch (_lastDir) {
         case LEFT:
-            _xPixel -= GHOST_FEAR_SPEED;
+            _xPixel -= GHOST_SLOW_SPEED;
             break;
         case RIGHT:
-            _xPixel += GHOST_FEAR_SPEED;
+            _xPixel += GHOST_SLOW_SPEED;
             break;
         case UP:
-            _yPixel -= GHOST_FEAR_SPEED;
+            _yPixel -= GHOST_SLOW_SPEED;
             break;
         case DOWN:
-            _yPixel += GHOST_FEAR_SPEED;
+            _yPixel += GHOST_SLOW_SPEED;
             break;
         case NONE:
             break;
@@ -405,21 +405,13 @@ bool ghost::waitSquareCenter() {
         speed = GHOST_RETURN_SPEED;
         range = GHOST_RETURN_RANGE_CENTER;
     }
-    // fear speed
-    else if (_isFear == true && _isReturnHouse == false &&
-             _isInHouse == false) {
+    // fear / house / tunnel speed
+    else if ((_isFear == true || _isInTunnel == true || _isInHouse == true) &&
+             _isReturnHouse == false && _isInHouse == false) {
 
-        speed = GHOST_FEAR_SPEED;
-        range = GHOST_FEAR_RANGE_CENTER;
+        speed = GHOST_SLOW_SPEED;
+        range = GHOST_SLOW_RANGE_CENTER;
     }
-    // house speed
-    else if (_isFear == false && _isReturnHouse == false &&
-             _isInHouse == true) {
-
-        speed = GHOST_HOUSE_SPEED;
-        range = GHOST_HOUSE_RANGE_CENTER;
-    }
-
     if (_lastDir == LEFT && _xPixel - speed <= xCenter + range) {
         _xPixel = _xBoard * SCALE_PIXEL + GHOST_CENTER_X;
         return true;
@@ -476,13 +468,28 @@ void ghost::updateDir(
 
     // if ghost takes the teleportation, make him leave the teleportation
     // hall
-    if (_xBoard <= 4 && _yBoard == 13 && _lastDir == RIGHT) {
+    // bool inTunnel_ReturnHouse = false;
+    if (_xBoard <= 4 && _yBoard == 13 &&
+        (_lastDir == RIGHT || _lastDir == NONE)) {
         _isInTunnel = true;
-        _xBoard++;
+        // go back to house, keep his speed
+        if (_isReturnHouse == true) {
+            _lastDir = RIGHT;
+            _xBoard += GHOST_RETURN_SPEED;
+            _isInTunnel = false;
+        } else
+            _xBoard++;
         return;
-    } else if (_xBoard >= 16 && _yBoard == 13 && _lastDir == LEFT) {
+    } else if (_xBoard >= 16 && _yBoard == 13 &&
+               (_lastDir == LEFT || _lastDir == NONE)) {
         _isInTunnel = true;
-        _xBoard--;
+        // go back to house, keep his speed
+        if (_isReturnHouse == true) {
+            _lastDir = LEFT;
+            _xBoard -= GHOST_RETURN_SPEED;
+            _isInTunnel = false;
+        } else
+            _xBoard--;
         return;
     }
 
