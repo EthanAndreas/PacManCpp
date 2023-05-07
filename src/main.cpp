@@ -1,8 +1,20 @@
-#include "board.h"
-#include "fruit.h"
-#include "ghost.h"
 #include "graphic.h"
-#include "pacman.h"
+
+void quit(std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup,
+          std::vector<std::shared_ptr<ghost>> vecGhost, pacman Pacman,
+          board Board, SDL_Surface *spriteBoard, SDL_Surface *windowSurf) {
+
+    vecDot.clear();
+    vecPowerup.clear();
+    for (auto Ghost : vecGhost)
+        Ghost->~ghost();
+    vecGhost.clear();
+    Pacman.~pacman();
+    Board.~board();
+    SDL_FreeSurface(spriteBoard);
+    SDL_FreeSurface(windowSurf);
+    SDL_Quit();
+}
 
 int main() {
 
@@ -30,6 +42,23 @@ int main() {
     Board.transpose();
     Board.setItem();
 
+    // read highscore if exist or create it
+    int highScore = 0;
+    std::ifstream file("bin/highscore.txt");
+    if (file.is_open()) {
+        file >> highScore;
+        file.close();
+    } else {
+        std::ofstream file("bin/highscore.txt");
+        if (file.is_open()) {
+            file << highScore;
+            file.close();
+        } else {
+            std::cerr << "Unable to create highscore.txt" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+
     // Game
     bool game = true;
     bool next_level = true;
@@ -39,7 +68,7 @@ int main() {
         // Intro
         while (menu) {
             // display intro
-            intro(&windowSurf, &spriteBoard);
+            intro(&windowSurf, &spriteBoard, highScore);
             SDL_UpdateWindowSurface(Window);
 
             // keyboard management
@@ -48,233 +77,249 @@ int main() {
             if (event.type == SDL_KEYDOWN &&
                 event.key.keysym.sym == SDLK_RETURN)
                 menu = false;
-            // esc touch
-            else if (event.type == SDL_KEYDOWN &&
-                     event.key.keysym.sym == SDLK_ESCAPE) {
-                game = false;
-                menu = false;
-                SDL_Quit();
-                return EXIT_SUCCESS;
-            }
-            // close window
-            else if (event.type == SDL_QUIT) {
-                game = false;
-                menu = false;
-                SDL_Quit();
-                return EXIT_SUCCESS;
-            }
-        }
+            // esc touch or close window
+            else if ((event.type == SDL_KEYDOWN &&
+                      event.key.keysym.sym == SDLK_ESCAPE) ||
+                     event.type == SDL_QUIT) {
 
-        // Level
-        int curLevel = 1;
-        bool level = true;
-        while (level) {
-
-            // initialize next level
-            if (next_level == true) {
-                // reload all the items
-                Board.setItem();
-                next_level = false;
+                quit(std::vector<Coordinate>(), std::vector<Coordinate>(),
+                     std::vector<std::shared_ptr<ghost>>(), pacman(), Board,
+                     spriteBoard, windowSurf);
+                exit(EXIT_SUCCESS);
             }
 
-            // initialize pacman and ghost
-            Pacman.init();
-            std::vector<std::shared_ptr<ghost>> vecGhost;
-            for (int i = 0; i < 4; i++) {
-                std::shared_ptr<ghost> Ghost = std::make_shared<ghost>();
-                Ghost->setGhost(color(i));
-                vecGhost.push_back(Ghost);
-            }
+            // Level
+            int curLevel = 1;
+            bool level = true;
+            while (level) {
 
-            // retrieve item list
-            std::vector<Coordinate> vecDot = Board.getDotList();
-            std::vector<Coordinate> vecPowerup = Board.getPowerupList();
-            fruit Fruit;
+                // initialize next level
+                if (next_level == true) {
+                    // reload all the items
+                    Board.setItem();
+                    next_level = false;
+                }
 
-            // display initial board
-            int count = 0;
-            count =
-                draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost, vecDot,
-                     vecPowerup, _NONE, Pacman.getScore(), PACMAN_LIVE, false);
-            SDL_UpdateWindowSurface(Window);
+                // initialize pacman and ghost
+                Pacman.init();
+                std::vector<std::shared_ptr<ghost>> vecGhost;
+                for (int i = 0; i < 4; i++) {
+                    std::shared_ptr<ghost> Ghost = std::make_shared<ghost>();
+                    Ghost->setGhost(color(i));
+                    vecGhost.push_back(Ghost);
+                }
 
-            bool life = true, start = false;
-            // Life
-            while (life) {
+                // retrieve item list
+                std::vector<Coordinate> vecDot = Board.getDotList();
+                std::vector<Coordinate> vecPowerup = Board.getPowerupList();
+                fruit Fruit;
 
-                // fps management
-                Uint64 fps_start = SDL_GetTicks();
+                // display initial board
+                int count = 0;
+                count = draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost,
+                             vecDot, vecPowerup, _NONE, Pacman.getScore(),
+                             highScore, PACMAN_LIVE, false, curLevel);
+                SDL_UpdateWindowSurface(Window);
 
-                // event management
-                if (life && SDL_PollEvent(&event)) {
-                    switch (event.type) {
-                    // leave the game
-                    case SDL_QUIT:
-                        // free memory
-                        // vecDot.clear();
-                        // vecPowerup.clear();
-                        // for (auto Ghost : vecGhost)
-                        //     Ghost->~ghost();
-                        // vecGhost.clear();
-                        // Pacman.~pacman();
-                        // Board.~board();
+                bool life = true, start = false;
+                // Life
+                while (life) {
+
+                    // fps management
+                    Uint64 fps_start = SDL_GetTicks();
+
+                    // event management
+                    if (life && SDL_PollEvent(&event)) {
+                        switch (event.type) {
                         // leave the game
-                        life = false;
-                        level = false;
-                        game = false;
-                        SDL_Quit();
+                        case SDL_QUIT:
+                            quit(vecDot, vecPowerup, vecGhost, Pacman, Board,
+                                 spriteBoard, windowSurf);
+                            exit(EXIT_SUCCESS);
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+
+                    // keyboard management
+                    // esc touch
+                    if (event.type == SDL_KEYDOWN &&
+                        event.key.keysym.sym == SDLK_ESCAPE) {
+
+                        quit(vecDot, vecPowerup, vecGhost, Pacman, Board,
+                             spriteBoard, windowSurf);
                         exit(EXIT_SUCCESS);
-                        break;
-                    default:
-                        break;
                     }
-                }
+                    // left arrow touch
+                    else if (event.type == SDL_KEYDOWN &&
+                             event.key.keysym.sym == SDLK_LEFT) {
 
-                // keyboard management
-                // esc touch
-                if (event.type == SDL_KEYDOWN &&
-                    event.key.keysym.sym == SDLK_ESCAPE) {
-                    life = false;
-                    level = false;
-                    game = false;
-                    SDL_Quit();
-                    exit(EXIT_SUCCESS);
-                }
-                // left arrow touch
-                else if (event.type == SDL_KEYDOWN &&
-                         event.key.keysym.sym == SDLK_LEFT) {
-                    start = true;
-                    currentDir = LEFT;
-                }
-                // right arrow touch
-                else if (event.type == SDL_KEYDOWN &&
-                         event.key.keysym.sym == SDLK_RIGHT) {
-                    start = true;
-                    currentDir = RIGHT;
-                }
-                // up arrow touch
-                else if (event.type == SDL_KEYDOWN &&
-                         event.key.keysym.sym == SDLK_UP) {
-                    start = true;
-                    currentDir = UP;
-                }
-                // down arrow touch
-                else if (event.type == SDL_KEYDOWN &&
-                         event.key.keysym.sym == SDLK_DOWN) {
-                    start = true;
-                    currentDir = DOWN;
-                }
+                        start = true;
+                        currentDir = LEFT;
+                    }
+                    // right arrow touch
+                    else if (event.type == SDL_KEYDOWN &&
+                             event.key.keysym.sym == SDLK_RIGHT) {
 
-                // press any key to start the game
-                if (start) {
+                        start = true;
+                        currentDir = RIGHT;
+                    }
+                    // up arrow touch
+                    else if (event.type == SDL_KEYDOWN &&
+                             event.key.keysym.sym == SDLK_UP) {
 
-                    // pacman movement management
-                    if (Pacman.waitSquareCenter() == true)
-                        Pacman.updateDir(Board.getBoard(), currentDir);
-                    Pacman.updatePos();
-                    Pacman.updateSquare(Board.getBoard(), vecGhost, &Fruit);
-                    // pacman eat fruit management
-                    if (Fruit.updateFruit(Board.getBoard(),
-                                          Pacman.getDotCounter(),
-                                          Pacman.getFruitEaten()) == EXCEED) {
-                        Pacman.resetDotCounter();
+                        start = true;
+                        currentDir = UP;
+                    }
+                    // down arrow touch
+                    else if (event.type == SDL_KEYDOWN &&
+                             event.key.keysym.sym == SDLK_DOWN) {
+
+                        start = true;
+                        currentDir = DOWN;
                     }
 
-                    // ghost movement management
-                    for (auto Ghost : vecGhost) {
+                    // press any key to start the game
+                    if (start) {
 
-                        if (Ghost->waitSquareCenter() == true)
-                            Ghost->updateDir(
-                                Board.getBoard(),
-                                Pacman.getPos().first / SCALE_PIXEL,
-                                Pacman.getPos().second / SCALE_PIXEL,
-                                Pacman.getLastDir(), curLevel,
-                                Pacman.getDotCounterLevel(),
-                                Pacman.getRemainingLife());
-                        Ghost->updatePos();
-                    }
-
-                    // update item on the board
-                    vecDot = Board.getDotList();
-                    vecPowerup = Board.getPowerupList();
-
-                    // win statement
-                    if (vecDot.size() == 0 && vecPowerup.size() == 0) {
-                        // TODO: add a win animation
-                        std::cout << "You win!" << std::endl;
-                        // next level
-                        curLevel++;
-                        next_level = true;
-                        life = false;
-                        level = false;
-                        break;
-                    }
-
-                    // loose statement
-                    if (Pacman.ghostCollision(vecGhost)) {
-
-                        // death animation
-                        int i;
-                        for (i = 0; i < 10; i++) {
-                            count = draw(&windowSurf, &spriteBoard, count,
-                                         Pacman, vecGhost, vecDot, vecPowerup,
-                                         Fruit.getFruit(), Pacman.getScore(),
-                                         PACMAN_DEATH * i, start);
-                            SDL_UpdateWindowSurface(Window);
-                            Uint64 fps_end = SDL_GetTicks();
-                            float elapsed =
-                                (fps_end - fps_start) /
-                                (float)SDL_GetPerformanceFrequency() * 1000.0f;
-
-                            // slow the animation
-                            SDL_Delay(int(66.668f - elapsed));
+                        // pacman movement management
+                        if (Pacman.waitSquareCenter() == true)
+                            Pacman.updateDir(Board.getBoard(), currentDir);
+                        Pacman.updatePos();
+                        Pacman.updateSquare(Board.getBoard(), vecGhost, &Fruit);
+                        // pacman eat fruit management
+                        if (Fruit.updateFruit(
+                                Board.getBoard(), Pacman.getDotCounter(),
+                                Pacman.getFruitEaten()) == EXCEED) {
+                            Pacman.resetDotCounter();
                         }
 
-                        // loose a life
-                        Pacman.looseLife();
+                        // ghost movement management
+                        for (auto Ghost : vecGhost) {
 
-                        // TODO: add an animation to write this sentence in the
-                        // middle of the screen
-                        std::cout << "Remaining " << Pacman.getRemainingLife()
-                                  << " level(s)" << std::endl;
+                            if (Ghost->waitSquareCenter() == true)
+                                Ghost->updateDir(
+                                    Board.getBoard(),
+                                    Pacman.getPos().first / SCALE_PIXEL,
+                                    Pacman.getPos().second / SCALE_PIXEL,
+                                    Pacman.getLastDir(), curLevel,
+                                    Pacman.getDotCounterLevel(),
+                                    Pacman.getRemainingLife(),
+                                    Pacman.getNoEatenDotTimer());
+                            Ghost->updatePos();
+                        }
 
-                        // no more life, reset level and score
-                        if (Pacman.getRemainingLife() == 0) {
-                            // TODO: add a loose animation and add this sentence
-                            // in the middle of the screen
-                            std::cout << "You loose with a score of : "
-                                      << Pacman.getScore() << std::endl;
-                            // beginning level
-                            Pacman.reset();
+                        // update item on the board
+                        vecDot = Board.getDotList();
+                        vecPowerup = Board.getPowerupList();
+
+                        // win statement
+                        if (vecDot.size() == 0 && vecPowerup.size() == 0) {
+                            // next level
+                            curLevel++;
                             next_level = true;
                             life = false;
-                            level = false;
-                            menu = true;
                             break;
                         }
 
-                        // next life
-                        life = false;
-                        break;
+                        // loose statement
+                        if (Pacman.ghostCollision(vecGhost)) {
+
+                            // death animation
+                            int i;
+                            for (i = 0; i < 10; i++) {
+                                count = draw(&windowSurf, &spriteBoard, count,
+                                             Pacman, vecGhost, vecDot,
+                                             vecPowerup, Fruit.getFruit(),
+                                             Pacman.getScore(), highScore,
+                                             PACMAN_DEATH * i, start, curLevel);
+                                SDL_UpdateWindowSurface(Window);
+                                Uint64 fps_end = SDL_GetTicks();
+                                float elapsed =
+                                    (fps_end - fps_start) /
+                                    (float)SDL_GetPerformanceFrequency() *
+                                    1000.0f;
+
+                                // slow the animation
+                                SDL_Delay(int(66.668f - elapsed));
+                            }
+
+                            // loose a life
+                            Pacman.looseLife();
+
+                            // no more life, reset level and score
+                            if (Pacman.getRemainingLife() == 0) {
+
+                                // save highscore
+                                if (Pacman.getScore() > size_t(highScore)) {
+
+                                    highScore = Pacman.getScore();
+                                    std::ofstream file;
+                                    file.open("bin/highscore.txt");
+                                    file << highScore;
+                                    file.close();
+                                }
+
+                                // print game over screen
+                                bool gameOverScreen = true;
+                                while (gameOverScreen) {
+
+                                    gameOver(&windowSurf, &spriteBoard,
+                                             Pacman.getScore(), highScore);
+                                    SDL_UpdateWindowSurface(Window);
+
+                                    // keyboard management
+                                    SDL_PollEvent(&event);
+                                    // return touch
+                                    if (event.type == SDL_KEYDOWN &&
+                                        event.key.keysym.sym == SDLK_RETURN)
+                                        gameOverScreen = false;
+                                    // esc touch
+                                    else if (event.type == SDL_KEYDOWN &&
+                                             event.key.keysym.sym ==
+                                                 SDLK_ESCAPE) {
+                                        SDL_Quit();
+                                        return EXIT_SUCCESS;
+                                    }
+                                    // close window
+                                    else if (event.type == SDL_QUIT) {
+                                        SDL_Quit();
+                                        return EXIT_SUCCESS;
+                                    }
+                                }
+
+                                // beginning level
+                                Pacman.reset();
+                                next_level = true;
+                                life = false;
+                                level = false;
+                                menu = true;
+                                break;
+                            }
+
+                            // next life
+                            life = false;
+                            break;
+                        }
+
+                        // display updated board
+                        count = draw(&windowSurf, &spriteBoard, count, Pacman,
+                                     vecGhost, vecDot, vecPowerup,
+                                     Fruit.getFruit(), Pacman.getScore(),
+                                     highScore, PACMAN_LIVE, start, curLevel);
+                        SDL_UpdateWindowSurface(Window);
                     }
 
-                    // display updated board
-                    count = draw(&windowSurf, &spriteBoard, count, Pacman,
-                                 vecGhost, vecDot, vecPowerup, Fruit.getFruit(),
-                                 Pacman.getScore(), PACMAN_LIVE, start);
-                    SDL_UpdateWindowSurface(Window);
+                    Uint64 fps_end = SDL_GetTicks();
+                    float elapsed = (fps_end - fps_start) /
+                                    (float)SDL_GetPerformanceFrequency() *
+                                    1000.0f;
+
+                    // fps
+                    SDL_Delay(floor(10.000f - elapsed));
                 }
-
-                Uint64 fps_end = SDL_GetTicks();
-                float elapsed = (fps_end - fps_start) /
-                                (float)SDL_GetPerformanceFrequency() * 1000.0f;
-
-                // fps
-                SDL_Delay(floor(10.000f - elapsed));
             }
         }
     }
-
-    SDL_Quit();
-    exit(EXIT_SUCCESS);
 }

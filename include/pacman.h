@@ -3,8 +3,6 @@
 
 #include "fruit.h"
 #include "ghost.h"
-#include "lib.h"
-#include "square.h"
 
 #define PACMAN_INIT_X 10
 #define PACMAN_INIT_Y 20
@@ -115,11 +113,21 @@ class pacman {
      */
     bool ghostCollision(std::vector<std::shared_ptr<ghost>> vecGhost);
     /**
+     * @brief Get the color of the ghost eaten by pacman.
+     * @return color
+     */
+    color getGhostEatenColor();
+    /**
      * @brief Get the Ghost Eaten Score object.
      *
      * @return size_t
      */
     size_t getGhostEatenScore();
+    /**
+     * @brief Get the Fruit Eaten object.
+     *
+     */
+    std::vector<typeFruit> getEatenFruit();
     /**
      * @brief Get the Fruit Eaten object.
      *
@@ -177,6 +185,12 @@ class pacman {
      *
      */
     dir getOldDir();
+    /**
+     * @brief Get the no eaten dot timer object.
+     *
+     * @return time_t
+     */
+    time_t getNoEatenDotTimer();
 
   private:
     // board coordinates corresponding to coordinates of the board vector
@@ -191,9 +205,15 @@ class pacman {
     // ghostEaten is the number of ghost eaten in a level
     // ghostEatenScore is the score of the ghost eaten with one powerup
     short _ghostEaten, _ghostEatenScore;
-    time_t fruitEatenTimer1;
+    color _ghostEatenColor;
+    // fruitEaten is the number of fruit eaten in a level
+    // fruitEatenScore is the score of the fruit eaten
+    std::vector<typeFruit> _eatenFruit;
     short _fruitEaten, _fruitEatenScore;
+    time_t fruitEatenTimer1;
     short _remainingLife;
+    // timer since the last dot eaten by pacman
+    time_t noEatenDotTimer1;
 };
 
 #endif

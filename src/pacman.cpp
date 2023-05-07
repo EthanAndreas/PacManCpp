@@ -19,6 +19,7 @@ void pacman::init() {
     _ghostEatenScore = 0;
     _fruitEaten = 0;
     _dotCounterLevel = 0;
+    noEatenDotTimer1 = std::chrono::steady_clock::now();
 }
 
 void pacman::reset() {
@@ -213,6 +214,8 @@ void pacman::updateSquare(
         vecBoard[_xBoard][_yBoard]->setItem(_EMPTY);
         vecBoard[_xBoard][_yBoard]->setScore(0);
 
+        noEatenDotTimer1 = std::chrono::steady_clock::now();
+
     } else if (vecBoard[_xBoard][_yBoard]->getItem() == _POWERUP) {
 
         if (_lastDir == LEFT || _lastDir == RIGHT) {
@@ -261,6 +264,7 @@ void pacman::updateSquare(
         fruitEatenTimer1 = std::chrono::steady_clock::now();
         Fruit->eatFruit(vecBoard);
         _fruitEaten++;
+        _eatenFruit.push_back(Fruit->getFruit());
     }
 
     if (_powerup) {
@@ -303,6 +307,7 @@ bool pacman::ghostCollision(std::vector<std::shared_ptr<ghost>> vecGhost) {
                 _ghostEatenScore++;
                 _score += (GHOST_SCORE * _ghostEatenScore);
                 _ghostEaten++;
+                _ghostEatenColor = Ghost->getGhost();
 
                 // all ghost eaten for each powerup
                 if (_ghostEaten == 16)
@@ -319,6 +324,8 @@ bool pacman::ghostCollision(std::vector<std::shared_ptr<ghost>> vecGhost) {
     return false;
 }
 
+color pacman::getGhostEatenColor() { return _ghostEatenColor; }
+
 size_t pacman::getGhostEatenScore() {
     if (_ghostEatenScore == 3)
         return (_ghostEatenScore + 1) * GHOST_SCORE;
@@ -327,6 +334,8 @@ size_t pacman::getGhostEatenScore() {
     else
         return _ghostEatenScore * GHOST_SCORE;
 }
+
+std::vector<typeFruit> pacman::getEatenFruit() { return _eatenFruit; }
 
 short pacman::getFruitEaten() { return _fruitEaten; }
 
@@ -350,3 +359,5 @@ short pacman::getRemainingLife() { return _remainingLife; }
 void pacman::looseLife() { _remainingLife--; }
 
 dir pacman::getOldDir() { return _oldDir; }
+
+time_t pacman::getNoEatenDotTimer() { return noEatenDotTimer1; }

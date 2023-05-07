@@ -8,26 +8,20 @@ enum color { RED, PINK, BLUE, ORANGE };
 
 #define GHOST_INIT_X 10
 #define GHOST_INIT_Y 10
-
-#define RED_GHOST_INIT_X 10
-#define RED_GHOST_INIT_Y 13
-
-#define PINK_GHOST_INIT_X 10
-#define PINK_GHOST_INIT_Y 13
-
-#define BLUE_GHOST_INIT_X 9
-#define BLUE_GHOST_INIT_Y 12
-
-#define ORANGE_GHOST_INIT_X 11
-#define ORANGE_GHOST_INIT_Y 12
-
 #define GHOST_CENTER_X 0
 #define GHOST_CENTER_Y 4
 
-#define GHOST_HOUSE_SPEED 1
-#define GHOST_HOUSE_RANGE_CENTER GHOST_HOUSE_SPEED - 1
-#define GHOST_FEAR_SPEED 1
-#define GHOST_FEAR_RANGE_CENTER GHOST_FEAR_SPEED - 1
+#define RED_GHOST_INIT_X 10
+#define RED_GHOST_INIT_Y 13
+#define PINK_GHOST_INIT_X 10
+#define PINK_GHOST_INIT_Y 13
+#define BLUE_GHOST_INIT_X 9
+#define BLUE_GHOST_INIT_Y 12
+#define ORANGE_GHOST_INIT_X 11
+#define ORANGE_GHOST_INIT_Y 12
+
+#define GHOST_SLOW_SPEED 1
+#define GHOST_SLOW_RANGE_CENTER GHOST_SLOW_SPEED - 1
 #define GHOST_SPEED 2
 #define GHOST_RANGE_CENTER GHOST_SPEED - 1
 #define GHOST_RETURN_SPEED 3
@@ -55,7 +49,9 @@ enum color { RED, PINK, BLUE, ORANGE };
 #define SCATTER_MODE_1 7 // 7s
 #define SCATTER_MODE_2 5 // 5s
 
-#define DEFAULT_LIVES 3
+#define NO_EATEN_DOT_TIME 7 // 7s
+
+#define DEFAULT_LIVES 1
 
 #define updateDirWithShortestPath(vecBoard, xPac, yPac) \
     updateDirRed(vecBoard, xPac, yPac)
@@ -95,7 +91,7 @@ class ghost {
      */
     void
     updateInHouse(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
-                  int level, int dotCounter, int life);
+                  int level, int dotCounter, int life, time_t noEatenDotTimer1);
     /**
      * @brief Ghost go back to the house.
      *
@@ -174,7 +170,7 @@ class ghost {
      */
     void updateDir(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
                    size_t xPac, size_t yPac, dir dirPac, int level,
-                   int dotCounter, int life);
+                   int dotCounter, int life, time_t noEatenDotTimer1);
     /**
      * @brief Update direction of red ghost. Red ghost is following the pacman.
      *
@@ -266,7 +262,7 @@ class ghost {
     // mode of the ghost
     bool _chaseMode, _scatterMode, _frightenedMode;
     // state of the ghost
-    bool _isInHouse, _isReturnHouse, _isFear, _isInTunnel;
+    bool _isTime, _isInHouse, _isReturnHouse, _isFear, _isInTunnel;
     // blue ghost is following the red ghost during 20s and the pink ghost
     // during 12s
     bool _blueRed, _bluePink;
