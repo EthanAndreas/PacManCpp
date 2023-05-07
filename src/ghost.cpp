@@ -263,17 +263,22 @@ void ghost::setFrightened(bool isFear) {
 
     if (_isFear == true && isFear == false && _isReturnHouse == false &&
         _isInHouse == false) {
+
         // reset dir
         _lastDir = NONE;
         _mode = SCATTER;
+        _scatterHouse = false;
         modeTimer1 = std::chrono::steady_clock::now();
-        _isFear = isFear;
+        _isFear = false;
+        return;
+
     } else if (_isFear == false && isFear == true && _isReturnHouse == false &&
                _isInHouse == false) {
+
         // reset dir
         _lastDir = NONE;
         _mode = FRIGHTENED;
-        _isFear = isFear;
+        _isFear = true;
         // go back when they become frightened
         switch (_lastDir) {
         case LEFT:
