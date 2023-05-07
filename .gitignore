@@ -6,3 +6,4 @@ pacman
 test.log
 *.zip
 highscore.txt
+*.tar

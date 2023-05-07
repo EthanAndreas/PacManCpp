@@ -31,6 +31,7 @@ clean:
 	rm -rf tests/obj/*.o
 	rm -f $(BINDIR)/$(TARGET)
 	rm -rf html
+	rm -rf *.tar
 	@echo "\033[92mCleaned\033[0m" 
 
 debug: 
@@ -46,13 +47,10 @@ doc:
 	@cp -r ./assets ./html
 	@doxygen > /dev/null 2>&1
 	@echo "\033[92mDocumentation built\033[0m"
-	@wslview html/index.html 		
-	# @wslview html/index.html 		# Windows Subsystem for Linux
-	# @open html/index.html 		# MacOS
-	# @xdg-open html/index.html 		# Linux
+	@xdg-open html/index.html 		# Linux
 
 run:
-	# @make clean -s 1>/dev/null 
+	@make clean -s 1>/dev/null 
 	@echo "\033[93mCompilation...\033[0m"
 	@make -s 2>/dev/null || (echo "\033[91mError on compilation, re-run with \"make\" to see the errors\033[0m" && exit 1)
 	@echo "\033[93mRun Application...\033[0m"
@@ -74,6 +72,12 @@ valgrind-segfault:
 	@echo "\033[93mRun Application with valgrind...\033[0m"
 	valgrind --show-possibly-lost=yes --show-reachable=yes ./$(BINDIR)/$(TARGET)
 	@echo "\033[92mExit properly\033[0m"
+
+tar:
+	@make clean -s 1>/dev/null 
+	@echo "\033[93mCreating tarball...\033[0m"
+	@tar -czf PacManCpp.tar *
+	@echo "\033[92mTarball created\033[0m"
 
 all:
 	make

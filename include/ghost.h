@@ -51,7 +51,7 @@ enum color { RED, PINK, BLUE, ORANGE };
 
 #define NO_EATEN_DOT_TIME 7 // 7s
 
-#define DEFAULT_LIVES 1
+#define DEFAULT_LIVES 3
 
 #define updateDirWithShortestPath(vecBoard, xPac, yPac) \
     updateDirRed(vecBoard, xPac, yPac)
