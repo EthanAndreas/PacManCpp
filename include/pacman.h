@@ -3,8 +3,6 @@
 
 #include "fruit.h"
 #include "ghost.h"
-#include "lib.h"
-#include "square.h"
 
 #define PACMAN_INIT_X 10
 #define PACMAN_INIT_Y 20

@@ -8,6 +8,8 @@
 #include <utility>
 #include <vector>
 
+#include "debug.h"
+
 #define HALL 0
 #define WALL 1
 #define DOOR 2

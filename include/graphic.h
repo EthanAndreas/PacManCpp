@@ -2,7 +2,6 @@
 #define GRAPHIC_H
 
 #include "board.h"
-#include "fruit.h"
 #include <SDL2/SDL.h>
 #include <map>
 

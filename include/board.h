@@ -1,12 +1,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "debug.h"
-#include "fruit.h"
-#include "ghost.h"
-#include "lib.h"
 #include "pacman.h"
-#include "square.h"
 
 /**
  * @brief The board is formed by vector of square's vector.

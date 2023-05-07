@@ -765,6 +765,7 @@ void ghost::updateDirOrange(
     else {
         if (_mode != SCATTER) {
             _mode = SCATTER;
+            _scatterHouse = false;
             modeTimer1 = std::chrono::steady_clock::now();
         }
         updateDirScatterMode(vecBoard, 1, 25);
@@ -1009,6 +1010,7 @@ void ghost::swapMode(int level) {
 
     if (_mode == ANY) {
         _mode = SCATTER;
+        _scatterHouse = false;
         modeTimer1 = std::chrono::steady_clock::now();
 
     } else if (_mode == CHASE) {
@@ -1017,6 +1019,7 @@ void ghost::swapMode(int level) {
             if (elapsedTime.count() >= CHASE_MODE) {
                 _lastDir = NONE;
                 _mode = SCATTER;
+                _scatterHouse = false;
                 modeTimer1 = std::chrono::steady_clock::now();
             }
         }
