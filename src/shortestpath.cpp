@@ -16,12 +16,12 @@ findShortestPath(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
 
     if (vecBoard[xStart][yStart]->getState() == WALL) {
         std::cerr << "Error in shortest path: start is a wall" << std::endl;
-        return {};
+        exit(EXIT_FAILURE);
     }
 
     if (vecBoard[xEnd][yEnd]->getState() == WALL) {
         std::cerr << "Error in shortest path: end is a wall" << std::endl;
-        return {};
+        exit(EXIT_FAILURE);
     }
 
     if (xStart == xEnd && yStart == yEnd)

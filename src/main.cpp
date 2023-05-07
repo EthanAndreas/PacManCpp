@@ -97,7 +97,7 @@ int main() {
             // initialize pacman and ghost
             Pacman.init();
             std::vector<std::shared_ptr<ghost>> vecGhost;
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < 4; i++) {
                 std::shared_ptr<ghost> Ghost = std::make_shared<ghost>();
                 Ghost->setGhost(color(i));
                 vecGhost.push_back(Ghost);
@@ -218,13 +218,10 @@ int main() {
 
                     // win statement
                     if (vecDot.size() == 0 && vecPowerup.size() == 0) {
-                        // TODO: add a win animation
-                        std::cout << "You win!" << std::endl;
                         // next level
                         curLevel++;
                         next_level = true;
                         life = false;
-                        level = false;
                         break;
                     }
 
@@ -252,17 +249,8 @@ int main() {
                         // loose a life
                         Pacman.looseLife();
 
-                        // TODO: add an animation to write this sentence in the
-                        // middle of the screen
-                        std::cout << "Remaining " << Pacman.getRemainingLife()
-                                  << " level(s)" << std::endl;
-
                         // no more life, reset level and score
                         if (Pacman.getRemainingLife() == 0) {
-                            // TODO: add a loose animation and add this sentence
-                            // in the middle of the screen
-                            std::cout << "You loose with a score of : "
-                                      << Pacman.getScore() << std::endl;
 
                             // save highscore
                             if (Pacman.getScore() > size_t(highScore)) {
