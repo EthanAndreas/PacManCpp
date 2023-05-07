@@ -439,6 +439,17 @@ void ghost::updateDir(
         return;
     }
 
+    // if ghost is in some area, only left-right moves are allowed
+    if (_xBoard >= 8 && _xBoard <= 12 && (_yBoard == 10 || _yBoard == 20)) {
+        if (_lastDir == LEFT) {
+            updateCoord();
+            return;
+        } else if (_lastDir == RIGHT) {
+            updateCoord();
+            return;
+        }
+    }
+
     // switching mode
     swapMode();
 
@@ -464,16 +475,16 @@ void ghost::updateDir(
     else if (_mode == SCATTER) {
         switch (_color) {
         case RED:
-            updateDirScatterMode(vecBoard, 1, 1);
-            break;
-        case PINK:
             updateDirScatterMode(vecBoard, 19, 1);
             break;
+        case PINK:
+            updateDirScatterMode(vecBoard, 1, 1);
+            break;
         case BLUE:
-            updateDirScatterMode(vecBoard, 1, 25);
+            updateDirScatterMode(vecBoard, 19, 25);
             break;
         case ORANGE:
-            updateDirScatterMode(vecBoard, 19, 25);
+            updateDirScatterMode(vecBoard, 1, 25);
             break;
         }
     }
@@ -661,7 +672,7 @@ void ghost::updateDirOrange(
             _mode = SCATTER;
             modeTimer1 = std::chrono::steady_clock::now();
         }
-        updateDirScatterMode(vecBoard, 19, 25);
+        updateDirScatterMode(vecBoard, 1, 25);
         return;
     }
 }
@@ -678,7 +689,7 @@ void ghost::updateDirScatterMode(
 
     if (_scatterHouse == true) {
         // top left corner
-        if (_color == RED) {
+        if (_color == PINK) {
             // arrive with left direction
             if (_scatterDir == LEFT) {
                 if (_lastDir == LEFT) {
@@ -716,7 +727,7 @@ void ghost::updateDirScatterMode(
             }
         }
         // top right corner
-        else if (_color == PINK) {
+        else if (_color == RED) {
             // arrive with right direction
             if (_scatterDir == RIGHT) {
                 if (_lastDir == RIGHT) {
@@ -754,7 +765,7 @@ void ghost::updateDirScatterMode(
             }
         }
         // bottom left corner
-        else if (_color == BLUE) {
+        else if (_color == ORANGE) {
             // arrive with left direction
             if (_scatterDir == LEFT) {
                 if (_lastDir == LEFT) {
@@ -814,7 +825,7 @@ void ghost::updateDirScatterMode(
             }
         }
         // bottom right corner
-        else if (_color == ORANGE) {
+        else if (_color == BLUE) {
             // arrive with right direction
             if (_scatterDir == RIGHT) {
                 if (_lastDir == RIGHT) {

@@ -79,7 +79,7 @@ int main() {
             // initialize pacman and ghost
             Pacman.init();
             std::vector<std::shared_ptr<ghost>> vecGhost;
-            for (int i = 3; i < 4; i++) {
+            for (int i = 0; i < 4; i++) {
                 std::shared_ptr<ghost> Ghost = std::make_shared<ghost>();
                 Ghost->setGhost(color(i));
                 vecGhost.push_back(Ghost);
