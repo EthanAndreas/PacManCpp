@@ -17,6 +17,7 @@ ghost::ghost() {
     _frightenedMode = false;
     _isReturnHouse = false;
     _isFear = false;
+    _isTime = false;
     _isInTunnel = false;
     _blueRed = false;
     _bluePink = false;
@@ -65,32 +66,30 @@ void ghost::updateInHouse(
     std::vector<std::vector<std::shared_ptr<square>>> vecBoard, int level,
     int dotCounter, int life, time_t noEatenDotTimer1) {
 
-    bool isTime = false;
-
     time_t noEatenDotTimer2 = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsedTime =
         noEatenDotTimer2 - noEatenDotTimer1;
     if (elapsedTime.count() >= NO_EATEN_DOT_TIME)
-        isTime = true;
+        _isTime = true;
 
     // wait in ghost house
     switch (_color) {
     case RED:
         if (dotCounter >= RED_GHOST_WAIT_DOT)
-            isTime = true;
+            _isTime = true;
         break;
     case PINK:
         if ((life == DEFAULT_LIVES && dotCounter >= PINK_GHOST_WAIT_DOT) ||
             (life < DEFAULT_LIVES &&
              dotCounter >= PINK_GHOST_WAIT_DOT_LESS_LIFE))
-            isTime = true;
+            _isTime = true;
         break;
     case BLUE:
         if ((level == 1 && dotCounter >= BLUE_GHOST_WAIT_DOT_LVL1) ||
             (level == 2 && dotCounter >= BLUE_GHOST_WAIT_DOT_LVL2) ||
             (level < DEFAULT_LIVES &&
              dotCounter >= BLUE_GHOST_WAIT_DOT_LESS_LIFE))
-            isTime = true;
+            _isTime = true;
         break;
     case ORANGE:
         if ((level == 1 && dotCounter >= ORANGE_GHOST_WAIT_DOT_LVL1) ||
@@ -98,23 +97,27 @@ void ghost::updateInHouse(
             (level >= 3 && dotCounter >= ORANGE_GHOST_WAIT_DOT_LVL3) ||
             (level < DEFAULT_LIVES &&
              dotCounter >= ORANGE_GHOST_WAIT_DOT_LESS_LIFE))
-            isTime = true;
+            _isTime = true;
         break;
     default:
         break;
     }
 
     // move in ghost house
-    if (isTime == false) {
-
-        if (_xPixel % SCALE_PIXEL != GHOST_CENTER_X ||
-            _yPixel % SCALE_PIXEL != GHOST_CENTER_Y)
-            return;
+    if (_isTime == false) {
 
         if (_yBoard == 13) {
+            if (_yPixel + GHOST_HOUSE_SPEED >= _yBoard * SCALE_PIXEL +
+                                                   GHOST_CENTER_X -
+                                                   GHOST_HOUSE_RANGE_CENTER)
+                _yPixel = _yBoard * SCALE_PIXEL + GHOST_CENTER_X;
             _lastDir = UP;
             _yBoard -= GHOST_HOUSE_SPEED;
         } else if (_yBoard == 12) {
+            if (_yPixel + GHOST_HOUSE_SPEED <= _yBoard * SCALE_PIXEL +
+                                                   GHOST_CENTER_X +
+                                                   GHOST_HOUSE_RANGE_CENTER)
+                _yPixel = _yBoard * SCALE_PIXEL + GHOST_CENTER_X;
             _lastDir = DOWN;
             _yBoard += GHOST_HOUSE_SPEED;
         }
@@ -123,8 +126,13 @@ void ghost::updateInHouse(
     else {
         // if the ghost has left the house
         if (_xBoard == GHOST_INIT_X && _yBoard == GHOST_INIT_Y) {
+            // reset pixel position
+            _xPixel = GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X;
+            _yPixel = GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y;
             _mode = ANY;
             _isInHouse = false;
+            _lastDir = NONE;
+            return;
         }
 
         // next condition are set only for the 12th line
@@ -253,13 +261,15 @@ bool ghost::isReturnHouse() { return _isReturnHouse; }
 
 void ghost::setFrightened(bool isFear) {
 
-    if (_isFear == true && isFear == false && _isReturnHouse == false) {
+    if (_isFear == true && isFear == false && _isReturnHouse == false &&
+        _isInHouse == false) {
         // reset dir
         _lastDir = NONE;
         _mode = SCATTER;
         modeTimer1 = std::chrono::steady_clock::now();
         _isFear = isFear;
-    } else if (_isFear == false && isFear == true && _isReturnHouse == false) {
+    } else if (_isFear == false && isFear == true && _isReturnHouse == false &&
+               _isInHouse == false) {
         // reset dir
         _lastDir = NONE;
         _mode = FRIGHTENED;
@@ -440,17 +450,7 @@ void ghost::updateDir(
         exit(EXIT_FAILURE);
     }
 
-    if (_isInHouse == true) {
-        updateInHouse(vecBoard, level, dotCounter, life, noEatenDotTimer1);
-        return;
-    }
-
-    if (_isReturnHouse == true) {
-        returnHouse(vecBoard);
-        return;
-    }
-
-    if (_xBoard == xPac && _yBoard == yPac)
+    if (_isReturnHouse == false && _xBoard == xPac && _yBoard == yPac)
         return;
 
     // if ghost is on the teleportation, take it
@@ -487,6 +487,19 @@ void ghost::updateDir(
     }
 
     _isInTunnel = false;
+
+    // std::cout << "test 3" << std::endl;
+    // move in the house
+    if (_isInHouse == true) {
+        updateInHouse(vecBoard, level, dotCounter, life, noEatenDotTimer1);
+        return;
+    }
+
+    // return to house
+    if (_isReturnHouse == true) {
+        returnHouse(vecBoard);
+        return;
+    }
 
     // if ghost is in some area, only left-right moves are allowed
     if (_xBoard >= 8 && _xBoard <= 12 && (_yBoard == 10 || _yBoard == 20)) {
@@ -570,8 +583,18 @@ void ghost::updateDirRed(
         updateCoord();
     }
 
-    else
-        _lastDir = NONE;
+    else {
+        std::vector<dir> vecPossibleDir =
+            findPossibleDir(vecBoard, _lastDir, LEFT, _xBoard, _yBoard);
+
+        if (vecPossibleDir.size() > 0) {
+
+            _lastDir = vecPossibleDir[std::uniform_int_distribution<size_t>(
+                0, vecPossibleDir.size() - 1)(_rng)];
+            updateCoord();
+        } else
+            _lastDir = NONE;
+    }
 }
 
 void ghost::updateDirPink(
@@ -702,8 +725,18 @@ void ghost::updateDirBlue(
         return;
     }
 
-    else
-        _lastDir = NONE;
+    else {
+        std::vector<dir> vecPossibleDir =
+            findPossibleDir(vecBoard, _lastDir, LEFT, _xBoard, _yBoard);
+
+        if (vecPossibleDir.size() > 0) {
+
+            _lastDir = vecPossibleDir[std::uniform_int_distribution<size_t>(
+                0, vecPossibleDir.size() - 1)(_rng)];
+            updateCoord();
+        } else
+            _lastDir = NONE;
+    }
 }
 
 void ghost::updateDirOrange(
@@ -942,8 +975,18 @@ void ghost::updateDirRunAwayMode(
     std::vector<std::vector<std::shared_ptr<square>>> vecBoard) {
 
     // find all the possible directions with avoiding last direction
-    std::vector<dir> vecPossibleDir =
-        findPossibleDir(vecBoard, _lastDir, NONE, _xBoard, _yBoard);
+    std::vector<dir> vecPossibleDir;
+    // avoid tp
+    if (_xBoard == 5 && _yBoard == 13)
+        vecPossibleDir =
+            findPossibleDir(vecBoard, _lastDir, LEFT, _xBoard, _yBoard);
+    // avoid tp
+    else if (_xBoard == 15 && _yBoard == 13)
+        vecPossibleDir =
+            findPossibleDir(vecBoard, _lastDir, RIGHT, _xBoard, _yBoard);
+    else
+        vecPossibleDir =
+            findPossibleDir(vecBoard, _lastDir, NONE, _xBoard, _yBoard);
 
     if (vecPossibleDir.size() > 0) {
 

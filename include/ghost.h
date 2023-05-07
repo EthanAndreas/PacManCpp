@@ -8,21 +8,17 @@ enum color { RED, PINK, BLUE, ORANGE };
 
 #define GHOST_INIT_X 10
 #define GHOST_INIT_Y 10
+#define GHOST_CENTER_X 0
+#define GHOST_CENTER_Y 4
 
 #define RED_GHOST_INIT_X 10
 #define RED_GHOST_INIT_Y 13
-
 #define PINK_GHOST_INIT_X 10
 #define PINK_GHOST_INIT_Y 13
-
 #define BLUE_GHOST_INIT_X 9
 #define BLUE_GHOST_INIT_Y 12
-
 #define ORANGE_GHOST_INIT_X 11
 #define ORANGE_GHOST_INIT_Y 12
-
-#define GHOST_CENTER_X 0
-#define GHOST_CENTER_Y 4
 
 #define GHOST_HOUSE_SPEED 1
 #define GHOST_HOUSE_RANGE_CENTER GHOST_HOUSE_SPEED - 1
@@ -268,7 +264,7 @@ class ghost {
     // mode of the ghost
     bool _chaseMode, _scatterMode, _frightenedMode;
     // state of the ghost
-    bool _isInHouse, _isReturnHouse, _isFear, _isInTunnel;
+    bool _isTime, _isInHouse, _isReturnHouse, _isFear, _isInTunnel;
     // blue ghost is following the red ghost during 20s and the pink ghost
     // during 12s
     bool _blueRed, _bluePink;
