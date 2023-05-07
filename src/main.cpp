@@ -93,9 +93,9 @@ int main() {
 
             // display initial board
             int count = 0;
-            count =
-                draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost, vecDot,
-                     vecPowerup, _NONE, Pacman.getScore(), PACMAN_LIVE, false);
+            count = draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost,
+                         vecDot, vecPowerup, _NONE, Pacman.getScore(),
+                         PACMAN_LIVE, false, curLevel);
             SDL_UpdateWindowSurface(Window);
 
             bool life = true, start = false;
@@ -219,7 +219,7 @@ int main() {
                             count = draw(&windowSurf, &spriteBoard, count,
                                          Pacman, vecGhost, vecDot, vecPowerup,
                                          Fruit.getFruit(), Pacman.getScore(),
-                                         PACMAN_DEATH * i, start);
+                                         PACMAN_DEATH * i, start, curLevel);
                             SDL_UpdateWindowSurface(Window);
                             Uint64 fps_end = SDL_GetTicks();
                             float elapsed =
@@ -259,9 +259,10 @@ int main() {
                     }
 
                     // display updated board
-                    count = draw(&windowSurf, &spriteBoard, count, Pacman,
-                                 vecGhost, vecDot, vecPowerup, Fruit.getFruit(),
-                                 Pacman.getScore(), PACMAN_LIVE, start);
+                    count =
+                        draw(&windowSurf, &spriteBoard, count, Pacman, vecGhost,
+                             vecDot, vecPowerup, Fruit.getFruit(),
+                             Pacman.getScore(), PACMAN_LIVE, start, curLevel);
                     SDL_UpdateWindowSurface(Window);
                 }
 
