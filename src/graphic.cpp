@@ -227,7 +227,7 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
 
     count = (count + 1) % (512);
 
-    // area for the score header
+    // clear the area for the score header
     SDL_Rect scoreHeaderArea = {0, 0, 676, SCORE_HEADER};
     SDL_FillRect(*windowSurf, &scoreHeaderArea, 0);
 
@@ -256,17 +256,23 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
     drawString(windowSurf, spriteBoard, 676 - SCORE_HEADER / 2 - 128,
                SCORE_HEADER / 2, levelString);
 
-    // area for remaining lifes
+    // area for score
     SDL_Rect scoreArea = {0, 864 + SCORE_HEADER, 676, 36};
     SDL_FillRect(*windowSurf, &scoreArea, 0);
 
-    // print the remaining life
-    SDL_Rect lifeArea = {4, 874 + SCORE_HEADER, 54, 20};
+    // print the remaining life and eaten fruits
+    SDL_Rect lifeArea = {4, 874 + SCORE_HEADER, 676, 20};
     // Erase the area
     SDL_FillRect(*windowSurf, &lifeArea, 0);
     for (auto i = 0; i < Pacman.getRemainingLife(); i++) {
         SDL_Rect life = {4 + i * 22, 874 + SCORE_HEADER, 20, 20};
         SDL_BlitScaled(*spriteBoard, &_life, *windowSurf, &life);
+    }
+
+    // print the eaten fruit
+    for (auto i = 0; i < int(Pacman.getEatenFruit().size()); i++) {
+        SDL_Rect fruit = {400 + i * 32, 874 + SCORE_HEADER, 20, 20};
+        SDL_BlitScaled(*spriteBoard, &vecFruitSprite[i], *windowSurf, &fruit);
     }
 
     // print ready before the game starts

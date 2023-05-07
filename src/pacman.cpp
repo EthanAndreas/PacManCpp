@@ -261,6 +261,7 @@ void pacman::updateSquare(
         fruitEatenTimer1 = std::chrono::steady_clock::now();
         Fruit->eatFruit(vecBoard);
         _fruitEaten++;
+        _eatenFruit.push_back(Fruit->getFruit());
     }
 
     if (_powerup) {
@@ -350,3 +351,5 @@ short pacman::getRemainingLife() { return _remainingLife; }
 void pacman::looseLife() { _remainingLife--; }
 
 dir pacman::getOldDir() { return _oldDir; }
+
+std::vector<typeFruit> pacman::getEatenFruit() { return _eatenFruit; }

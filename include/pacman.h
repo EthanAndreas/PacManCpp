@@ -177,6 +177,12 @@ class pacman {
      *
      */
     dir getOldDir();
+    /**
+     * @brief Get the eaten fruit object.
+     *
+     * @return std::vector<typeFruit>
+     */
+    std::vector<typeFruit> getEatenFruit();
 
   private:
     // board coordinates corresponding to coordinates of the board vector
@@ -194,6 +200,7 @@ class pacman {
     time_t fruitEatenTimer1;
     short _fruitEaten, _fruitEatenScore;
     short _remainingLife;
+    std::vector<typeFruit> _eatenFruit;
 };
 
 #endif
