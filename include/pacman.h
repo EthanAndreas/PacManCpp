@@ -177,6 +177,12 @@ class pacman {
      *
      */
     dir getOldDir();
+    /**
+     * @brief Get the no eaten dot timer object.
+     *
+     * @return time_t
+     */
+    time_t getNoEatenDotTimer();
 
   private:
     // board coordinates corresponding to coordinates of the board vector
@@ -192,8 +198,12 @@ class pacman {
     // ghostEatenScore is the score of the ghost eaten with one powerup
     short _ghostEaten, _ghostEatenScore;
     time_t fruitEatenTimer1;
+    // fruitEaten is the number of fruit eaten in a level
+    // fruitEatenScore is the score of the fruit eaten
     short _fruitEaten, _fruitEatenScore;
     short _remainingLife;
+    // timer since the last dot eaten by pacman
+    time_t noEatenDotTimer1;
 };
 
 #endif

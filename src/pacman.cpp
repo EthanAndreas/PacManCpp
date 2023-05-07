@@ -19,6 +19,7 @@ void pacman::init() {
     _ghostEatenScore = 0;
     _fruitEaten = 0;
     _dotCounterLevel = 0;
+    noEatenDotTimer1 = std::chrono::steady_clock::now();
 }
 
 void pacman::reset() {
@@ -213,6 +214,8 @@ void pacman::updateSquare(
         vecBoard[_xBoard][_yBoard]->setItem(_EMPTY);
         vecBoard[_xBoard][_yBoard]->setScore(0);
 
+        noEatenDotTimer1 = std::chrono::steady_clock::now();
+
     } else if (vecBoard[_xBoard][_yBoard]->getItem() == _POWERUP) {
 
         if (_lastDir == LEFT || _lastDir == RIGHT) {
@@ -350,3 +353,5 @@ short pacman::getRemainingLife() { return _remainingLife; }
 void pacman::looseLife() { _remainingLife--; }
 
 dir pacman::getOldDir() { return _oldDir; }
+
+time_t pacman::getNoEatenDotTimer() { return noEatenDotTimer1; }

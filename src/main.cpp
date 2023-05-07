@@ -80,7 +80,7 @@ int main() {
             // initialize pacman and ghost
             Pacman.init();
             std::vector<std::shared_ptr<ghost>> vecGhost;
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 1; i++) {
                 std::shared_ptr<ghost> Ghost = std::make_shared<ghost>();
                 Ghost->setGhost(color(i));
                 vecGhost.push_back(Ghost);
@@ -190,7 +190,8 @@ int main() {
                                 Pacman.getPos().second / SCALE_PIXEL,
                                 Pacman.getLastDir(), curLevel,
                                 Pacman.getDotCounterLevel(),
-                                Pacman.getRemainingLife());
+                                Pacman.getRemainingLife(),
+                                Pacman.getNoEatenDotTimer());
                         Ghost->updatePos();
                     }
 

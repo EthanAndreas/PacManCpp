@@ -55,6 +55,8 @@ enum color { RED, PINK, BLUE, ORANGE };
 #define SCATTER_MODE_1 7 // 7s
 #define SCATTER_MODE_2 5 // 5s
 
+#define NO_EATEN_DOT_TIME 7 // 7s
+
 #define DEFAULT_LIVES 3
 
 #define updateDirWithShortestPath(vecBoard, xPac, yPac) \
@@ -95,7 +97,7 @@ class ghost {
      */
     void
     updateInHouse(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
-                  int level, int dotCounter, int life);
+                  int level, int dotCounter, int life, time_t noEatenDotTimer1);
     /**
      * @brief Ghost go back to the house.
      *
@@ -174,7 +176,7 @@ class ghost {
      */
     void updateDir(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
                    size_t xPac, size_t yPac, dir dirPac, int level,
-                   int dotCounter, int life);
+                   int dotCounter, int life, time_t noEatenDotTimer1);
     /**
      * @brief Update direction of red ghost. Red ghost is following the pacman.
      *

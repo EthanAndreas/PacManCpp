@@ -63,9 +63,15 @@ bool ghost::isInHouse() { return _isInHouse; }
 
 void ghost::updateInHouse(
     std::vector<std::vector<std::shared_ptr<square>>> vecBoard, int level,
-    int dotCounter, int life) {
+    int dotCounter, int life, time_t noEatenDotTimer1) {
 
     bool isTime = false;
+
+    time_t noEatenDotTimer2 = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsedTime =
+        noEatenDotTimer2 - noEatenDotTimer1;
+    if (elapsedTime.count() >= NO_EATEN_DOT_TIME)
+        isTime = true;
 
     // wait in ghost house
     switch (_color) {
@@ -258,6 +264,26 @@ void ghost::setFrightened(bool isFear) {
         _lastDir = NONE;
         _mode = FRIGHTENED;
         _isFear = isFear;
+        // go back when they become frightened
+        switch (_lastDir) {
+        case LEFT:
+            _lastDir = RIGHT;
+            break;
+        case RIGHT:
+            _lastDir = LEFT;
+            break;
+        case UP:
+            _lastDir = DOWN;
+            break;
+        case DOWN:
+            _lastDir = UP;
+            break;
+        case NONE:
+            break;
+        }
+
+        updateCoord();
+        return;
     }
 }
 
@@ -406,7 +432,8 @@ dir ghost::getLastDir() { return _lastDir; }
 
 void ghost::updateDir(
     std::vector<std::vector<std::shared_ptr<square>>> vecBoard, size_t xPac,
-    size_t yPac, dir dirPac, int level, int dotCounter, int life) {
+    size_t yPac, dir dirPac, int level, int dotCounter, int life,
+    time_t noEatenDotTimer1) {
 
     if (_xBoard > 20 || _yBoard == 0 || _yBoard >= 26) {
         std::cerr << "Ghost out of the board in updateDir" << std::endl;
@@ -414,7 +441,7 @@ void ghost::updateDir(
     }
 
     if (_isInHouse == true) {
-        updateInHouse(vecBoard, level, dotCounter, life);
+        updateInHouse(vecBoard, level, dotCounter, life, noEatenDotTimer1);
         return;
     }
 
@@ -940,6 +967,7 @@ void ghost::swapMode(int level) {
         modeTimer1 = std::chrono::steady_clock::now();
 
     } else if (_mode == CHASE) {
+        std::cout << "chase mode" << std::endl;
 
         if ((level == 1 && _swapMode < 4) || (level >= 2 && _swapMode < 3)) {
             if (elapsedTime.count() >= CHASE_MODE) {
@@ -949,6 +977,7 @@ void ghost::swapMode(int level) {
             }
         }
     } else if (_mode == SCATTER) {
+        std::cout << "scatter mode" << std::endl;
 
         if (level == 1) {
 
