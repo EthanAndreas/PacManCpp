@@ -967,7 +967,6 @@ void ghost::swapMode(int level) {
         modeTimer1 = std::chrono::steady_clock::now();
 
     } else if (_mode == CHASE) {
-        std::cout << "chase mode" << std::endl;
 
         if ((level == 1 && _swapMode < 4) || (level >= 2 && _swapMode < 3)) {
             if (elapsedTime.count() >= CHASE_MODE) {
@@ -977,7 +976,6 @@ void ghost::swapMode(int level) {
             }
         }
     } else if (_mode == SCATTER) {
-        std::cout << "scatter mode" << std::endl;
 
         if (level == 1) {
 
