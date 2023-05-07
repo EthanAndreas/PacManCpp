@@ -217,6 +217,30 @@ void intro(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int highScore) {
                "coded by ethan huret and thomas dumond");
 }
 
+void gameOver(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int curScore,
+              int highScore) {
+    SDL_SetColorKey(*spriteBoard, false, 0);
+
+    // Area for window
+    SDL_Rect windowArea = {0, 0, 676, 900 + SCORE_HEADER};
+    SDL_FillRect(*windowSurf, &windowArea, 0);
+
+    // Print text
+    drawString(windowSurf, spriteBoard, 250, 450, "game over !");
+
+    if (curScore > highScore) {
+        highScore = curScore;
+    }
+
+    // Print score
+    std::string scoreStr = "your score " + std::to_string(curScore);
+    drawString(windowSurf, spriteBoard, 178, 600, scoreStr);
+
+    // Print high score
+    std::string highScoreStr = "high score " + std::to_string(highScore);
+    drawString(windowSurf, spriteBoard, 178, 700, highScoreStr);
+}
+
 int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
          pacman Pacman, std::vector<std::shared_ptr<ghost>> vecGhost,
          std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup,

@@ -261,6 +261,32 @@ int main() {
                                 file.close();
                             }
 
+                            // print game over screen
+                            bool gameOverScreen = true;
+                            while (gameOverScreen) {
+                                gameOver(&windowSurf, &spriteBoard,
+                                         Pacman.getScore(), highScore);
+                                SDL_UpdateWindowSurface(Window);
+
+                                // keyboard management
+                                SDL_PollEvent(&event);
+                                // return touch
+                                if (event.type == SDL_KEYDOWN &&
+                                    event.key.keysym.sym == SDLK_RETURN)
+                                    gameOverScreen = false;
+                                // esc touch
+                                else if (event.type == SDL_KEYDOWN &&
+                                         event.key.keysym.sym == SDLK_ESCAPE) {
+                                    SDL_Quit();
+                                    return EXIT_SUCCESS;
+                                }
+                                // close window
+                                else if (event.type == SDL_QUIT) {
+                                    SDL_Quit();
+                                    return EXIT_SUCCESS;
+                                }
+                            }
+
                             // beginning level
                             Pacman.reset();
                             next_level = true;

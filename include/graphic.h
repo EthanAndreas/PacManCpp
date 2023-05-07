@@ -40,4 +40,7 @@ void drawString(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int x,
 
 void intro(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int highScore);
 
+void gameOver(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int curScore,
+              int highScore);
+
 #endif
