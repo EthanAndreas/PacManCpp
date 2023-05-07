@@ -22,8 +22,6 @@ int main() {
 
     // Keyboard
     SDL_Event event;
-    const Uint8 *keys;
-    int nbk = 0;
 
     // initialize game
     pacman Pacman;
@@ -81,7 +79,7 @@ int main() {
             // initialize pacman and ghost
             Pacman.init();
             std::vector<std::shared_ptr<ghost>> vecGhost;
-            for (int i = 0; i < 4; i++) {
+            for (int i = 3; i < 4; i++) {
                 std::shared_ptr<ghost> Ghost = std::make_shared<ghost>();
                 Ghost->setGhost(color(i));
                 vecGhost.push_back(Ghost);
@@ -132,9 +130,9 @@ int main() {
                 }
 
                 // keyboard management
-                keys = SDL_GetKeyboardState(&nbk);
                 // esc touch
-                if (keys[SDL_SCANCODE_ESCAPE]) {
+                if (event.type == SDL_KEYDOWN &&
+                    event.key.keysym.sym == SDLK_ESCAPE) {
                     life = true;
                     level = true;
                     game = true;
@@ -142,7 +140,8 @@ int main() {
                     exit(EXIT_SUCCESS);
                 }
                 // left arrow touch
-                else if (keys[SDL_SCANCODE_LEFT]) {
+                else if (event.type == SDL_KEYDOWN &&
+                         event.key.keysym.sym == SDLK_LEFT) {
                     if (start == false) {
                         for (auto Ghost : vecGhost)
                             Ghost->setTimer();
@@ -151,7 +150,8 @@ int main() {
                     currentDir = LEFT;
                 }
                 // right arrow touch
-                else if (keys[SDL_SCANCODE_RIGHT]) {
+                else if (event.type == SDL_KEYDOWN &&
+                         event.key.keysym.sym == SDLK_RIGHT) {
                     if (start == false) {
                         for (auto Ghost : vecGhost)
                             Ghost->setTimer();
@@ -160,7 +160,8 @@ int main() {
                     currentDir = RIGHT;
                 }
                 // up arrow touch
-                else if (keys[SDL_SCANCODE_UP]) {
+                else if (event.type == SDL_KEYDOWN &&
+                         event.key.keysym.sym == SDLK_UP) {
                     if (start == false) {
                         for (auto Ghost : vecGhost)
                             Ghost->setTimer();
@@ -169,7 +170,8 @@ int main() {
                     currentDir = UP;
                 }
                 // down arrow touch
-                else if (keys[SDL_SCANCODE_DOWN]) {
+                else if (event.type == SDL_KEYDOWN &&
+                         event.key.keysym.sym == SDLK_DOWN) {
                     if (start == false) {
                         for (auto Ghost : vecGhost)
                             Ghost->setTimer();
@@ -188,7 +190,8 @@ int main() {
                     Pacman.updateSquare(Board.getBoard(), vecGhost, &Fruit);
                     // pacman eat fruit management
                     if (Fruit.updateFruit(Board.getBoard(),
-                                          Pacman.getDotCounter()) == EXCEED) {
+                                          Pacman.getDotCounter(),
+                                          Pacman.getFruitEaten()) == EXCEED) {
                         Pacman.resetDotCounter();
                     }
 

@@ -28,8 +28,6 @@
 
 #define POWERUP_MODE 10 // 10s
 
-#define GHOST_DEFAULT_SCORE 200
-
 class pacman {
   public:
     pacman();
@@ -125,6 +123,12 @@ class pacman {
      */
     size_t getGhostEatenScore();
     /**
+     * @brief Get the Fruit Eaten object.
+     *
+     * @return short
+     */
+    short getFruitEaten();
+    /**
      * @brief Get the fruit eaten timer object.
      *
      * @return time_t
@@ -183,7 +187,7 @@ class pacman {
     // ghostEatenScore is the score of the ghost eaten with one powerup
     short _ghostEaten, _ghostEatenScore;
     time_t fruitEatenTimer1;
-    short _fruitEatenScore;
+    short _fruitEaten, _fruitEatenScore;
     short _remainingLife;
 };
 

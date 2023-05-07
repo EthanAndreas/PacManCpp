@@ -11,6 +11,8 @@ ghost::ghost() {
     _mode = ANY;
     _chaseMode = false;
     _scatterMode = false;
+    _scatterDir = NONE;
+    _scatterHouse = false;
     _frightenedMode = false;
     _isReturnHouse = false;
     _isFear = false;
@@ -230,13 +232,13 @@ bool ghost::isReturnHouse() { return _isReturnHouse; }
 
 void ghost::setFrightened(bool isFear) {
 
-    if (_isFear == true && isFear == false) {
+    if (_isFear == true && isFear == false && _isReturnHouse == false) {
         // reset dir
         _lastDir = NONE;
         _mode = SCATTER;
         modeTimer1 = std::chrono::steady_clock::now();
         _isFear = isFear;
-    } else if (_isFear == false && isFear == true) {
+    } else if (_isFear == false && isFear == true && _isReturnHouse == false) {
         // reset dir
         _lastDir = NONE;
         _mode = FRIGHTENED;
@@ -403,6 +405,9 @@ void ghost::updateDir(
         return;
     }
 
+    if (_xBoard == xPac && _yBoard == yPac)
+        return;
+
     // if ghost is on the teleportation, take it
     if (_xBoard == 0 && _yBoard == 13 && _lastDir == LEFT) {
         _xBoard = 20;
@@ -476,9 +481,8 @@ void ghost::updateDir(
     else if (_mode == FRIGHTENED)
         updateDirRunAwayMode(vecBoard, xPac, yPac);
 
-    // if an error occurs
     else
-        exit(EXIT_FAILURE);
+        _lastDir = NONE;
 }
 
 void ghost::updateDirRed(
@@ -505,13 +509,9 @@ void ghost::updateDirRed(
         _lastDir = findDir(path[0], path[1]);
         updateCoord();
     }
-    // if an error occurs on A* algorithm, take the direction that minimizes the
-    // euclidian distance between the ghost and pacman
-    else {
-        std::cerr << "No possible direction in updateDirRed for ghost "
-                  << _color << std::endl;
-        exit(EXIT_FAILURE);
-    }
+
+    else
+        _lastDir = NONE;
 }
 
 void ghost::updateDirPink(
@@ -640,11 +640,9 @@ void ghost::updateDirBlue(
         updateDirPink(vecBoard, xPac, yPac, dirPac);
         return;
     }
-    // if there is an error, take a random direction
-    else {
-        std::cerr << "Error in updateDirBlue for ghost " << _color << std::endl;
-        exit(EXIT_FAILURE);
-    }
+
+    else
+        _lastDir = NONE;
 }
 
 void ghost::updateDirOrange(
@@ -659,8 +657,10 @@ void ghost::updateDirOrange(
 
     // if ghost is at a distance less than 8 go in scatter mode
     else {
-        _mode = SCATTER;
-        modeTimer1 = std::chrono::steady_clock::now();
+        if (_mode != SCATTER) {
+            _mode = SCATTER;
+            modeTimer1 = std::chrono::steady_clock::now();
+        }
         updateDirScatterMode(vecBoard, 19, 25);
         return;
     }
@@ -672,12 +672,209 @@ void ghost::updateDirScatterMode(
 
     // when arrive in the house, go back in chase mode
     if (_xBoard == x && _yBoard == y) {
-        _mode = CHASE;
-        modeTimer1 = std::chrono::steady_clock::now();
-        return;
+        _scatterHouse = true;
+        _scatterDir = _lastDir;
     }
 
-    updateDirWithShortestPath(vecBoard, x, y);
+    if (_scatterHouse == true) {
+        // top left corner
+        if (_color == RED) {
+            // arrive with left direction
+            if (_scatterDir == LEFT) {
+                if (_lastDir == LEFT) {
+                    if (_xBoard == 1 && _yBoard == 1)
+                        _lastDir = DOWN;
+                } else if (_lastDir == DOWN) {
+                    if (_xBoard == 1 && _yBoard == 5)
+                        _lastDir = RIGHT;
+                } else if (_lastDir == RIGHT) {
+                    if (_xBoard == 5 && _yBoard == 5)
+                        _lastDir = UP;
+                } else if (_lastDir == UP) {
+                    if (_xBoard == 5 && _yBoard == 1)
+                        _lastDir = LEFT;
+                }
+                updateCoord();
+                return;
+
+            } else if (_scatterDir == UP) {
+                if (_lastDir == UP) {
+                    if (_xBoard == 1 && _yBoard == 1)
+                        _lastDir = RIGHT;
+                } else if (_lastDir == RIGHT) {
+                    if (_xBoard == 5 && _yBoard == 1)
+                        _lastDir = DOWN;
+                } else if (_lastDir == DOWN) {
+                    if (_xBoard == 5 && _yBoard == 5)
+                        _lastDir = LEFT;
+                } else if (_lastDir == LEFT) {
+                    if (_xBoard == 1 && _yBoard == 5)
+                        _lastDir = UP;
+                }
+                updateCoord();
+                return;
+            }
+        }
+        // top right corner
+        else if (_color == PINK) {
+            // arrive with right direction
+            if (_scatterDir == RIGHT) {
+                if (_lastDir == RIGHT) {
+                    if (_xBoard == 19 && _yBoard == 1)
+                        _lastDir = DOWN;
+                } else if (_lastDir == DOWN) {
+                    if (_xBoard == 19 && _yBoard == 5)
+                        _lastDir = LEFT;
+                } else if (_lastDir == LEFT) {
+                    if (_xBoard == 15 && _yBoard == 5)
+                        _lastDir = UP;
+                } else if (_lastDir == UP) {
+                    if (_xBoard == 15 && _yBoard == 1)
+                        _lastDir = RIGHT;
+                }
+                updateCoord();
+                return;
+
+            } else if (_scatterDir == UP) {
+                if (_lastDir == UP) {
+                    if (_xBoard == 19 && _yBoard == 1)
+                        _lastDir = LEFT;
+                } else if (_lastDir == LEFT) {
+                    if (_xBoard == 15 && _yBoard == 1)
+                        _lastDir = DOWN;
+                } else if (_lastDir == DOWN) {
+                    if (_xBoard == 15 && _yBoard == 5)
+                        _lastDir = RIGHT;
+                } else if (_lastDir == RIGHT) {
+                    if (_xBoard == 19 && _yBoard == 5)
+                        _lastDir = UP;
+                }
+                updateCoord();
+                return;
+            }
+        }
+        // bottom left corner
+        else if (_color == BLUE) {
+            // arrive with left direction
+            if (_scatterDir == LEFT) {
+                if (_lastDir == LEFT) {
+                    if (_xBoard == 1 && _yBoard == 25)
+                        _lastDir = UP;
+                } else if (_lastDir == UP) {
+                    if (_xBoard == 1 && _yBoard == 23)
+                        _lastDir = RIGHT;
+                    else if (_xBoard == 5 && _yBoard == 20)
+                        _lastDir = RIGHT;
+                    else if (_xBoard == 9 && _yBoard == 23)
+                        _lastDir = DOWN;
+                } else if (_lastDir == RIGHT) {
+                    if (_xBoard == 5 && _yBoard == 23)
+                        _lastDir = UP;
+                    else if (_xBoard == 7 && _yBoard == 20)
+                        _lastDir = DOWN;
+                    else if (_xBoard == 9 && _yBoard == 23)
+                        _lastDir = DOWN;
+                } else if (_lastDir == DOWN) {
+                    if (_xBoard == 7 && _yBoard == 23)
+                        _lastDir = RIGHT;
+                    else if (_xBoard == 9 && _yBoard == 25)
+                        _lastDir = LEFT;
+                }
+                updateCoord();
+                return;
+
+            } else if (_scatterDir == DOWN) {
+                if (_lastDir == DOWN) {
+                    if (_xBoard == 1 && _yBoard == 25)
+                        _lastDir = RIGHT;
+                    else if (_xBoard == 5 && _yBoard == 23)
+                        _lastDir = LEFT;
+                } else if (_lastDir == RIGHT) {
+                    if (_xBoard == 9 && _yBoard == 25)
+                        _lastDir = UP;
+                    else if (_xBoard == 7 && _yBoard == 20)
+                        _lastDir = LEFT;
+                    else if (_xBoard == 5 && _yBoard == 23)
+                        _lastDir = LEFT;
+                } else if (_lastDir == UP) {
+                    if (_xBoard == 9 && _yBoard == 23)
+                        _lastDir = LEFT;
+                    else if (_xBoard == 7 && _yBoard == 20)
+                        _lastDir = LEFT;
+                } else if (_lastDir == LEFT) {
+                    if (_xBoard == 7 && _yBoard == 23)
+                        _lastDir = UP;
+                    else if (_xBoard == 5 && _yBoard == 20)
+                        _lastDir = DOWN;
+                    else if (_xBoard == 1 && _yBoard == 23)
+                        _lastDir = DOWN;
+                }
+                updateCoord();
+                return;
+            }
+        }
+        // bottom right corner
+        else if (_color == ORANGE) {
+            // arrive with right direction
+            if (_scatterDir == RIGHT) {
+                if (_lastDir == RIGHT) {
+                    if (_xBoard == 19 && _yBoard == 25)
+                        _lastDir = UP;
+                } else if (_lastDir == UP) {
+                    if (_xBoard == 19 && _yBoard == 23)
+                        _lastDir = LEFT;
+                    else if (_xBoard == 15 && _yBoard == 20)
+                        _lastDir = LEFT;
+                    else if (_xBoard == 11 && _yBoard == 23)
+                        _lastDir = DOWN;
+                } else if (_lastDir == LEFT) {
+                    if (_xBoard == 15 && _yBoard == 23)
+                        _lastDir = UP;
+                    else if (_xBoard == 13 && _yBoard == 20)
+                        _lastDir = DOWN;
+                    else if (_xBoard == 11 && _yBoard == 23)
+                        _lastDir = DOWN;
+                } else if (_lastDir == DOWN) {
+                    if (_xBoard == 13 && _yBoard == 23)
+                        _lastDir = LEFT;
+                    else if (_xBoard == 11 && _yBoard == 25)
+                        _lastDir = RIGHT;
+                }
+                updateCoord();
+                return;
+
+            } else if (_scatterDir == DOWN) {
+                if (_lastDir == DOWN) {
+                    if (_xBoard == 19 && _yBoard == 25)
+                        _lastDir = LEFT;
+                    else if (_xBoard == 15 && _yBoard == 23)
+                        _lastDir = RIGHT;
+                } else if (_lastDir == LEFT) {
+                    if (_xBoard == 11 && _yBoard == 25)
+                        _lastDir = UP;
+                    else if (_xBoard == 13 && _yBoard == 20)
+                        _lastDir = RIGHT;
+                    else if (_xBoard == 15 && _yBoard == 23)
+                        _lastDir = RIGHT;
+                } else if (_lastDir == UP) {
+                    if (_xBoard == 11 && _yBoard == 23)
+                        _lastDir = RIGHT;
+                    else if (_xBoard == 13 && _yBoard == 20)
+                        _lastDir = RIGHT;
+                } else if (_lastDir == RIGHT) {
+                    if (_xBoard == 13 && _yBoard == 23)
+                        _lastDir = UP;
+                    else if (_xBoard == 15 && _yBoard == 20)
+                        _lastDir = DOWN;
+                    else if (_xBoard == 19 && _yBoard == 23)
+                        _lastDir = DOWN;
+                }
+                updateCoord();
+                return;
+            }
+        }
+    } else
+        updateDirWithShortestPath(vecBoard, x, y);
 }
 
 void ghost::updateDirRunAwayMode(
@@ -696,7 +893,8 @@ void ghost::updateDirRunAwayMode(
         std::vector<dir> vecPossibleDir = findPossibleDir(
             vecBoard, _lastDir, shortestDirToPacman, _xBoard, _yBoard);
 
-        // if a direction is possible corresponding to the previous conditions
+        // if a direction is possible corresponding to the previous
+        // conditions
         if (vecPossibleDir.size() > 0) {
 
             // take the direction that maximizes the euclidian distance
@@ -771,11 +969,8 @@ void ghost::updateDirRunAwayMode(
             }
         }
 
-    } else {
-        std::cerr << "No possible direction in updateDirRunAwayMode"
-                  << std::endl;
-        exit(EXIT_FAILURE);
-    }
+    } else
+        _lastDir = NONE;
 }
 
 void ghost::swapMode() {
@@ -793,6 +988,7 @@ void ghost::swapMode() {
         }
     } else if (_mode == SCATTER) {
         if (elapsedTime.count() >= SCATTER_MODE) {
+            _scatterHouse = false;
             _mode = CHASE;
             modeTimer1 = std::chrono::steady_clock::now();
         }

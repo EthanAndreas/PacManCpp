@@ -244,6 +244,8 @@ class ghost {
     size_t _xBoard, _yBoard, _xPixel, _yPixel, _xPixelEaten, _yPixelEaten;
     dir _lastDir;
     mode _mode;
+    bool _scatterHouse;
+    dir _scatterDir;
     // mode of the ghost
     bool _chaseMode, _scatterMode, _frightenedMode;
     // state of the ghost

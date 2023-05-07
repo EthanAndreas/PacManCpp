@@ -22,14 +22,15 @@ fruit::~fruit() {}
 typeFruit fruit::getFruit() { return _fruit; }
 
 int fruit::updateFruit(
-    std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
-    int dotCounter) {
+    std::vector<std::vector<std::shared_ptr<square>>> vecBoard, int dotCounter,
+    int fruitCounter) {
 
-    if (dotCounter >= MIN_DOT_FRUIT) {
+    if (dotCounter >= MIN_DOT_FRUIT + (fruitCounter * MIN_DOT_FRUIT_STEP)) {
 
-        if (dotCounter == MIN_DOT_FRUIT && _fruit == _NONE) {
+        if (dotCounter == MIN_DOT_FRUIT + (fruitCounter * MIN_DOT_FRUIT_STEP) &&
+            _fruit == _NONE) {
 
-            _lastFruit = (_lastFruit + 1) % 8;
+            _lastFruit = (_lastFruit + 1) % 9;
             _fruit = typeFruit(_lastFruit);
             timeFruit1 = std::chrono::steady_clock::now();
             vecBoard[FRUIT_X][FRUIT_Y]->setItem(_FRUIT);

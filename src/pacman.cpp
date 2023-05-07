@@ -17,6 +17,7 @@ void pacman::init() {
     _powerup = false;
     _ghostEaten = 0;
     _ghostEatenScore = 0;
+    _fruitEaten = 0;
 }
 
 void pacman::reset() {
@@ -257,7 +258,7 @@ void pacman::updateSquare(
         _fruitEatenScore = vecBoard[_xBoard][_yBoard]->getScore();
         fruitEatenTimer1 = std::chrono::steady_clock::now();
         Fruit->eatFruit(vecBoard);
-        _dotCounter = 0;
+        _fruitEaten++;
     }
 
     if (_powerup) {
@@ -317,8 +318,15 @@ bool pacman::ghostCollision(std::vector<std::shared_ptr<ghost>> vecGhost) {
 }
 
 size_t pacman::getGhostEatenScore() {
-    return _ghostEatenScore * GHOST_DEFAULT_SCORE;
+    if (_ghostEatenScore == 3)
+        return (_ghostEatenScore + 1) * GHOST_SCORE;
+    else if (_ghostEatenScore == 4)
+        return (_ghostEatenScore + 4) * GHOST_SCORE;
+    else
+        return _ghostEatenScore * GHOST_SCORE;
 }
+
+short pacman::getFruitEaten() { return _fruitEaten; }
 
 time_t pacman::getfruitEatenTimer() { return fruitEatenTimer1; }
 
@@ -328,7 +336,10 @@ short pacman::getFruitEatenScore() { return _fruitEatenScore; }
 
 size_t pacman::getDotCounter() { return _dotCounter; }
 
-void pacman::resetDotCounter() { _dotCounter = 0; }
+void pacman::resetDotCounter() {
+    _dotCounter = 0;
+    _fruitEaten = 0;
+}
 
 short pacman::getRemainingLife() { return _remainingLife; }
 
