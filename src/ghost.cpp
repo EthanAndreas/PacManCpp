@@ -941,49 +941,42 @@ void ghost::swapMode(int level) {
 
     } else if (_mode == CHASE) {
 
-        if (elapsedTime.count() >= CHASE_MODE) {
-            _lastDir = NONE;
-            _mode = SCATTER;
-            modeTimer1 = std::chrono::steady_clock::now();
+        if ((level == 1 && _swapMode < 4) || (level >= 2 && _swapMode < 3)) {
+            if (elapsedTime.count() >= CHASE_MODE) {
+                _lastDir = NONE;
+                _mode = SCATTER;
+                modeTimer1 = std::chrono::steady_clock::now();
+            }
         }
     } else if (_mode == SCATTER) {
 
         if (level == 1) {
 
-            if (_swapMode < 4 || _color == ORANGE) {
-
-                if (elapsedTime.count() >= SCATTER_MODE_1) {
-                    _lastDir = NONE;
-                    _scatterHouse = false;
-                    _mode = CHASE;
-                    _swapMode++;
-                    modeTimer1 = std::chrono::steady_clock::now();
-                }
+            if (elapsedTime.count() >= SCATTER_MODE_1) {
+                _lastDir = NONE;
+                _scatterHouse = false;
+                _mode = CHASE;
+                _swapMode++;
+                modeTimer1 = std::chrono::steady_clock::now();
             }
         } else if ((level >= 2 && level <= 4) || _color == ORANGE) {
 
-            if (_swapMode < 3) {
-
-                if ((_swapMode <= 1 && elapsedTime.count() >= SCATTER_MODE_1) ||
-                    (_swapMode == 2 && elapsedTime.count() >= SCATTER_MODE_2)) {
-                    _lastDir = NONE;
-                    _scatterHouse = false;
-                    _mode = CHASE;
-                    _swapMode++;
-                    modeTimer1 = std::chrono::steady_clock::now();
-                }
+            if ((_swapMode <= 1 && elapsedTime.count() >= SCATTER_MODE_1) ||
+                (_swapMode == 2 && elapsedTime.count() >= SCATTER_MODE_2)) {
+                _lastDir = NONE;
+                _scatterHouse = false;
+                _mode = CHASE;
+                _swapMode++;
+                modeTimer1 = std::chrono::steady_clock::now();
             }
         } else if (level > 4 || _color == ORANGE) {
 
-            if (_swapMode < 3) {
-
-                if (elapsedTime.count() >= SCATTER_MODE_2) {
-                    _lastDir = NONE;
-                    _scatterHouse = false;
-                    _mode = CHASE;
-                    _swapMode++;
-                    modeTimer1 = std::chrono::steady_clock::now();
-                }
+            if (elapsedTime.count() >= SCATTER_MODE_2) {
+                _lastDir = NONE;
+                _scatterHouse = false;
+                _mode = CHASE;
+                _swapMode++;
+                modeTimer1 = std::chrono::steady_clock::now();
             }
         }
     }
