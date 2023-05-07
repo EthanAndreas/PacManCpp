@@ -193,7 +193,7 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
     *spriteBoard = SDL_LoadBMP("assets/pacman_sprites.bmp");
 }
 
-void intro(SDL_Surface **windowSurf, SDL_Surface **spriteBoard) {
+void intro(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int highScore) {
     SDL_SetColorKey(*spriteBoard, false, 0);
 
     // Area for window
@@ -208,6 +208,10 @@ void intro(SDL_Surface **windowSurf, SDL_Surface **spriteBoard) {
     // Print text
     drawString(windowSurf, spriteBoard, 178, 600, "press enter to start");
 
+    // Print high score
+    std::string highScoreStr = "high score " + std::to_string(highScore);
+    drawString(windowSurf, spriteBoard, 178, 700, highScoreStr);
+
     // print credits
     drawString(windowSurf, spriteBoard, 38, 878 + SCORE_HEADER,
                "coded by ethan huret and thomas dumond");
@@ -216,7 +220,8 @@ void intro(SDL_Surface **windowSurf, SDL_Surface **spriteBoard) {
 int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
          pacman Pacman, std::vector<std::shared_ptr<ghost>> vecGhost,
          std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup,
-         typeFruit fruit, int curScore, short death, bool start, int curLevel) {
+         typeFruit fruit, int curScore, int highScore, short death, bool start,
+         int curLevel) {
     SDL_SetColorKey(*spriteBoard, false, 0);
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
 
@@ -233,11 +238,22 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
     drawString(windowSurf, spriteBoard, SCORE_HEADER / 2, SCORE_HEADER / 2,
                scoreString);
 
+    if (curScore > highScore) {
+        highScore = curScore;
+    }
+
+    // combine the score string and the score number into one string
+    std::string highScoreString = "high score " + std::to_string(highScore);
+
+    // print the score string
+    drawString(windowSurf, spriteBoard, 400 - SCORE_HEADER / 2 - 144,
+               SCORE_HEADER / 2, highScoreString);
+
     // combine the level string and the level number into one string
     std::string levelString = "level " + std::to_string(curLevel);
 
     // print the level string
-    drawString(windowSurf, spriteBoard, 676 - SCORE_HEADER / 2 - 144,
+    drawString(windowSurf, spriteBoard, 676 - SCORE_HEADER / 2 - 128,
                SCORE_HEADER / 2, levelString);
 
     // area for remaining lifes
