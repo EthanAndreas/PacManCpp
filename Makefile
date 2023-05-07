@@ -1,6 +1,6 @@
 CC ?= g++
-CFLAGS ?= -Wall -Wextra -Werror -std=c++17 -g -Og
-LDLIBS ?= -lSDL2 -lstdc++
+CFLAGS ?= -Wall -Wextra -Werror -std=c++17 -g -Og 
+LDLIBS ?= -lSDL2 -lstdc++ -lm
 
 INCLUDE_PATH = ./include
 
@@ -52,7 +52,7 @@ doc:
 	# @xdg-open html/index.html 		# Linux
 
 run:
-	@make clean -s 1>/dev/null 
+	# @make clean -s 1>/dev/null 
 	@echo "\033[93mCompilation...\033[0m"
 	@make -s 2>/dev/null || (echo "\033[91mError on compilation, re-run with \"make\" to see the errors\033[0m" && exit 1)
 	@echo "\033[93mRun Application...\033[0m"

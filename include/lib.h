@@ -4,6 +4,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -13,7 +14,10 @@
 
 #define SCALE_PIXEL 32 // each square is 32x32 pixels
 
-#define DIFFICULTY 1
+#define DIFFICULTY 3
+
+#define PACMAN_LIVE 0
+#define PACMAN_DEATH 1
 
 enum dir { LEFT, RIGHT, UP, DOWN, NONE };
 

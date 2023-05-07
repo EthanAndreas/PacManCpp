@@ -3,6 +3,9 @@
 SDL_Rect src_bg = {370, 3, 168, 216};
 SDL_Rect bg = {4, 4, 672, 864};
 
+// Pacman logo
+SDL_Rect pacmanLogo = {3, 3, 182, 49};
+
 // PacMan
 // animation
 SDL_Rect pac_blank = {3, 89, 16, 16};
@@ -14,6 +17,13 @@ SDL_Rect pac_u = {75, 89, 16, 16};
 SDL_Rect _pacman = {PACMAN_INIT_X * SCALE_PIXEL + PACMAN_CENTER_X,
                     PACMAN_INIT_Y *SCALE_PIXEL + PACMAN_CENTER_Y, SCALE_PIXEL,
                     SCALE_PIXEL};
+// eaten
+std::vector<SDL_Rect> eatenPacman{
+    {3, 110, 17, 10}, {22, 112, 18, 8}, {41, 113, 18, 7},
+    {79, 112, 18, 8}, {98, 111, 16, 9}, {115, 111, 12, 9},
+    {128, 111, 8, 9}, {137, 111, 4, 9}, {142, 108, 12, 12}};
+// life
+SDL_Rect _life = {168, 75, 12, 14};
 
 // Ghost
 std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
@@ -75,6 +85,13 @@ std::vector<std::vector<SDL_Rect>> initGhostSrpite() {
     return vecGhostSprite;
 }
 
+SDL_Rect fearBlueGhostSprite{3, 195, 16, 16};
+SDL_Rect fearWhiteGhostSprite{37, 195, 16, 16};
+SDL_Rect eatenGhostSprite_r{71, 195, 16, 16};
+SDL_Rect eatenGhostSprite_l{88, 195, 16, 16};
+SDL_Rect eatenGhostSprite_u{105, 195, 16, 16};
+SDL_Rect eatenGhostSprite_d{122, 195, 16, 16};
+
 std::vector<std::vector<SDL_Rect>> vecGhostSprite = initGhostSrpite();
 
 // items
@@ -108,6 +125,10 @@ SDL_Rect score400 = {155, 185, 14, 7};
 SDL_Rect score800 = {155, 194, 14, 7};
 SDL_Rect score1600 = {154, 203, 15, 7};
 SDL_Rect pts = {177, 204, 16, 7};
+std::map<int, SDL_Rect> scoreSprite = {
+    {100, score100},   {300, score300},   {500, score500},   {700, score700},
+    {1000, score1000}, {2000, score2000}, {3000, score3000}, {5000, score5000},
+    {200, score200},   {400, score400},   {800, score800},   {1600, score1600}};
 
 // Letters and numbers for SDL
 SDL_Rect letter_a = {12, 61, 8, 8};
@@ -160,9 +181,7 @@ std::map<char, SDL_Rect> sdlChar = {
     {'y', letter_y}, {'z', letter_z}, {'.', letter_point}, {' ', letter_blank},
     {'1', letter_1}, {'2', letter_2}, {'3', letter_3},     {'4', letter_4},
     {'5', letter_5}, {'6', letter_6}, {'7', letter_7},     {'8', letter_8},
-    {'9', letter_9}, {'0', letter_0}, {' ', letter_blank}};
-
-int count;
+    {'9', letter_9}, {'0', letter_0}};
 
 void init(SDL_Window **Window, SDL_Surface **windowSurf,
           SDL_Surface **spriteBoard) {
@@ -172,21 +191,59 @@ void init(SDL_Window **Window, SDL_Surface **windowSurf,
                          SDL_WINDOWPOS_UNDEFINED, 700, 900, SDL_WINDOW_SHOWN);
     *windowSurf = SDL_GetWindowSurface(*Window);
     *spriteBoard = SDL_LoadBMP("assets/pacman_sprites.bmp");
-    count = 0;
 }
 
-void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
-          std::vector<ghost *> vecGhost, std::vector<Coordinate> vecDot,
-          std::vector<Coordinate> vecPowerup, typeFruit fruit, int curScore) {
+void intro(SDL_Surface **windowSurf, SDL_Surface **spriteBoard) {
+    SDL_SetColorKey(*spriteBoard, false, 0);
 
+    // Area for window
+    SDL_Rect windowArea = {0, 0, 700, 900};
+    SDL_FillRect(*windowSurf, &windowArea, 0);
+
+    // Area for pacman logo
+    SDL_Rect logoArea = {166, 80, 364, 98};
+    SDL_FillRect(*windowSurf, &logoArea, 0);
+    SDL_BlitScaled(*spriteBoard, &pacmanLogo, *windowSurf, &logoArea);
+
+    // Print text
+    drawString(windowSurf, spriteBoard, 190, 600, "press enter to start");
+
+    // print credits
+    drawString(windowSurf, spriteBoard, 8, 878,
+               "developped by ethan huret and thomas dumond");
+}
+
+int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
+         pacman Pacman, std::vector<std::shared_ptr<ghost>> vecGhost,
+         std::vector<Coordinate> vecDot, std::vector<Coordinate> vecPowerup,
+         typeFruit fruit, int curScore, short death, bool start) {
     SDL_SetColorKey(*spriteBoard, false, 0);
     SDL_BlitScaled(*spriteBoard, &src_bg, *windowSurf, &bg);
+
+    count = (count + 1) % (512);
+
+    // area for score and life
+    SDL_Rect scoreArea = {0, 864, 700, 36};
+    SDL_FillRect(*windowSurf, &scoreArea, 0);
+
+    // print ready before the game starts
+    if (!start)
+        drawString(windowSurf, spriteBoard, 298, 492, "ready");
 
     // combine the score string and the score number into one string
     std::string scoreString = "score " + std::to_string(curScore);
 
     // print the score string
     drawString(windowSurf, spriteBoard, 4, 874, scoreString);
+
+    // print the remaining life
+    SDL_Rect lifeArea = {610, 874, 54, 16};
+    // Erase the area
+    SDL_FillRect(*windowSurf, &lifeArea, 0);
+    for (auto i = 0; i < Pacman.getRemainingLife(); i++) {
+        SDL_Rect life = {610 + i * 18, 874, 16, 16};
+        SDL_BlitScaled(*spriteBoard, &_life, *windowSurf, &life);
+    }
 
     // dot display
     for (auto &coord : vecDot) {
@@ -196,13 +253,15 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
     }
 
     // powerup display
-    for (auto &coord : vecPowerup) {
-        SDL_Rect powerup = {coord.x * SCALE_PIXEL + 6,
-                            coord.y * SCALE_PIXEL + 10, 20, 20};
-        SDL_BlitScaled(*spriteBoard, &powerup_in, *windowSurf, &powerup);
+    if ((count / 8) % 2 == 0) {
+        for (auto &coord : vecPowerup) {
+            SDL_Rect powerup = {coord.x * SCALE_PIXEL + 6,
+                                coord.y * SCALE_PIXEL + 10, 20, 20};
+            SDL_BlitScaled(*spriteBoard, &powerup_in, *windowSurf, &powerup);
+        }
     }
 
-    // Fruit display
+    // fruit display
     if (fruit != _NONE) {
         SDL_Rect fruitSdl = {FRUIT_X * SCALE_PIXEL, FRUIT_Y * SCALE_PIXEL,
                              SCALE_PIXEL, SCALE_PIXEL};
@@ -210,63 +269,177 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
                        &fruitSdl);
     }
 
-    for (auto &Ghost : vecGhost) {
-        // _ghost look animation
-        SDL_Rect *ghost_in = nullptr;
-        switch (Ghost->getLastDir()) {
-        case LEFT:
-            ghost_in = &(vecGhostSprite[Ghost->getGhost()][LEFT]);
-            break;
-        case RIGHT:
-            ghost_in = &(vecGhostSprite[Ghost->getGhost()][RIGHT]);
-            break;
-        case UP:
-            ghost_in = &(vecGhostSprite[Ghost->getGhost()][UP]);
-            break;
-        case DOWN:
-            ghost_in = &(vecGhostSprite[Ghost->getGhost()][DOWN]);
-            break;
-        case NONE:
-            // by default, _ghost looks right
-            ghost_in = &(vecGhostSprite[Ghost->getGhost()][RIGHT]);
-            break;
+    // score fruit display
+    if (Pacman.getFruitEatenScore() != 0) {
+
+        time_t fruitEatenTimer2 = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsedTime =
+            fruitEatenTimer2 - Pacman.getfruitEatenTimer();
+
+        if (elapsedTime.count() < FRUIT_SCORE_DISPLAY_TIME) {
+
+            // Place the area to write the score
+            SDL_Rect pointArea = {FRUIT_X * SCALE_PIXEL,
+                                  FRUIT_Y * SCALE_PIXEL + 10, 34, 20};
+
+            // print the score
+            SDL_BlitScaled(*spriteBoard,
+                           &scoreSprite[Pacman.getFruitEatenScore()],
+                           *windowSurf, &pointArea);
+        } else
+            Pacman.setFruitEatenScore(0);
+    }
+
+    // do not draw ghost if pacman is dead
+    if (death == PACMAN_LIVE) {
+
+        for (auto &Ghost : vecGhost) {
+            // _ghost look animation
+            SDL_Rect *ghost_in = nullptr;
+            // normal mode
+            switch (Ghost->getLastDir()) {
+            case LEFT:
+                ghost_in = &(vecGhostSprite[Ghost->getGhost()][LEFT]);
+                break;
+            case RIGHT:
+                ghost_in = &(vecGhostSprite[Ghost->getGhost()][RIGHT]);
+                break;
+            case UP:
+                ghost_in = &(vecGhostSprite[Ghost->getGhost()][UP]);
+                break;
+            case DOWN:
+                ghost_in = &(vecGhostSprite[Ghost->getGhost()][DOWN]);
+                break;
+            case NONE:
+                // by default, _ghost looks right
+                ghost_in = &(vecGhostSprite[Ghost->getGhost()][RIGHT]);
+                break;
+            }
+
+            // _ghost wave animation
+            SDL_Rect ghost_in2 = *ghost_in;
+            if ((count / 4) % 2)
+                ghost_in2.x += 17;
+
+            // fear mode
+            if (Ghost->isFrightened() == true && Ghost->isInHouse() == false &&
+                Ghost->isReturnHouse() == false) {
+
+                time_t powerupTimer2 = std::chrono::steady_clock::now();
+                std::chrono::duration<double> elapsedTime =
+                    powerupTimer2 - Pacman.getPowerupTimer();
+
+                if (elapsedTime.count() < POWERUP_MODE - GHOST_BLINK)
+                    ghost_in = &(fearBlueGhostSprite);
+                else {
+                    if ((count / 8) % 2)
+                        ghost_in = &(fearBlueGhostSprite);
+                    else
+                        ghost_in = &(fearWhiteGhostSprite);
+                }
+
+                // _ghost wave animation
+                ghost_in2 = *ghost_in;
+                if ((count / 4) % 2)
+                    ghost_in2.x += 17;
+            }
+            // go back to house mode
+            else if (Ghost->isReturnHouse() == true) {
+
+                // place the area to write the score
+                SDL_Rect pointArea = {0, 0, 34, 20};
+                size_t lastGhostScore = 0;
+
+                // new ghost is eaten
+                if (Pacman.getGhostEatenScore() != lastGhostScore) {
+                    // remove the previous score
+                    SDL_FillRect(*windowSurf, &pointArea,
+                                 SDL_MapRGB((*windowSurf)->format, 0, 0, 0));
+
+                    pointArea.x = int(Ghost->getEatenPosition().first) +
+                                  (GHOST_CENTER_X / 2);
+                    pointArea.y = int(Ghost->getEatenPosition().second +
+                                      (GHOST_CENTER_Y / 2));
+
+                    SDL_BlitScaled(*spriteBoard,
+                                   &scoreSprite[Pacman.getGhostEatenScore()],
+                                   *windowSurf, &pointArea);
+
+                    lastGhostScore = Pacman.getGhostEatenScore();
+                }
+
+                switch (Ghost->getLastDir()) {
+                case RIGHT:
+                    ghost_in2 = eatenGhostSprite_r;
+                    break;
+                case LEFT:
+                    ghost_in2 = eatenGhostSprite_l;
+                    break;
+                case UP:
+                    ghost_in2 = eatenGhostSprite_u;
+                    break;
+                case DOWN:
+                    ghost_in2 = eatenGhostSprite_d;
+                    break;
+                case NONE:
+                    ghost_in2 = eatenGhostSprite_l;
+                    break;
+                }
+            }
+
+            // ghost updated position
+            vecGhostSprite[Ghost->getGhost()].back().x = Ghost->getPos().first;
+            vecGhostSprite[Ghost->getGhost()].back().y = Ghost->getPos().second;
+
+            SDL_SetColorKey(*spriteBoard, true, 0);
+            SDL_BlitScaled(*spriteBoard, &ghost_in2, *windowSurf,
+                           &vecGhostSprite[Ghost->getGhost()].back());
         }
-        count = (count + 1) % (512);
-
-        // _ghost wave animation
-        SDL_Rect ghost_in2 = *ghost_in;
-        if ((count / 4) % 2)
-            ghost_in2.x += 17;
-
-        // _ghost updated position
-        vecGhostSprite[Ghost->getGhost()].back().x = Ghost->getPos().first;
-        vecGhostSprite[Ghost->getGhost()].back().y = Ghost->getPos().second;
-
-        SDL_SetColorKey(*spriteBoard, true, 0);
-        SDL_BlitScaled(*spriteBoard, &ghost_in2, *windowSurf,
-                       &vecGhostSprite[Ghost->getGhost()].back());
     }
 
     // pacman animation
     SDL_Rect pac_in = pac_blank;
-    if ((count / 4) % 2) {
-        switch (Pacman.getLastDir()) {
-        case RIGHT:
-            pac_in = pac_r;
-            break;
-        case LEFT:
-            pac_in = pac_l;
-            break;
-        case UP:
-            pac_in = pac_u;
-            break;
-        case DOWN:
-            pac_in = pac_d;
-            break;
-        case NONE:
-            pac_in = pac_blank;
-            break;
+    if (death == PACMAN_LIVE) {
+        if ((count / 4) % 2) {
+            switch (Pacman.getLastDir()) {
+            case LEFT:
+                pac_in = pac_l;
+                break;
+            case RIGHT:
+                pac_in = pac_r;
+                break;
+            case UP:
+                pac_in = pac_u;
+                break;
+            case DOWN:
+                pac_in = pac_d;
+                break;
+            case NONE:
+                break;
+            }
         }
+        // avoid animation when pacman is not moving
+        if (Pacman.getLastDir() == NONE) {
+            switch (Pacman.getOldDir()) {
+            case LEFT:
+                pac_in = pac_l;
+                break;
+            case RIGHT:
+                pac_in = pac_r;
+                break;
+            case UP:
+                pac_in = pac_u;
+                break;
+            case DOWN:
+                pac_in = pac_d;
+                break;
+            case NONE:
+                pac_in = pac_blank;
+                break;
+            }
+        }
+    } else {
+        pac_in = eatenPacman[death];
     }
 
     // pacman updated position
@@ -275,6 +448,8 @@ void draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, pacman Pacman,
 
     SDL_SetColorKey(*spriteBoard, true, 0);
     SDL_BlitScaled(*spriteBoard, &pac_in, *windowSurf, &_pacman);
+
+    return count;
 }
 
 void drawString(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int x,
@@ -283,15 +458,15 @@ void drawString(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int x,
     int len = str.length();
 
     // Create a rectangle for the text
-    SDL_Rect area = {x, y, 16 * (len + 5), 16};
+    SDL_Rect area = {x, y, 16 * (len + 2), 16};
 
     // Erase the area
     SDL_FillRect(*windowSurf, &area, 0);
 
     // Print the text
     SDL_Rect textRect = {x, y, 16, 16};
-    for (int i = 0; i < len; i++) {
-        SDL_BlitScaled(*spriteBoard, &sdlChar[str[i]], *windowSurf, &textRect);
+    for (auto s : str) {
+        SDL_BlitScaled(*spriteBoard, &sdlChar[s], *windowSurf, &textRect);
         textRect.x += 16;
     }
 }
