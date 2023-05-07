@@ -16,6 +16,7 @@ ghost::ghost() {
     _frightenedMode = false;
     _isReturnHouse = false;
     _isFear = false;
+    _isInTunnel = false;
     _blueRed = false;
     _bluePink = false;
 }
@@ -32,10 +33,10 @@ void ghost::setGhost(color c) {
     switch (c) {
     case RED:
         _isInHouse = true;
-        _xBoard = RED_GHOST_INIT_X;
-        _yBoard = RED_GHOST_INIT_Y;
-        _xPixel = RED_GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X;
-        _yPixel = RED_GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y;
+        _xBoard = GHOST_INIT_X;
+        _yBoard = GHOST_INIT_Y;
+        _xPixel = GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X;
+        _yPixel = GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y;
         break;
     case PINK:
         _isInHouse = true;
@@ -77,7 +78,7 @@ void ghost::updateInHouse(
     switch (_color) {
     case RED:
         if (elapsedTime.count() >= RED_GHOST_WAIT_TIME)
-            _isInHouse = false;
+            isTime = true;
         break;
     case PINK:
         if (elapsedTime.count() >= PINK_GHOST_WAIT_TIME)
@@ -181,8 +182,15 @@ void ghost::returnHouse(
 
         _isReturnHouse = false;
         _lastDir = NONE;
-        setGhost(_color);
-        houseWaitTimer1 = std::chrono::steady_clock::now();
+        _isInHouse = true;
+
+        if (_color == RED) {
+            _xBoard = RED_GHOST_INIT_X;
+            _yBoard = RED_GHOST_INIT_Y;
+            _xPixel = RED_GHOST_INIT_X * SCALE_PIXEL + GHOST_CENTER_X;
+            _yPixel = RED_GHOST_INIT_Y * SCALE_PIXEL + GHOST_CENTER_Y;
+        } else
+            setGhost(_color);
         return;
     }
 
@@ -199,6 +207,11 @@ void ghost::returnHouse(
 
     switch (_color) {
     case RED:
+        if (_xBoard == 10 && _yBoard == 12) {
+            _lastDir = DOWN;
+            _yBoard++;
+            return;
+        }
         break;
     case PINK:
 
@@ -259,7 +272,8 @@ std::pair<size_t, size_t> ghost::getEatenPosition() {
 void ghost::updatePos() {
 
     // normal speed
-    if (_isFear == false && _isReturnHouse == false) {
+    if (_isFear == false && _isReturnHouse == false && _isInTunnel == false &&
+        _isInHouse == false) {
         switch (_lastDir) {
         case LEFT:
             _xPixel -= GHOST_SPEED;
@@ -278,7 +292,8 @@ void ghost::updatePos() {
         }
     }
     // speed up the ghost
-    else if (_isFear == false && _isReturnHouse == true) {
+    else if (_isFear == false && _isReturnHouse == true &&
+             _isInTunnel == false && _isInHouse == false) {
         switch (_lastDir) {
         case LEFT:
             _xPixel -= GHOST_RETURN_SPEED;
@@ -297,7 +312,8 @@ void ghost::updatePos() {
         }
     }
     // slow down the ghost
-    else if (_isFear == true && _isReturnHouse == false) {
+    else if ((_isFear == true || _isInTunnel == true || _isInHouse == true) &&
+             _isReturnHouse == false) {
         switch (_lastDir) {
         case LEFT:
             _xPixel -= GHOST_FEAR_SPEED;
@@ -412,19 +428,19 @@ void ghost::updateDir(
     if (_xBoard == 0 && _yBoard == 13 && _lastDir == LEFT) {
         _xBoard = 20;
         _xPixel = 20 * SCALE_PIXEL + GHOST_CENTER_X;
-        // return;
     } else if (_xBoard == 20 && _yBoard == 13 && _lastDir == RIGHT) {
         _xBoard = 0;
         _xPixel = GHOST_CENTER_X;
-        // return;
     }
 
     // if ghost enters in the teleportation hall, go to the teleportation
     // hall
     if (_xBoard <= 4 && _yBoard == 13 && _lastDir == LEFT) {
+        _isInTunnel = true;
         _xBoard--;
         return;
     } else if (_xBoard >= 16 && _yBoard == 13 && _lastDir == RIGHT) {
+        _isInTunnel = true;
         _xBoard++;
         return;
     }
@@ -432,12 +448,16 @@ void ghost::updateDir(
     // if ghost takes the teleportation, make him leave the teleportation
     // hall
     if (_xBoard <= 4 && _yBoard == 13 && _lastDir == RIGHT) {
+        _isInTunnel = true;
         _xBoard++;
         return;
     } else if (_xBoard >= 16 && _yBoard == 13 && _lastDir == LEFT) {
+        _isInTunnel = true;
         _xBoard--;
         return;
     }
+
+    _isInTunnel = false;
 
     // if ghost is in some area, only left-right moves are allowed
     if (_xBoard >= 8 && _xBoard <= 12 && (_yBoard == 10 || _yBoard == 20)) {
