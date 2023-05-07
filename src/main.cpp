@@ -66,6 +66,7 @@ int main() {
         }
 
         // Level
+        int curLevel = 1;
         bool level = true;
         while (level) {
 
@@ -133,49 +134,33 @@ int main() {
                 // esc touch
                 if (event.type == SDL_KEYDOWN &&
                     event.key.keysym.sym == SDLK_ESCAPE) {
-                    life = true;
-                    level = true;
-                    game = true;
+                    life = false;
+                    level = false;
+                    game = false;
                     SDL_Quit();
                     exit(EXIT_SUCCESS);
                 }
                 // left arrow touch
                 else if (event.type == SDL_KEYDOWN &&
                          event.key.keysym.sym == SDLK_LEFT) {
-                    if (start == false) {
-                        for (auto Ghost : vecGhost)
-                            Ghost->setTimer();
-                    }
                     start = true;
                     currentDir = LEFT;
                 }
                 // right arrow touch
                 else if (event.type == SDL_KEYDOWN &&
                          event.key.keysym.sym == SDLK_RIGHT) {
-                    if (start == false) {
-                        for (auto Ghost : vecGhost)
-                            Ghost->setTimer();
-                    }
                     start = true;
                     currentDir = RIGHT;
                 }
                 // up arrow touch
                 else if (event.type == SDL_KEYDOWN &&
                          event.key.keysym.sym == SDLK_UP) {
-                    if (start == false) {
-                        for (auto Ghost : vecGhost)
-                            Ghost->setTimer();
-                    }
                     start = true;
                     currentDir = UP;
                 }
                 // down arrow touch
                 else if (event.type == SDL_KEYDOWN &&
                          event.key.keysym.sym == SDLK_DOWN) {
-                    if (start == false) {
-                        for (auto Ghost : vecGhost)
-                            Ghost->setTimer();
-                    }
                     start = true;
                     currentDir = DOWN;
                 }
@@ -203,7 +188,8 @@ int main() {
                                 Board.getBoard(),
                                 Pacman.getPos().first / SCALE_PIXEL,
                                 Pacman.getPos().second / SCALE_PIXEL,
-                                Pacman.getLastDir());
+                                Pacman.getLastDir(), curLevel,
+                                Pacman.getDotCounterLevel());
                         Ghost->updatePos();
                     }
 
@@ -216,6 +202,7 @@ int main() {
                         // TODO: add a win animation
                         std::cout << "You win!" << std::endl;
                         // next level
+                        curLevel++;
                         next_level = true;
                         life = false;
                         level = false;

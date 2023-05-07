@@ -153,6 +153,12 @@ class pacman {
      */
     size_t getDotCounter();
     /**
+     * @brief Get the Dot Counter Level object.
+     *
+     * @return size_t
+     */
+    size_t getDotCounterLevel();
+    /**
      * @brief Reset the dot counter.
      *
      */
@@ -181,6 +187,7 @@ class pacman {
     dir _lastDir, _oldDir;
     size_t _score;
     size_t _dotCounter;
+    size_t _dotCounterLevel;
     bool _powerup;
     time_t powerupTimer1;
     // ghostEaten is the number of ghost eaten in a level

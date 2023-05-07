@@ -10,11 +10,11 @@
 #define RED_GHOST_INIT_X 10
 #define RED_GHOST_INIT_Y 13
 
-#define PINK_GHOST_INIT_X 9
-#define PINK_GHOST_INIT_Y 12
+#define PINK_GHOST_INIT_X 10
+#define PINK_GHOST_INIT_Y 13
 
-#define BLUE_GHOST_INIT_X 10
-#define BLUE_GHOST_INIT_Y 13
+#define BLUE_GHOST_INIT_X 9
+#define BLUE_GHOST_INIT_Y 12
 
 #define ORANGE_GHOST_INIT_X 11
 #define ORANGE_GHOST_INIT_Y 12
@@ -34,17 +34,21 @@
 enum color { RED, PINK, BLUE, ORANGE };
 
 // macro for wait time in function of difficulty
-#define RED_GHOST_WAIT_TIME (6 / DIFFICULTY)     // 6s for easy
-#define PINK_GHOST_WAIT_TIME (12 / DIFFICULTY)   // 12s for easy
-#define BLUE_GHOST_WAIT_TIME (18 / DIFFICULTY)   // 18s for easy
-#define ORANGE_GHOST_WAIT_TIME (24 / DIFFICULTY) // 24s for easy
+#define RED_GHOST_WAIT_DOT 0
+#define PINK_GHOST_WAIT_DOT 0
+#define BLUE_GHOST_WAIT_DOT_LVL1 30
+#define BLUE_GHOST_WAIT_DOT_LVL2 0
+#define ORANGE_GHOST_WAIT_DOT_LVL1 90
+#define ORANGE_GHOST_WAIT_DOT_LVL2 50
+#define ORANGE_GHOST_WAIT_DOT_LVL3 0
 
 // swap for the blue ghost between chase mode of red and pink ghost
 #define BLUE_GHOST_RED_TIME 20  // 20s
 #define BLUE_GHOST_PINK_TIME 12 // 12s
 
-#define CHASE_MODE 20  // 20s
-#define SCATTER_MODE 7 // 7s
+#define CHASE_MODE 20    // 20s
+#define SCATTER_MODE_1 7 // 7s
+#define SCATTER_MODE_2 5 // 5s
 
 #define updateDirWithShortestPath(vecBoard, xPac, yPac) \
     updateDirRed(vecBoard, xPac, yPac)
@@ -55,11 +59,6 @@ class ghost {
   public:
     ghost();
     ~ghost();
-    /**
-     * @brief Set the timer object.
-     *
-     */
-    void setTimer();
     /**
      * @brief Set the color of the ghost.
      *
@@ -83,7 +82,8 @@ class ghost {
      * @brief Update the position of the ghost in the ghost house.
      */
     void
-    updateInHouse(std::vector<std::vector<std::shared_ptr<square>>> vecBoard);
+    updateInHouse(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
+                  int level, int dotCounter);
     /**
      * @brief Ghost go back to the house.
      *
@@ -161,7 +161,8 @@ class ghost {
      * @param vecBoard
      */
     void updateDir(std::vector<std::vector<std::shared_ptr<square>>> vecBoard,
-                   size_t xPac, size_t yPac, dir dirPac);
+                   size_t xPac, size_t yPac, dir dirPac, int level,
+                   int dotCounter);
     /**
      * @brief Update direction of red ghost. Red ghost is following the pacman.
      *
@@ -229,13 +230,12 @@ class ghost {
      * @param dirPac
      */
     void updateDirRunAwayMode(
-        std::vector<std::vector<std::shared_ptr<square>>> vecBoard, size_t xPac,
-        size_t yPac);
+        std::vector<std::vector<std::shared_ptr<square>>> vecBoard);
     /**
      * @brief Swap between chase and scatter mode.
      *
      */
-    void swapMode();
+    void swapMode(int level);
 
   private:
     color _color;
@@ -244,6 +244,7 @@ class ghost {
     size_t _xBoard, _yBoard, _xPixel, _yPixel, _xPixelEaten, _yPixelEaten;
     dir _lastDir;
     mode _mode;
+    int _swapMode;
     bool _scatterHouse;
     dir _scatterDir;
     // mode of the ghost
@@ -253,8 +254,6 @@ class ghost {
     // blue ghost is following the red ghost during 20s and the pink ghost
     // during 12s
     bool _blueRed, _bluePink;
-    // timer for house waiting
-    time_t houseWaitTimer1;
     // timer for switching mode
     time_t modeTimer1;
     // timer orange ghost

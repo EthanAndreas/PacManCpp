@@ -9,6 +9,7 @@ ghost::ghost() {
     _yPixelEaten = 0;
     _lastDir = NONE;
     _mode = ANY;
+    _swapMode = 0;
     _chaseMode = false;
     _scatterMode = false;
     _scatterDir = NONE;
@@ -21,12 +22,6 @@ ghost::ghost() {
     _bluePink = false;
 }
 ghost::~ghost() {}
-
-void ghost::setTimer() {
-    houseWaitTimer1 = std::chrono::steady_clock::now();
-    std::mt19937 _rng(
-        std::chrono::steady_clock::now().time_since_epoch().count());
-}
 
 void ghost::setGhost(color c) {
     _color = c;
@@ -67,29 +62,33 @@ color ghost::getGhost() { return _color; }
 bool ghost::isInHouse() { return _isInHouse; }
 
 void ghost::updateInHouse(
-    std::vector<std::vector<std::shared_ptr<square>>> vecBoard) {
+    std::vector<std::vector<std::shared_ptr<square>>> vecBoard, int level,
+    int dotCounter) {
 
-    time_t houseWaitTimer2 = std::chrono::steady_clock::now();
-    std::chrono::duration<double> elapsedTime =
-        houseWaitTimer2 - houseWaitTimer1;
     bool isTime = false;
 
     // wait in ghost house
     switch (_color) {
     case RED:
-        if (elapsedTime.count() >= RED_GHOST_WAIT_TIME)
+        if (dotCounter >= RED_GHOST_WAIT_DOT)
             isTime = true;
         break;
     case PINK:
-        if (elapsedTime.count() >= PINK_GHOST_WAIT_TIME)
+        if (dotCounter >= PINK_GHOST_WAIT_DOT)
             isTime = true;
         break;
     case BLUE:
-        if (elapsedTime.count() >= BLUE_GHOST_WAIT_TIME)
+        if (level == 1 && dotCounter >= BLUE_GHOST_WAIT_DOT_LVL1)
+            isTime = true;
+        else if (level == 2 && dotCounter >= BLUE_GHOST_WAIT_DOT_LVL2)
             isTime = true;
         break;
     case ORANGE:
-        if (elapsedTime.count() >= ORANGE_GHOST_WAIT_TIME)
+        if (level == 1 && dotCounter >= ORANGE_GHOST_WAIT_DOT_LVL1)
+            isTime = true;
+        else if (level == 2 && dotCounter >= ORANGE_GHOST_WAIT_DOT_LVL2)
+            isTime = true;
+        else if (level >= 3 && dotCounter >= ORANGE_GHOST_WAIT_DOT_LVL3)
             isTime = true;
         break;
     default:
@@ -216,15 +215,15 @@ void ghost::returnHouse(
     case PINK:
 
         if (_xBoard == 10 && _yBoard == 12) {
-            _lastDir = LEFT;
-            _xBoard--;
+            _lastDir = DOWN;
+            _yBoard++;
             return;
         }
         break;
     case BLUE:
         if (_xBoard == 10 && _yBoard == 12) {
-            _lastDir = DOWN;
-            _yBoard++;
+            _lastDir = LEFT;
+            _xBoard--;
             return;
         }
         break;
@@ -404,7 +403,7 @@ dir ghost::getLastDir() { return _lastDir; }
 
 void ghost::updateDir(
     std::vector<std::vector<std::shared_ptr<square>>> vecBoard, size_t xPac,
-    size_t yPac, dir dirPac) {
+    size_t yPac, dir dirPac, int level, int dotCounter) {
 
     if (_xBoard > 20 || _yBoard == 0 || _yBoard >= 26) {
         std::cerr << "Ghost out of the board in updateDir" << std::endl;
@@ -412,7 +411,7 @@ void ghost::updateDir(
     }
 
     if (_isInHouse == true) {
-        updateInHouse(vecBoard);
+        updateInHouse(vecBoard, level, dotCounter);
         return;
     }
 
@@ -471,7 +470,7 @@ void ghost::updateDir(
     }
 
     // switching mode
-    swapMode();
+    swapMode(level);
 
     // chase mode
     if (_mode == CHASE) {
@@ -510,7 +509,7 @@ void ghost::updateDir(
     }
     // frightened mode
     else if (_mode == FRIGHTENED)
-        updateDirRunAwayMode(vecBoard, xPac, yPac);
+        updateDirRunAwayMode(vecBoard);
 
     else
         _lastDir = NONE;
@@ -645,7 +644,7 @@ void ghost::updateDirBlue(
             _blueRed = false;
             _bluePink = true;
             updateDirPink(vecBoard, xPac, yPac, dirPac);
-            houseWaitTimer1 = std::chrono::steady_clock::now();
+            blueTimer1 = std::chrono::steady_clock::now();
             return;
         }
 
@@ -659,11 +658,12 @@ void ghost::updateDirBlue(
         time_t blueTimer2 = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsedTime = blueTimer2 - blueTimer1;
 
-        // if 10 seconds are spent, take random mode
+        // if 10 seconds are spent, take red chase mode
         if (elapsedTime.count() >= BLUE_GHOST_PINK_TIME) {
             _bluePink = false;
             _blueRed = true;
             updateDirRed(vecBoard, xPac, yPac);
+            blueTimer1 = std::chrono::steady_clock::now();
             return;
         }
 
@@ -909,102 +909,25 @@ void ghost::updateDirScatterMode(
 }
 
 void ghost::updateDirRunAwayMode(
-    std::vector<std::vector<std::shared_ptr<square>>> vecBoard, size_t xPac,
-    size_t yPac) {
+    std::vector<std::vector<std::shared_ptr<square>>> vecBoard) {
 
-    auto path = findShortestPath(vecBoard, _xBoard, _yBoard, xPac, yPac);
+    // find all the possible directions with avoiding last direction
+    std::vector<dir> vecPossibleDir =
+        findPossibleDir(vecBoard, _lastDir, NONE, _xBoard, _yBoard);
 
-    // if a shortest path is found
-    if (path.size() >= 2) {
-        // retrieve the shortest direction to pacman
-        dir shortestDirToPacman = findDir(path[0], path[1]);
+    if (vecPossibleDir.size() > 0) {
 
-        // find all the possible directions with avoiding last direction
-        // of ghost and pacman
-        std::vector<dir> vecPossibleDir = findPossibleDir(
-            vecBoard, _lastDir, shortestDirToPacman, _xBoard, _yBoard);
+        // take a random direction among the possible ones
+        _lastDir = vecPossibleDir[std::uniform_int_distribution<size_t>(
+            0, vecPossibleDir.size() - 1)(_rng)];
+        updateCoord();
+    }
 
-        // if a direction is possible corresponding to the previous
-        // conditions
-        if (vecPossibleDir.size() > 0) {
-
-            // take the direction that maximizes the euclidian distance
-            // between the ghost and pacman
-            dir maxDir = NONE;
-            int maxDist = -1;
-
-            // lambda function to compute the euclidian distance
-            auto euclidianDistance = [](int x1, int y1, int x2, int y2) {
-                return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
-            };
-
-            for (auto dir : vecPossibleDir) {
-
-                switch (dir) {
-                case LEFT:
-                    if (euclidianDistance(_xBoard - 1, _yBoard, xPac, yPac) >
-                        maxDist) {
-                        maxDist =
-                            euclidianDistance(_xBoard - 1, _yBoard, xPac, yPac);
-                        maxDir = LEFT;
-                    }
-                    break;
-                case RIGHT:
-                    if (euclidianDistance(_xBoard + 1, _yBoard, xPac, yPac) >
-                        maxDist) {
-                        maxDist =
-                            euclidianDistance(_xBoard + 1, _yBoard, xPac, yPac);
-                        maxDir = RIGHT;
-                    }
-                    break;
-                case UP:
-                    if (euclidianDistance(_xBoard, _yBoard - 1, xPac, yPac) >
-                        maxDist) {
-                        maxDist =
-                            euclidianDistance(_xBoard, _yBoard - 1, xPac, yPac);
-                        maxDir = UP;
-                    }
-                    break;
-                case DOWN:
-                    if (euclidianDistance(_xBoard, _yBoard + 1, xPac, yPac) >
-                        maxDist) {
-                        maxDist =
-                            euclidianDistance(_xBoard, _yBoard + 1, xPac, yPac);
-                        maxDir = DOWN;
-                    }
-                    break;
-                case NONE:
-                    break;
-                }
-            }
-
-            // take the direction that maximizes the euclidian distance
-            // between the ghost and pacman
-            _lastDir = maxDir;
-            updateCoord();
-        }
-        // if no direction is possible, take a random direction in possible
-        // direction
-        else {
-
-            std::vector<dir> vecPossibleDir2 =
-                findPossibleDir(vecBoard, _lastDir, NONE, _xBoard, _yBoard);
-
-            if (vecPossibleDir2.size() > 0) {
-
-                // take a random direction among the possible ones
-                _lastDir =
-                    vecPossibleDir2[std::uniform_int_distribution<size_t>(
-                        0, vecPossibleDir2.size() - 1)(_rng)];
-                updateCoord();
-            }
-        }
-
-    } else
+    else
         _lastDir = NONE;
 }
 
-void ghost::swapMode() {
+void ghost::swapMode(int level) {
 
     time_t modeTimer2 = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsedTime = modeTimer2 - modeTimer1;
@@ -1012,16 +935,53 @@ void ghost::swapMode() {
     if (_mode == ANY) {
         _mode = SCATTER;
         modeTimer1 = std::chrono::steady_clock::now();
+
     } else if (_mode == CHASE) {
+
         if (elapsedTime.count() >= CHASE_MODE) {
+            _lastDir = NONE;
             _mode = SCATTER;
             modeTimer1 = std::chrono::steady_clock::now();
         }
     } else if (_mode == SCATTER) {
-        if (elapsedTime.count() >= SCATTER_MODE) {
-            _scatterHouse = false;
-            _mode = CHASE;
-            modeTimer1 = std::chrono::steady_clock::now();
+
+        if (level == 1) {
+
+            if (_swapMode < 4 || _color == ORANGE) {
+
+                if (elapsedTime.count() >= SCATTER_MODE_1) {
+                    _lastDir = NONE;
+                    _scatterHouse = false;
+                    _mode = CHASE;
+                    _swapMode++;
+                    modeTimer1 = std::chrono::steady_clock::now();
+                }
+            }
+        } else if ((level >= 2 && level <= 4) || _color == ORANGE) {
+
+            if (_swapMode < 3) {
+
+                if ((_swapMode <= 1 && elapsedTime.count() >= SCATTER_MODE_1) ||
+                    (_swapMode == 2 && elapsedTime.count() >= SCATTER_MODE_2)) {
+                    _lastDir = NONE;
+                    _scatterHouse = false;
+                    _mode = CHASE;
+                    _swapMode++;
+                    modeTimer1 = std::chrono::steady_clock::now();
+                }
+            }
+        } else if (level > 4 || _color == ORANGE) {
+
+            if (_swapMode < 3) {
+
+                if (elapsedTime.count() >= SCATTER_MODE_2) {
+                    _lastDir = NONE;
+                    _scatterHouse = false;
+                    _mode = CHASE;
+                    _swapMode++;
+                    modeTimer1 = std::chrono::steady_clock::now();
+                }
+            }
         }
     }
 }

@@ -18,6 +18,7 @@ void pacman::init() {
     _ghostEaten = 0;
     _ghostEatenScore = 0;
     _fruitEaten = 0;
+    _dotCounterLevel = 0;
 }
 
 void pacman::reset() {
@@ -208,6 +209,7 @@ void pacman::updateSquare(
 
         _score = _score + vecBoard[_xBoard][_yBoard]->getScore();
         _dotCounter++;
+        _dotCounterLevel++;
         vecBoard[_xBoard][_yBoard]->setItem(_EMPTY);
         vecBoard[_xBoard][_yBoard]->setScore(0);
 
@@ -335,6 +337,8 @@ void pacman::setFruitEatenScore(short score) { _fruitEatenScore = score; }
 short pacman::getFruitEatenScore() { return _fruitEatenScore; }
 
 size_t pacman::getDotCounter() { return _dotCounter; }
+
+size_t pacman::getDotCounterLevel() { return _dotCounterLevel; }
 
 void pacman::resetDotCounter() {
     _dotCounter = 0;
