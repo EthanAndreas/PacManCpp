@@ -307,6 +307,7 @@ bool pacman::ghostCollision(std::vector<std::shared_ptr<ghost>> vecGhost) {
                 _ghostEatenScore++;
                 _score += (GHOST_SCORE * _ghostEatenScore);
                 _ghostEaten++;
+                _ghostEatenColor = Ghost->getGhost();
 
                 // all ghost eaten for each powerup
                 if (_ghostEaten == 16)
@@ -322,6 +323,8 @@ bool pacman::ghostCollision(std::vector<std::shared_ptr<ghost>> vecGhost) {
 
     return false;
 }
+
+color pacman::getGhostEatenColor() { return _ghostEatenColor; }
 
 size_t pacman::getGhostEatenScore() {
     if (_ghostEatenScore == 3)

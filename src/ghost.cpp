@@ -975,18 +975,8 @@ void ghost::updateDirRunAwayMode(
     std::vector<std::vector<std::shared_ptr<square>>> vecBoard) {
 
     // find all the possible directions with avoiding last direction
-    std::vector<dir> vecPossibleDir;
-    // avoid tp
-    if (_xBoard == 5 && _yBoard == 13)
-        vecPossibleDir =
-            findPossibleDir(vecBoard, _lastDir, LEFT, _xBoard, _yBoard);
-    // avoid tp
-    else if (_xBoard == 15 && _yBoard == 13)
-        vecPossibleDir =
-            findPossibleDir(vecBoard, _lastDir, RIGHT, _xBoard, _yBoard);
-    else
-        vecPossibleDir =
-            findPossibleDir(vecBoard, _lastDir, NONE, _xBoard, _yBoard);
+    std::vector<dir> vecPossibleDir =
+        findPossibleDir(vecBoard, _lastDir, NONE, _xBoard, _yBoard);
 
     if (vecPossibleDir.size() > 0) {
 

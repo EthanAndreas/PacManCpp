@@ -404,30 +404,24 @@ int draw(SDL_Surface **windowSurf, SDL_Surface **spriteBoard, int count,
                 if ((count / 4) % 2)
                     ghost_in2.x += 17;
             }
+
             // go back to house mode
             else if (Ghost->isReturnHouse() == true) {
 
                 // place the area to write the score
                 SDL_Rect pointArea = {0, 0, 34, 20};
-                size_t lastGhostScore = 0;
 
                 // new ghost is eaten
-                if (Pacman.getGhostEatenScore() != lastGhostScore) {
-                    // remove the previous score
-                    SDL_FillRect(*windowSurf, &pointArea,
-                                 SDL_MapRGB((*windowSurf)->format, 0, 0, 0));
+                pointArea.x =
+                    int(Ghost->getEatenPosition().first) + (GHOST_CENTER_X / 2);
+                pointArea.y = int(Ghost->getEatenPosition().second +
+                                  (GHOST_CENTER_Y / 2) + SCORE_HEADER);
 
-                    pointArea.x = int(Ghost->getEatenPosition().first) +
-                                  (GHOST_CENTER_X / 2);
-                    pointArea.y = int(Ghost->getEatenPosition().second +
-                                      (GHOST_CENTER_Y / 2) + SCORE_HEADER);
+                if (Pacman.getGhostEatenColor() == Ghost->getGhost())
 
                     SDL_BlitScaled(*spriteBoard,
                                    &scoreSprite[Pacman.getGhostEatenScore()],
                                    *windowSurf, &pointArea);
-
-                    lastGhostScore = Pacman.getGhostEatenScore();
-                }
 
                 switch (Ghost->getLastDir()) {
                 case RIGHT:
